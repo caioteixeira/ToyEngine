@@ -1,6 +1,8 @@
-#include "EnginePCH.h"
+#include "Game.h"
 
-Game::Game()
+Game::Game(): 
+	mRenderer(*this)
+	,mShouldQuit(false)
 {
 }
 
@@ -17,6 +19,11 @@ bool Game::Init()
 		return false;
 	}
 
+	if(!mRenderer.Init(1024, 768))
+	{
+		SDL_Log("Failed to initialized SDL.");
+	}
+
 	return true;
 }
 
@@ -26,4 +33,13 @@ void Game::RunLoop()
 	{
 		//TODO: Run systems
 	}
+}
+
+void Game::Quit()
+{
+}
+
+void Game::StartGame()
+{
+
 }

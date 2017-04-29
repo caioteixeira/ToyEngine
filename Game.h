@@ -1,4 +1,6 @@
 #pragma once
+#include "WindowsHeaders.h"
+#include "Renderer.h"
 
 class Game
 {
@@ -11,6 +13,8 @@ public:
 
 private:
 	void StartGame();
+
+	class Renderer mRenderer;
 
 	bool mShouldQuit;
 };
