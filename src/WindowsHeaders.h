@@ -11,7 +11,3 @@
 //SDL
 #define SDL_MAIN_HANDLED
 #include "SDL.h"
-
-//DX11
-#include "D3D11Types.h"
-#include "D3D11GraphicsDevice.h"

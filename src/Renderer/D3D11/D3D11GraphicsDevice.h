@@ -1,6 +1,6 @@
 #pragma once
 #include "D3D11Types.h"
-#include "WindowsHeaders.h"
+#include "../../WindowsHeaders.h"
 
 class D3D11GraphicsDevice
 {

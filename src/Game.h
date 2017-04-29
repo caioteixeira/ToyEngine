@@ -1,6 +1,6 @@
 #pragma once
 #include "WindowsHeaders.h"
-#include "Renderer.h"
+#include "Renderer/Renderer.h"
 
 class Game
 {

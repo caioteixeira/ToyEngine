@@ -16,39 +16,42 @@
     <Filter Include="Source Files\Renderer">
       <UniqueIdentifier>{512cedd7-f93f-43a8-b2e4-721509e9dd37}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Renderer\D3D11Renderer">
+    <Filter Include="Source Files\Renderer\D3D11">
       <UniqueIdentifier>{5cad7f88-96a6-454d-b958-f67eae789f4d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
+    <ClInclude Include="src\Renderer\D3D11\D3D11GraphicsDevice.h">
+      <Filter>Source Files\Renderer\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\D3D11\D3D11Types.h">
+      <Filter>Source Files\Renderer\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game.h">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cpp">
+    </ClInclude>
+    <ClInclude Include="src\WindowsHeaders.h">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer.cpp">
+    </ClInclude>
+    <ClInclude Include="src\Renderer\D3D11\D3D11Renderer.h">
+      <Filter>Source Files\Renderer\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\Renderer.h">
       <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="D3D11GraphicsDevice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D3D11GraphicsDevice.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D3D11Types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowsHeaders.h">
+    <ClCompile Include="src\Renderer\D3D11\D3D11GraphicsDevice.cpp">
+      <Filter>Source Files\Renderer\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\D3D11\D3D11Renderer.cpp">
+      <Filter>Source Files\Renderer\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
+    </ClCompile>
+    <ClCompile Include="src\Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
