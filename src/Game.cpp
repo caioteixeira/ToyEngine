@@ -6,7 +6,6 @@ Game::Game():
 {
 }
 
-
 Game::~Game()
 {
 }
@@ -24,6 +23,8 @@ bool Game::Init()
 		SDL_Log("Failed to initialized SDL.");
 	}
 
+	StartGame();
+
 	return true;
 }
 
@@ -37,13 +38,9 @@ void Game::RunLoop()
 	}
 }
 
-void Game::Quit()
-{
-}
-
 void Game::StartGame()
 {
-
+	//TODO: Level Loader
 }
 
 void Game::ProcessInput()

@@ -9,7 +9,6 @@ public:
 	~Game();
 	bool Init();
 	void RunLoop();
-	void Quit();
 
 private:
 	void StartGame();
