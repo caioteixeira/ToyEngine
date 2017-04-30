@@ -19,6 +19,9 @@
     <Filter Include="Source Files\Renderer\D3D11">
       <UniqueIdentifier>{5cad7f88-96a6-454d-b958-f67eae789f4d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Renderer\D3D12">
+      <UniqueIdentifier>{5bdac72a-f1a8-4d1c-bedc-44b5e5e52c8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Renderer\D3D11\D3D11GraphicsDevice.h">
@@ -39,6 +42,12 @@
     <ClInclude Include="src\Renderer\Renderer.h">
       <Filter>Source Files\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer\D3D12\D3D12Renderer.h">
+      <Filter>Source Files\Renderer\D3D12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Renderer\D3D11\D3D11GraphicsDevice.cpp">
@@ -53,5 +62,11 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\D3D12\D3D12Renderer.cpp">
+      <Filter>Source Files\Renderer\D3D12</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

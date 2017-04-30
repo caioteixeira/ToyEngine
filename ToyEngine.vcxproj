@@ -252,6 +252,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Math.h" />
+    <ClInclude Include="src\Renderer\D3D12\D3D12Renderer.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Renderer\D3D11\D3D11GraphicsDevice.h" />
     <ClInclude Include="src\Renderer\D3D11\D3D11Renderer.h" />
@@ -260,10 +262,14 @@
     <ClInclude Include="src\WindowsHeaders.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Renderer\D3D12\D3D12Renderer.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Renderer\D3D11\D3D11GraphicsDevice.cpp" />
     <ClCompile Include="src\Renderer\D3D11\D3D11Renderer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
