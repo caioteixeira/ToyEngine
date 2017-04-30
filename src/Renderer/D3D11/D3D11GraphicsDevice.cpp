@@ -236,3 +236,24 @@ void D3D11GraphicsDevice::SetRasterizerState(RasterizerStatePtr rasterizerState)
 {
 	mImmediateContext->RSSetState(rasterizerState.get());
 }
+
+void D3D11GraphicsDevice::ClearBackBuffer(const Vector3& color, float alpha) const
+{
+	ClearRenderTarget(mBackBufferRenderTarget, color, alpha);
+}
+
+void D3D11GraphicsDevice::ClearRenderTarget(RenderTargetPtr renderTarget, const Vector3& inColor, float alpha) const
+{
+	float color[4];
+	color[0] = inColor.x;
+	color[1] = inColor.y;
+	color[2] = inColor.z;
+	color[3] = alpha;
+
+	mImmediateContext->ClearRenderTargetView(renderTarget.get(), color);
+}
+
+void D3D11GraphicsDevice::Present() const
+{
+	mSwapChain->Present(0, 0);
+}

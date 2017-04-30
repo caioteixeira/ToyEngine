@@ -31,7 +31,9 @@ void Game::RunLoop()
 {
 	while(!mShouldQuit)
 	{
+		ProcessInput();
 		//TODO: Run systems
+		mRenderer.RenderFrame();
 	}
 }
 
@@ -42,4 +44,23 @@ void Game::Quit()
 void Game::StartGame()
 {
 
+}
+
+void Game::ProcessInput()
+{
+	//TODO: Move to an input manager
+	// Poll events from SDL
+	SDL_Event event;
+	while (SDL_PollEvent(&event))
+	{
+		switch (event.type)
+		{
+		case SDL_QUIT:
+			mShouldQuit = true;
+			break;
+		default:
+			// Ignore other events
+			break;
+		}
+	}
 }

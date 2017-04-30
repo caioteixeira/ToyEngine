@@ -1,3 +1,4 @@
+#ifdef DX11
 #include "D3D11Renderer.h"
 
 Renderer::Renderer(Game& game)
@@ -27,3 +28,21 @@ bool Renderer::Init(int width, int height)
 
 	return true;
 }
+
+void Renderer::RenderFrame()
+{
+	Clear();
+	//TODO: Draw
+	Present();
+}
+
+void Renderer::Clear()
+{
+	mGraphicsDevice->ClearBackBuffer(Vector3(0.0f, 0.0f, 0.0f), 1.0f);
+}
+
+void Renderer::Present()
+{
+	mGraphicsDevice->Present();
+}
+#endif

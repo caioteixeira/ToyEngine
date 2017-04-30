@@ -13,6 +13,7 @@ public:
 
 private:
 	void StartGame();
+	void ProcessInput();
 
 	class Renderer mRenderer;
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "D3D11Types.h"
 #include "../../WindowsHeaders.h"
+#include "../../Math.h"
 
 class D3D11GraphicsDevice
 {
@@ -24,7 +25,9 @@ public:
 	void SetRasterizerState(RasterizerStatePtr inRasterizerStatePtr) const;
 	void SetBlendState(BlendStatePtr inBlendState);
 
-
+	void ClearBackBuffer(const Vector3& inColor, float inAlpha) const;
+	void ClearRenderTarget(RenderTargetPtr inRenderTarget, const Vector3& inColor, float inAlpha) const;
+	void Present() const;
 private:
 	void CreateDevice();
 	HRESULT CreateSwapChain(UINT backBufferWidth, UINT backBufferHeight, HWND window);
