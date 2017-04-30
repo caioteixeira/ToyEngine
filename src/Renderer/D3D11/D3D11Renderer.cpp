@@ -38,7 +38,7 @@ void Renderer::RenderFrame()
 
 void Renderer::Clear()
 {
-	mGraphicsDevice->ClearBackBuffer(Vector3(0.0f, 0.0f, 0.0f), 1.0f);
+	mGraphicsDevice->ClearBackBuffer(Vector3::Zero, 1.0f);
 }
 
 void Renderer::Present()
