@@ -48,6 +48,9 @@
     <ClInclude Include="src\Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\RenderingSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Renderer\D3D11\D3D11GraphicsDevice.cpp">
@@ -65,8 +68,8 @@
     <ClCompile Include="src\Renderer\D3D12\D3D12Renderer.cpp">
       <Filter>Source Files\Renderer\D3D12</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
+    <ClCompile Include="src\RenderingSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

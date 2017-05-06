@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "entityx/entityx.h"
 
 Game::Game(): 
 	mRenderer(*this)
@@ -41,6 +42,12 @@ void Game::RunLoop()
 void Game::StartGame()
 {
 	//TODO: Level Loader
+	entityx::EntityX * world = new entityx::EntityX();
+
+	world->systems.add<RenderingSystem>();
+	world->systems.configure();
+	world->systems.update_all(1.0f);
+	world->systems.update_all(0.5f);
 }
 
 void Game::ProcessInput()

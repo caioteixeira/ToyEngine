@@ -1,6 +1,7 @@
 #pragma once
 #include "WindowsHeaders.h"
 #include "Renderer/Renderer.h"
+#include "RenderingSystem.h"
 
 class Game
 {
@@ -15,6 +16,7 @@ private:
 	void ProcessInput();
 
 	class Renderer mRenderer;
+	RenderingSystem mRenderSystem;
 
 	bool mShouldQuit;
 };
