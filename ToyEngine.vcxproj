@@ -136,7 +136,7 @@
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)\External\EntityX\lib;$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>entityx-d.lib;SDL2.lib;SDL2main.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;entityx-d.lib;SDL2.lib;SDL2main.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)\external\SDL\lib\x86\*.dll" "$(OutDir)" /i /s /y</Command>
@@ -155,7 +155,7 @@
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)\External\EntityX\lib;$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>entityx-d.lib;SDL2.lib;SDL2main.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;entityx-d.lib;SDL2.lib;SDL2main.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);D3D12.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)\external\SDL\lib\x86\*.dll" "$(OutDir)" /i /s /y</Command>
@@ -194,7 +194,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)\External\EntityX\lib;$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>entityx.lib;SDL2.lib;SDL2main.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;entityx.lib;SDL2.lib;SDL2main.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)\external\SDL\lib\x86\*.dll" "$(OutDir)" /i /s /y</Command>
@@ -217,7 +217,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)\External\EntityX\lib;$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>entityx.lib;SDL2.lib;SDL2main.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;entityx.lib;SDL2.lib;SDL2main.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);D3D12.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)\external\SDL\lib\x86\*.dll" "$(OutDir)" /i /s /y</Command>
@@ -252,6 +252,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Renderer\D3D12\D3D12Device.h" />
+    <ClInclude Include="src\Renderer\D3DCommon\D3DHelpers.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12Renderer.h" />
@@ -263,6 +265,7 @@
     <ClInclude Include="src\WindowsHeaders.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Renderer\D3D12\D3D12Device.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Renderer.cpp" />
     <ClCompile Include="src\Game.cpp" />

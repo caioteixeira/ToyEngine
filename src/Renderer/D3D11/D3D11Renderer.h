@@ -1,4 +1,5 @@
 #pragma once
+#ifdef DX11
 #include <memory>
 #include "../../WindowsHeaders.h"
 #include "D3D11Types.h"
@@ -22,4 +23,5 @@ private:
 	int mWidth = 0;
 	int mHeight = 0;
 };
+#endif
 

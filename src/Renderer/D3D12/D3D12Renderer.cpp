@@ -24,6 +24,24 @@ bool Renderer::Init(int width, int height)
 		return false;
 	}
 
+	mGraphicsDevice = std::make_unique<D3D12GraphicsDevice>(GetActiveWindow());
+
 	return true;
+}
+
+void Renderer::RenderFrame()
+{
+	//TODO: WIP Clear is clearing and swapping buffers
+	Clear();
+}
+
+void Renderer::Clear()
+{
+	mGraphicsDevice->ClearBackBuffer(Vector3::Zero, 1.0f);
+}
+
+void Renderer::Present()
+{
+
 }
 #endif

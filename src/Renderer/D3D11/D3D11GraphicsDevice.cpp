@@ -1,3 +1,4 @@
+#ifdef DX11
 #include "D3D11GraphicsDevice.h"
 
 void AutoReleaseD3D(ID3D11DeviceChild* inResource)
@@ -257,3 +258,5 @@ void D3D11GraphicsDevice::Present() const
 {
 	mSwapChain->Present(0, 0);
 }
+
+#endif

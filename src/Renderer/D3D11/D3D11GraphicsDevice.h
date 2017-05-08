@@ -1,4 +1,5 @@
 #pragma once
+#ifdef DX11
 #include "D3D11Types.h"
 #include "../../WindowsHeaders.h"
 #include "../../Math.h"
@@ -47,4 +48,4 @@ private:
 	UINT mWindowWidth;
 	UINT mWindowHeight;
 };
-
+#endif

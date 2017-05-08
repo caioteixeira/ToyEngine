@@ -51,6 +51,12 @@
     <ClInclude Include="src\RenderingSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer\D3D12\D3D12Device.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\D3DCommon\D3DHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Renderer\D3D11\D3D11GraphicsDevice.cpp">
@@ -69,6 +75,9 @@
       <Filter>Source Files\Renderer\D3D12</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderingSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\D3D12\D3D12Device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
