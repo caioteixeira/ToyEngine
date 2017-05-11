@@ -1,5 +1,8 @@
 #include "Game.h"
 #include "entityx/entityx.h"
+#include "Core/ECS/GameWorld.h"
+
+using namespace Engine;
 
 Game::Game(): 
 	mRenderer(*this)
@@ -42,12 +45,10 @@ void Game::RunLoop()
 void Game::StartGame()
 {
 	//TODO: Level Loader
-	entityx::EntityX * world = new entityx::EntityX();
+	ECS::GameWorld gameWorld;
 
-	world->systems.add<RenderingSystem>();
-	world->systems.configure();
-	world->systems.update_all(1.0f);
-	world->systems.update_all(0.5f);
+	gameWorld.Update(1.0f);
+	gameWorld.Update(0.5f);
 }
 
 void Game::ProcessInput()

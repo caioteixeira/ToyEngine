@@ -63,7 +63,7 @@
     <ClInclude Include="src\Core\Asset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\System.h">
+    <ClInclude Include="src\Core\ECS\GameWorld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -93,6 +93,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Asset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ECS\GameWorld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

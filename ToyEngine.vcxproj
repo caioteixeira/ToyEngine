@@ -258,7 +258,6 @@
   <ItemGroup>
     <ClInclude Include="src\Core\Asset.h" />
     <ClInclude Include="src\Core\AssetCache.h" />
-    <ClInclude Include="src\ECS\System.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12Device.h" />
     <ClInclude Include="src\Renderer\D3DCommon\D3DHelpers.h" />
     <ClInclude Include="src\RenderingSystem.h" />
@@ -270,6 +269,7 @@
     <ClInclude Include="src\Renderer\D3D11\D3D11Types.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\WindowsHeaders.h" />
+    <ClInclude Include="src\Core\ECS\GameWorld.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Asset.cpp" />
@@ -281,6 +281,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Renderer\D3D11\D3D11GraphicsDevice.cpp" />
     <ClCompile Include="src\Renderer\D3D11\D3D11Renderer.cpp" />
+    <ClCompile Include="src\Core\ECS\GameWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="External\DirectXTK12\DirectXTK_Desktop_2015_Win10.vcxproj">
