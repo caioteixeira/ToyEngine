@@ -1,15 +1,17 @@
 #pragma once
-#ifdef DX12
+#if DX12
 
+#include "../IRenderer.h"
 #include "../../WindowsHeaders.h"
 #include <memory>
 #include "D3D12Device.h"
 
-class Renderer
+class D3D12Renderer : IRenderer
 {
 public:
-	Renderer(class Game& game);
-	~Renderer();
+	D3D12Renderer(class Game& game);
+	D3D12Renderer();
+	~D3D12Renderer();
 	bool Init(int width, int height);
 	void RenderFrame();
 private:
@@ -18,7 +20,6 @@ private:
 
 	std::unique_ptr<class D3D12GraphicsDevice> mGraphicsDevice;
 	SDL_Window* mWindow;
-	class Game& mGame;
 	int mWidth = 0;
 	int mHeight = 0;
 };

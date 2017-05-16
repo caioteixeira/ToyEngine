@@ -63,13 +63,13 @@
     <ClInclude Include="src\Core\ECS\GameWorld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\D3D11\D3D11ResourcesManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Renderer\IRenderer.h">
       <Filter>Source Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\D3D11\D3D11ResourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -104,10 +104,10 @@
     <ClCompile Include="src\Core\ECS\GameWorld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\D3D11\D3D11ResourcesManager.cpp">
+    <ClCompile Include="src\Renderer\IRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\IRenderer.cpp">
+    <ClCompile Include="src\Renderer\D3D11\D3D11ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
