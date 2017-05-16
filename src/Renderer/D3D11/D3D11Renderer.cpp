@@ -1,18 +1,16 @@
 #ifdef DX11
 #include "D3D11Renderer.h"
 
-Renderer::Renderer(Game& game)
-	:mWindow(nullptr)
-	,mGame(game)
+D3D11Renderer::D3D11Renderer()
+	: mWindow(nullptr)
 {
 }
 
-
-Renderer::~Renderer()
+D3D11Renderer::~D3D11Renderer()
 {
 }
 
-bool Renderer::Init(int width, int height)
+bool D3D11Renderer::Init(int width, int height)
 {
 	mWindow = SDL_CreateWindow("Toy Engine", 100, 100, width, height, 0);
 	mWidth = width;
@@ -29,19 +27,19 @@ bool Renderer::Init(int width, int height)
 	return true;
 }
 
-void Renderer::RenderFrame()
+void D3D11Renderer::RenderFrame()
 {
 	Clear();
 	//TODO: Draw
 	Present();
 }
 
-void Renderer::Clear()
+void D3D11Renderer::Clear()
 {
 	mGraphicsDevice->ClearBackBuffer(Vector3::Zero, 1.0f);
 }
 
-void Renderer::Present()
+void D3D11Renderer::Present()
 {
 	mGraphicsDevice->Present();
 }

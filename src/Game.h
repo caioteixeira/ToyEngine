@@ -15,7 +15,7 @@ private:
 	void StartGame();
 	void ProcessInput();
 
-	class Renderer mRenderer;
+	Renderer mRenderer;
 	RenderingSystem mRenderSystem;
 
 	bool mShouldQuit;

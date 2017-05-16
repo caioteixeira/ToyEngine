@@ -5,7 +5,7 @@
 using namespace Engine;
 
 Game::Game(): 
-	mRenderer(*this)
+	mRenderer()
 	,mShouldQuit(false)
 {
 }

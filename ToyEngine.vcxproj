@@ -258,8 +258,10 @@
   <ItemGroup>
     <ClInclude Include="src\Core\Asset.h" />
     <ClInclude Include="src\Core\AssetCache.h" />
+    <ClInclude Include="src\Renderer\D3D11\D3D11ResourcesManager.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12Device.h" />
     <ClInclude Include="src\Renderer\D3DCommon\D3DHelpers.h" />
+    <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12Renderer.h" />
@@ -267,14 +269,16 @@
     <ClInclude Include="src\Renderer\D3D11\D3D11GraphicsDevice.h" />
     <ClInclude Include="src\Renderer\D3D11\D3D11Renderer.h" />
     <ClInclude Include="src\Renderer\D3D11\D3D11Types.h" />
-    <ClInclude Include="src\Renderer\Renderer.h" />
+    <ClInclude Include="src\Renderer\IRenderer.h" />
     <ClInclude Include="src\WindowsHeaders.h" />
     <ClInclude Include="src\Core\ECS\GameWorld.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Asset.cpp" />
     <ClCompile Include="src\Core\AssetCache.cpp" />
+    <ClCompile Include="src\Renderer\D3D11\D3D11ResourcesManager.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Device.cpp" />
+    <ClCompile Include="src\Renderer\IRenderer.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Renderer.cpp" />
     <ClCompile Include="src\Game.cpp" />
