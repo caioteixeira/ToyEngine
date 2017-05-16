@@ -17,9 +17,9 @@
 #include <unordered_map>
 #include <memory>
 #include <utility>
-#include "entityx/config.h"
-#include "entityx/3rdparty/simplesignal.h"
-#include "entityx/help/NonCopyable.h"
+#include "config.h"
+#include "3rdparty/simplesignal.h"
+#include "help/NonCopyable.h"
 
 
 namespace entityx {

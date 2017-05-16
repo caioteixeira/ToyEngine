@@ -29,10 +29,10 @@
 #include <type_traits>
  #include <functional>
 
-#include "entityx/help/Pool.h"
-#include "entityx/config.h"
-#include "entityx/Event.h"
-#include "entityx/help/NonCopyable.h"
+#include "help/Pool.h"
+#include "config.h"
+#include "Event.h"
+#include "help/NonCopyable.h"
 
 namespace entityx {
 

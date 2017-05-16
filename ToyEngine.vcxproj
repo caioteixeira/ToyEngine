@@ -128,16 +128,16 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\External\EntityX\Include;$(SolutionDir)\External\DirectXTK\Inc;External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\External\DirectXTK\Inc;External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>EnginePCH.h</PrecompiledHeaderFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>DX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)\External\EntityX\lib;$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>dxgi.lib;entityx-d.lib;SDL2.lib;SDL2main.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;SDL2.lib;SDL2main.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)\external\SDL\lib\x86\*.dll" "$(OutDir)" /i /s /y</Command>
@@ -148,16 +148,16 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\External\EntityX\Include;$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>EnginePCH.h</PrecompiledHeaderFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>DX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)\External\EntityX\lib;$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>dxgi.lib;entityx-d.lib;SDL2.lib;SDL2main.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);D3D12.lib</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;SDL2.lib;SDL2main.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);D3D12.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)\external\SDL\lib\x86\*.dll" "$(OutDir)" /i /s /y</Command>
@@ -186,7 +186,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\External\EntityX\Include;$(SolutionDir)\External\DirectXTK\Inc;External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\External\DirectXTK\Inc;External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>EnginePCH.h</PrecompiledHeaderFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>DX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -195,9 +195,9 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)\External\EntityX\lib;$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>dxgi.lib;entityx.lib;SDL2.lib;SDL2main.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;SDL2.lib;SDL2main.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)\external\SDL\lib\x86\*.dll" "$(OutDir)" /i /s /y</Command>
@@ -210,7 +210,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\External\EntityX\Include;$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>EnginePCH.h</PrecompiledHeaderFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>DX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -219,9 +219,9 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)\External\EntityX\lib;$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>dxgi.lib;entityx.lib;SDL2.lib;SDL2main.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);D3D12.lib</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;SDL2.lib;SDL2main.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);D3D12.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)\external\SDL\lib\x86\*.dll" "$(OutDir)" /i /s /y</Command>
@@ -258,6 +258,18 @@
   <ItemGroup>
     <ClInclude Include="src\Core\Asset.h" />
     <ClInclude Include="src\Core\AssetCache.h" />
+    <ClInclude Include="src\Core\ECS\3rdparty\simplesignal.h" />
+    <ClInclude Include="src\Core\ECS\config.h" />
+    <ClInclude Include="src\Core\ECS\deps\Dependencies.h" />
+    <ClInclude Include="src\Core\ECS\Entity.h" />
+    <ClInclude Include="src\Core\ECS\entityx.h" />
+    <ClInclude Include="src\Core\ECS\Event.h" />
+    <ClInclude Include="src\Core\ECS\help\NonCopyable.h" />
+    <ClInclude Include="src\Core\ECS\help\Pool.h" />
+    <ClInclude Include="src\Core\ECS\help\Timer.h" />
+    <ClInclude Include="src\Core\ECS\quick.h" />
+    <ClInclude Include="src\Core\ECS\System.h" />
+    <ClInclude Include="src\Core\ECS\tags\TagsComponent.h" />
     <ClInclude Include="src\Renderer\D3D11\D3D11ResourceManager.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12Device.h" />
     <ClInclude Include="src\Renderer\D3DCommon\D3DHelpers.h" />
@@ -276,6 +288,11 @@
   <ItemGroup>
     <ClCompile Include="src\Core\Asset.cpp" />
     <ClCompile Include="src\Core\AssetCache.cpp" />
+    <ClCompile Include="src\Core\ECS\Entity.cc" />
+    <ClCompile Include="src\Core\ECS\Event.cc" />
+    <ClCompile Include="src\Core\ECS\help\Pool.cc" />
+    <ClCompile Include="src\Core\ECS\help\Timer.cc" />
+    <ClCompile Include="src\Core\ECS\System.cc" />
     <ClCompile Include="src\Renderer\D3D11\D3D11ResourceManager.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Device.cpp" />
     <ClCompile Include="src\Renderer\IRenderer.cpp" />

@@ -1,5 +1,5 @@
 #pragma once
-#include <entityx/entityx.h>
+#include "quick.h"
 
 
 namespace Engine::ECS

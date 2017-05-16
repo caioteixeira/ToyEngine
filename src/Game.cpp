@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "entityx/entityx.h"
+#include "Core/ECS/quick.h"
 #include "Core/ECS/GameWorld.h"
 
 using namespace Engine;

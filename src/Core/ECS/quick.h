@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "entityx/Entity.h"
-#include "entityx/Event.h"
-#include "entityx/System.h"
-#include "entityx/config.h"
+#include "Event.h"
+#include "Entity.h"
+#include "System.h"
+#include "config.h"
 
 namespace entityx {
 
