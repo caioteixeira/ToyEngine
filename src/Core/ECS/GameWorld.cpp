@@ -5,8 +5,8 @@ using namespace Engine::ECS;
 
 GameWorld::GameWorld()
 {
-	systems.add<RenderingSystem>();
-	systems.configure();
+	systems.Add<RenderingSystem>();
+	systems.Configure();
 }
 
 

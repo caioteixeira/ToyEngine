@@ -17,16 +17,16 @@ BaseSystem::Family BaseSystem::family_counter_;
 BaseSystem::~BaseSystem() {
 }
 
-void SystemManager::update_all(TimeDelta dt) {
+void SystemManager::UpdateAll(TimeDelta dt) {
   assert(initialized_ && "SystemManager::configure() not called");
   for (auto &pair : systems_) {
-    pair.second->update(entity_manager_, event_manager_, dt);
+    pair.second->Update(entity_manager_, event_manager_, dt);
   }
 }
 
-void SystemManager::configure() {
+void SystemManager::Configure() {
   for (auto &pair : systems_) {
-    pair.second->configure(entity_manager_, event_manager_);
+    pair.second->Configure(entity_manager_, event_manager_);
   }
   initialized_ = true;
 }

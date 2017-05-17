@@ -8,7 +8,7 @@ public:
 	RenderingSystem();
 	~RenderingSystem();
 
-	void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt) override;
+	void Update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt) override;
 private:
 //	Renderer& mRenderer;
 };

@@ -41,21 +41,21 @@ class BaseSystem : entityx::help::NonCopyable {
    *
    * Typically used to set up event handlers.
    */
-  virtual void configure(EntityManager &entities, EventManager &events) {
-    configure(events);
+  virtual void Configure(EntityManager &entities, EventManager &events) {
+    Configure(events);
   }
 
   /**
    * Legacy configure(). Called by default implementation of configure(EntityManager&, EventManager&).
    */
-  virtual void configure(EventManager &events) {}
+  virtual void Configure(EventManager &events) {}
 
   /**
    * Apply System behavior.
    *
    * Called every game step.
    */
-  virtual void update(EntityManager &entities, EventManager &events, TimeDelta dt) = 0;
+  virtual void Update(EntityManager &entities, EventManager &events, TimeDelta dt) = 0;
 
   static Family family_counter_;
 
@@ -104,7 +104,7 @@ class SystemManager : entityx::help::NonCopyable {
    * system.add(movement);
    */
   template <typename S>
-  void add(std::shared_ptr<S> system) {
+  void Add(std::shared_ptr<S> system) {
     systems_.insert(std::make_pair(S::family(), system));
   }
 
@@ -117,9 +117,9 @@ class SystemManager : entityx::help::NonCopyable {
    * auto movement = system.add<MovementSystem>();
    */
   template <typename S, typename ... Args>
-  std::shared_ptr<S> add(Args && ... args) {
+  std::shared_ptr<S> Add(Args && ... args) {
     std::shared_ptr<S> s(new S(std::forward<Args>(args) ...));
-    add(s);
+    Add(s);
     return s;
   }
 
@@ -131,7 +131,7 @@ class SystemManager : entityx::help::NonCopyable {
    * @return System instance or empty shared_std::shared_ptr<S>.
    */
   template <typename S>
-  std::shared_ptr<S> system() {
+  std::shared_ptr<S> System() {
     auto it = systems_.find(S::family());
     assert(it != systems_.end());
     return it == systems_.end()
@@ -145,8 +145,8 @@ class SystemManager : entityx::help::NonCopyable {
   template <typename S>
   void update(TimeDelta dt) {
     assert(initialized_ && "SystemManager::configure() not called");
-    std::shared_ptr<S> s = system<S>();
-    s->update(entity_manager_, event_manager_, dt);
+    std::shared_ptr<S> s = System<S>();
+    s->Update(entity_manager_, event_manager_, dt);
   }
 
   /**
@@ -160,14 +160,14 @@ class SystemManager : entityx::help::NonCopyable {
    * to manually specify the update order. EntityX does not yet support a way of
    * specifying priority for update_all().
    */
-  void update_all(TimeDelta dt);
+  void UpdateAll(TimeDelta dt);
 
   /**
    * Configure the system. Call after adding all Systems.
    *
    * This is typically used to set up event handlers.
    */
-  void configure();
+  void Configure();
 
  private:
   bool initialized_ = false;
