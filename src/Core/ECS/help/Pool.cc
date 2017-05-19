@@ -10,12 +10,13 @@
 
 #include "../help/Pool.h"
 
-namespace entityx {
-
-BasePool::~BasePool() {
-  for (char *ptr : blocks_) {
-    delete[] ptr;
-  }
-}
-
-}  // namespace entityx
+namespace entityx
+{
+	BasePool::~BasePool()
+	{
+		for (char* ptr : blocks_)
+		{
+			delete[] ptr;
+		}
+	}
+} // namespace entityx

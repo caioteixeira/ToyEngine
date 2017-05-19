@@ -10,25 +10,29 @@
 
 #include "System.h"
 
-namespace entityx {
+namespace entityx
+{
+	BaseSystem::Family BaseSystem::family_counter_;
 
-BaseSystem::Family BaseSystem::family_counter_;
+	BaseSystem::~BaseSystem()
+	{
+	}
 
-BaseSystem::~BaseSystem() {
-}
+	void SystemManager::UpdateAll(TimeDelta dt)
+	{
+		assert(initialized_ && "SystemManager::configure() not called");
+		for (auto& pair : systems_)
+		{
+			pair.second->Update(entity_manager_, event_manager_, dt);
+		}
+	}
 
-void SystemManager::UpdateAll(TimeDelta dt) {
-  assert(initialized_ && "SystemManager::configure() not called");
-  for (auto &pair : systems_) {
-    pair.second->Update(entity_manager_, event_manager_, dt);
-  }
-}
-
-void SystemManager::Configure() {
-  for (auto &pair : systems_) {
-    pair.second->Configure(entity_manager_, event_manager_);
-  }
-  initialized_ = true;
-}
-
-}  // namespace entityx
+	void SystemManager::Configure()
+	{
+		for (auto& pair : systems_)
+		{
+			pair.second->Configure(entity_manager_, event_manager_);
+		}
+		initialized_ = true;
+	}
+} // namespace entityx

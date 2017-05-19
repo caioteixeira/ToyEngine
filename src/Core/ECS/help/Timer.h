@@ -11,19 +11,20 @@
 
 #include <chrono>
 
-namespace entityx {
-namespace help {
+namespace entityx
+{
+	namespace help
+	{
+		class Timer
+		{
+		public:
+			Timer();
+			~Timer();
 
-class Timer {
-public:
-  Timer();
-  ~Timer();
-
-  void restart();
-  double elapsed();
-private:
-  std::chrono::time_point<std::chrono::system_clock> _start;
-};
-
-}  // namespace help
-}  // namespace entityx
+			void restart();
+			double elapsed();
+		private:
+			std::chrono::time_point<std::chrono::system_clock> _start;
+		};
+	} // namespace help
+} // namespace entityx
