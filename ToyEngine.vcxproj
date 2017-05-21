@@ -273,6 +273,7 @@
     <ClInclude Include="src\Renderer\D3D11\D3D11ResourceManager.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12Device.h" />
     <ClInclude Include="src\Renderer\D3DCommon\D3DHelpers.h" />
+    <ClInclude Include="src\Renderer\MeshGeometry.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Math.h" />
@@ -296,6 +297,7 @@
     <ClCompile Include="src\Renderer\D3D11\D3D11ResourceManager.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Device.cpp" />
     <ClCompile Include="src\Renderer\IRenderer.cpp" />
+    <ClCompile Include="src\Renderer\MeshGeometry.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Renderer.cpp" />
     <ClCompile Include="src\Game.cpp" />

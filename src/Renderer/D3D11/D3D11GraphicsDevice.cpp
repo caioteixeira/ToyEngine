@@ -218,6 +218,39 @@ void D3D11GraphicsDevice::SetPrimitiveTopology(EPrimitiveTopology topology) cons
 	mImmediateContext->IASetPrimitiveTopology(static_cast<D3D11_PRIMITIVE_TOPOLOGY>(topology));
 }
 
+InputLayoutPtr D3D11GraphicsDevice::CreateInputLayout(const InputLayoutElement* elements, int numElements, const std::vector<char>& compiledVertexShader) const
+{
+	ID3D11InputLayout* toRet = nullptr;
+	HRESULT hr = mDevice->CreateInputLayout(
+		elements, numElements,
+		compiledVertexShader.data(), compiledVertexShader.size(),
+		&toRet);
+	ThrowIfFailed(hr, "Failure Creating Vertex Layout");
+
+	return InputLayoutPtr(toRet, AutoReleaseD3D);
+}
+
+GraphicsBufferPtr D3D11GraphicsDevice::CreateGraphicsBuffer(const void* rawData, int rawDataSize, EBindflags bindFlags, ECPUAccessFlags cpuAccessFlags, EGraphicsBufferUsage bufferUsage) const
+{
+	D3D11_BUFFER_DESC bd;
+	ZeroMemory(&bd, sizeof bd);
+
+	bd.Usage = static_cast<D3D11_USAGE>(bufferUsage);
+	bd.ByteWidth = rawDataSize;
+
+	bd.BindFlags = bindFlags;
+
+	bd.CPUAccessFlags = cpuAccessFlags;
+	D3D11_SUBRESOURCE_DATA initialData;
+	ZeroMemory(&initialData, sizeof initialData);
+
+	ID3D11Buffer* ret = nullptr;
+	HRESULT hr = mDevice->CreateBuffer(&bd, rawData ? &initialData : nullptr, &ret);
+	ThrowIfFailed(hr, "Problem Creating Vertex Buffer!");
+
+	return GraphicsBufferPtr(ret, AutoReleaseD3D);
+}
+
 RasterizerStatePtr D3D11GraphicsDevice::CreateRasterizerState(EFillMode fillMode) const
 {
 	D3D11_RASTERIZER_DESC desc;

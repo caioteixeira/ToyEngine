@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #ifdef DX11
 #include "D3D11Types.h"
 #include "../../WindowsHeaders.h"
@@ -14,6 +15,11 @@ public:
 	{
 		return mBackBufferRenderTarget;
 	}
+
+	VertexShaderPtr CreateVertexShader(const std::vector<char>& compiledShaderCode);
+	PixelShaderPtr CreatePixelShader(const std::vector<char>& compiledShaderCode);
+	InputLayoutPtr CreateInputLayout(const InputLayoutElement* elements, int numElements, const std::vector<char>& compiledVertexShader) const;
+	GraphicsBufferPtr CreateGraphicsBuffer(const void* rawData, int rawDataSize, EBindflags bindFlags, ECPUAccessFlags cpuAccessFlags, EGraphicsBufferUsage usage) const;
 
 	RasterizerStatePtr CreateRasterizerState(EFillMode inFillMode) const;
 
