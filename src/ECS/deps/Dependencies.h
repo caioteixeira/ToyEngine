@@ -47,7 +47,7 @@ namespace entityx
 			template <typename D>
 			void assign(Entity entity)
 			{
-				if (!entity.component<D>()) entity.assign<D>();
+				if (!entity.component<D>()) entity.Assign<D>();
 			}
 
 			template <typename D, typename D1, typename ... Ds>

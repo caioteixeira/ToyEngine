@@ -256,6 +256,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Core\Asset.h" />
     <ClInclude Include="src\Core\AssetCache.h" />
     <ClInclude Include="src\ECS\3rdparty\simplesignal.h" />
@@ -273,6 +274,7 @@
     <ClInclude Include="src\Renderer\D3D11\D3D11ResourceManager.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12Device.h" />
     <ClInclude Include="src\Renderer\D3DCommon\D3DHelpers.h" />
+    <ClInclude Include="src\Renderer\FramePacket.h" />
     <ClInclude Include="src\Renderer\MeshGeometry.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\Renderer\Utils.h" />
@@ -285,6 +287,7 @@
     <ClInclude Include="src\Renderer\D3D11\D3D11Renderer.h" />
     <ClInclude Include="src\Renderer\D3D11\D3D11Types.h" />
     <ClInclude Include="src\Renderer\IRenderer.h" />
+    <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\WindowsHeaders.h" />
     <ClInclude Include="src\GameWorld.h" />
   </ItemGroup>

@@ -146,7 +146,7 @@ namespace entityx
 		Id id() const { return id_; }
 
 		template <typename C, typename ... Args>
-		ComponentHandle<C> assign(Args&& ... args);
+		ComponentHandle<C> Assign(Args&& ... args);
 
 		template <typename C>
 		ComponentHandle<C> assign_from_copy(const C& component);
@@ -658,7 +658,7 @@ namespace entityx
 		 *
 		 * Emits EntityCreatedEvent.
 		 */
-		Entity create()
+		Entity Create()
 		{
 			uint32_t index, version;
 			if (free_list_.empty())
@@ -686,7 +686,7 @@ namespace entityx
 		Entity create_from_copy(Entity original)
 		{
 			assert(original.valid());
-			auto clone = create();
+			auto clone = Create();
 			auto mask = original.component_mask();
 			for (size_t i = 0; i < component_helpers_.size(); i++)
 			{
@@ -703,7 +703,7 @@ namespace entityx
 		 *
 		 * Emits EntityDestroyedEvent.
 		 */
-		void destroy(Entity::Id entity)
+		void Destroy(Entity::Id entity)
 		{
 			assert_valid(entity);
 			uint32_t index = entity.index();
@@ -745,7 +745,7 @@ namespace entityx
 		 * @returns Smart pointer to newly created component.
 		 */
 		template <typename C, typename ... Args>
-		ComponentHandle<C> assign(Entity::Id id, Args&& ... args)
+		ComponentHandle<C> Assign(Entity::Id id, Args&& ... args)
 		{
 			assert_valid(id);
 			const BaseComponent::Family family = component_family<C>();
@@ -1085,17 +1085,17 @@ namespace entityx
 
 
 	template <typename C, typename ... Args>
-	ComponentHandle<C> Entity::assign(Args&& ... args)
+	ComponentHandle<C> Entity::Assign(Args&& ... args)
 	{
 		assert(valid());
-		return manager_->assign<C>(id_, std::forward<Args>(args) ...);
+		return manager_->Assign<C>(id_, std::forward<Args>(args) ...);
 	}
 
 	template <typename C>
 	ComponentHandle<C> Entity::assign_from_copy(const C& component)
 	{
 		assert(valid());
-		return manager_->assign<C>(id_, std::forward<const C &>(component));
+		return manager_->Assign<C>(id_, std::forward<const C &>(component));
 	}
 
 	template <typename C, typename ... Args>
@@ -1109,7 +1109,7 @@ namespace entityx
 		}
 		else
 		{
-			handle = manager_->assign<C>(id_, std::forward<Args>(args) ...);
+			handle = manager_->Assign<C>(id_, std::forward<Args>(args) ...);
 		}
 		return handle;
 	}

@@ -25,7 +25,7 @@ namespace entityx
 	void Entity::destroy()
 	{
 		assert(valid());
-		manager_->destroy(id_);
+		manager_->Destroy(id_);
 		invalidate();
 	}
 
