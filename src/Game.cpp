@@ -1,6 +1,6 @@
 #include "Game.h"
-#include "Core/ECS/quick.h"
-#include "Core/ECS/GameWorld.h"
+#include "ECS/quick.h"
+#include "GameWorld.h"
 
 using namespace Engine;
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "Renderer/Renderer.h"
-#include "Core/ECS/System.h"
+#include "ECS/System.h"
 
 class RenderingSystem : public entityx::System<RenderingSystem>
 {

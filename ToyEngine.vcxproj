@@ -258,18 +258,18 @@
   <ItemGroup>
     <ClInclude Include="src\Core\Asset.h" />
     <ClInclude Include="src\Core\AssetCache.h" />
-    <ClInclude Include="src\Core\ECS\3rdparty\simplesignal.h" />
-    <ClInclude Include="src\Core\ECS\config.h" />
-    <ClInclude Include="src\Core\ECS\deps\Dependencies.h" />
-    <ClInclude Include="src\Core\ECS\Entity.h" />
-    <ClInclude Include="src\Core\ECS\entityx.h" />
-    <ClInclude Include="src\Core\ECS\Event.h" />
-    <ClInclude Include="src\Core\ECS\help\NonCopyable.h" />
-    <ClInclude Include="src\Core\ECS\help\Pool.h" />
-    <ClInclude Include="src\Core\ECS\help\Timer.h" />
-    <ClInclude Include="src\Core\ECS\quick.h" />
-    <ClInclude Include="src\Core\ECS\System.h" />
-    <ClInclude Include="src\Core\ECS\tags\TagsComponent.h" />
+    <ClInclude Include="src\ECS\3rdparty\simplesignal.h" />
+    <ClInclude Include="src\ECS\config.h" />
+    <ClInclude Include="src\ECS\deps\Dependencies.h" />
+    <ClInclude Include="src\ECS\Entity.h" />
+    <ClInclude Include="src\ECS\entityx.h" />
+    <ClInclude Include="src\ECS\Event.h" />
+    <ClInclude Include="src\ECS\help\NonCopyable.h" />
+    <ClInclude Include="src\ECS\help\Pool.h" />
+    <ClInclude Include="src\ECS\help\Timer.h" />
+    <ClInclude Include="src\ECS\quick.h" />
+    <ClInclude Include="src\ECS\System.h" />
+    <ClInclude Include="src\ECS\tags\TagsComponent.h" />
     <ClInclude Include="src\Renderer\D3D11\D3D11ResourceManager.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12Device.h" />
     <ClInclude Include="src\Renderer\D3DCommon\D3DHelpers.h" />
@@ -286,16 +286,16 @@
     <ClInclude Include="src\Renderer\D3D11\D3D11Types.h" />
     <ClInclude Include="src\Renderer\IRenderer.h" />
     <ClInclude Include="src\WindowsHeaders.h" />
-    <ClInclude Include="src\Core\ECS\GameWorld.h" />
+    <ClInclude Include="src\GameWorld.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Asset.cpp" />
     <ClCompile Include="src\Core\AssetCache.cpp" />
-    <ClCompile Include="src\Core\ECS\Entity.cc" />
-    <ClCompile Include="src\Core\ECS\Event.cc" />
-    <ClCompile Include="src\Core\ECS\help\Pool.cc" />
-    <ClCompile Include="src\Core\ECS\help\Timer.cc" />
-    <ClCompile Include="src\Core\ECS\System.cc" />
+    <ClCompile Include="src\ECS\Entity.cc" />
+    <ClCompile Include="src\ECS\Event.cc" />
+    <ClCompile Include="src\ECS\help\Pool.cc" />
+    <ClCompile Include="src\ECS\help\Timer.cc" />
+    <ClCompile Include="src\ECS\System.cc" />
     <ClCompile Include="src\Renderer\D3D11\D3D11ResourceManager.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Device.cpp" />
     <ClCompile Include="src\Renderer\IRenderer.cpp" />
@@ -307,7 +307,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Renderer\D3D11\D3D11GraphicsDevice.cpp" />
     <ClCompile Include="src\Renderer\D3D11\D3D11Renderer.cpp" />
-    <ClCompile Include="src\Core\ECS\GameWorld.cpp" />
+    <ClCompile Include="src\GameWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="External\DirectXTK12\DirectXTK_Desktop_2015_Win10.vcxproj">

@@ -1,5 +1,5 @@
 #include "GameWorld.h"
-#include "../../RenderingSystem.h"
+#include "RenderingSystem.h"
 
 using namespace Engine::ECS;
 
