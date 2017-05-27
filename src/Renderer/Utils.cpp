@@ -5,7 +5,7 @@
 
 #include <unordered_map>
 
-void Utils::LoadModel(std::string& path, std::vector<Vertex>& vertices, std::vector<int>& indices)
+void Utils::LoadModel(const std::string& path, std::vector<Vertex>& vertices, std::vector<int>& indices)
 {
 	//Init tinyobj loader
 	tinyobj::attrib_t attrib;
