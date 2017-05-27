@@ -128,7 +128,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\External\DirectXTK\Inc;External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\Projects\ToyEngine\External\TinyObjLoader;$(SolutionDir)\External\DirectXTK\Inc;External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>EnginePCH.h</PrecompiledHeaderFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>DX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -148,7 +148,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\Projects\ToyEngine\External\TinyObjLoader;$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>EnginePCH.h</PrecompiledHeaderFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>DX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -186,7 +186,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\External\DirectXTK\Inc;External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\Projects\ToyEngine\External\TinyObjLoader;$(SolutionDir)\External\DirectXTK\Inc;External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>EnginePCH.h</PrecompiledHeaderFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>DX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -210,7 +210,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>G:\Projects\ToyEngine\External\TinyObjLoader;$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>EnginePCH.h</PrecompiledHeaderFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>DX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -275,6 +275,8 @@
     <ClInclude Include="src\Renderer\D3DCommon\D3DHelpers.h" />
     <ClInclude Include="src\Renderer\MeshGeometry.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
+    <ClInclude Include="src\Renderer\Utils.h" />
+    <ClInclude Include="src\Renderer\Vertex.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12Renderer.h" />
@@ -298,6 +300,7 @@
     <ClCompile Include="src\Renderer\D3D12\D3D12Device.cpp" />
     <ClCompile Include="src\Renderer\IRenderer.cpp" />
     <ClCompile Include="src\Renderer\MeshGeometry.cpp" />
+    <ClCompile Include="src\Renderer\Utils.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Renderer.cpp" />
     <ClCompile Include="src\Game.cpp" />

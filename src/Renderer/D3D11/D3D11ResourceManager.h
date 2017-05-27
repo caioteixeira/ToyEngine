@@ -10,11 +10,14 @@ class D3D11ResourceManager
 public:
 	D3D11ResourceManager(D3D11GraphicsDevice& mDevice);
 	~D3D11ResourceManager();
+	MeshGeometryPtr GetMeshGeometry(std::string& path);
 
 private:
 	D3D11GraphicsDevice& mDevice;
 	InputLayoutPtr GetInputLayout(const std::string& layoutName);
 	void RegisterInputLayout(const std::string& layoutName, InputLayoutPtr layout);
+
+	MeshGeometryPtr LoadMeshGeometry(std::string& path);
 
 	std::unordered_map<std::string, MeshGeometryPtr> mGeometryCache;
 	std::unordered_map<std::string, InputLayoutPtr> mInputLayoutCache;
