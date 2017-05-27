@@ -12,7 +12,7 @@ public:
 	D3D11Renderer();
 	virtual ~D3D11Renderer();
 	bool Init(int width, int height);
-	void RenderFrame();
+	void RenderFrame(FramePacket& packet);
 
 private:
 	void Clear();

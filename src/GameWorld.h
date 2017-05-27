@@ -1,5 +1,6 @@
 #pragma once
 #include "ECS/entityx.h"
+#include "Renderer/Renderer.h"
 
 
 namespace Engine::ECS
@@ -9,7 +10,8 @@ namespace Engine::ECS
 	public:
 		GameWorld();
 		~GameWorld();
-		
+		void SetRenderer(std::shared_ptr<Renderer> renderer);
+
 		void Update(float deltaTime);
 	};
 }

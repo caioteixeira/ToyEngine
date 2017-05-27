@@ -1,5 +1,7 @@
 #pragma once
 
+struct FramePacket;
+
 class IRenderer
 {
 public:
@@ -7,6 +9,6 @@ public:
 	virtual ~IRenderer() = 0;
 
 	void Init(int width, int height);
-	void RenderFrame();
+	void RenderFrame(FramePacket & framePacket);
 };
 

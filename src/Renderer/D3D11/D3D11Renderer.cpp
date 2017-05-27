@@ -27,7 +27,7 @@ bool D3D11Renderer::Init(int width, int height)
 	return true;
 }
 
-void D3D11Renderer::RenderFrame()
+void D3D11Renderer::RenderFrame(FramePacket& packet)
 {
 	Clear();
 	//TODO: Draw
@@ -44,3 +44,4 @@ void D3D11Renderer::Present()
 	mGraphicsDevice->Present();
 }
 #endif
+

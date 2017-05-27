@@ -5,9 +5,10 @@
 using namespace Engine;
 
 Game::Game(): 
-	mRenderer()
+	mWorld()
 	,mShouldQuit(false)
 {
+	mRenderer = std::make_shared<Renderer>();
 }
 
 Game::~Game()
@@ -22,9 +23,9 @@ bool Game::Init()
 		return false;
 	}
 
-	if(!mRenderer.Init(1024, 768))
+	if(!mRenderer->Init(1024, 768))
 	{
-		SDL_Log("Failed to initialized SDL.");
+		SDL_Log("Failed to initialized Renderer.");
 	}
 
 	StartGame();
@@ -38,17 +39,13 @@ void Game::RunLoop()
 	{
 		ProcessInput();
 		//TODO: Run systems
-		mRenderer.RenderFrame();
+		mWorld.Update(0.1f);
 	}
 }
 
 void Game::StartGame()
 {
-	//TODO: Level Loader
-	ECS::GameWorld gameWorld;
-
-	gameWorld.Update(1.0f);
-	gameWorld.Update(0.5f);
+	mWorld.SetRenderer(mRenderer);
 }
 
 void Game::ProcessInput()

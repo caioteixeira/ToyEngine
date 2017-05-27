@@ -2,6 +2,7 @@
 #include "WindowsHeaders.h"
 #include "Renderer/Renderer.h"
 #include "RenderingSystem.h"
+#include "GameWorld.h"
 
 class Game
 {
@@ -15,8 +16,8 @@ private:
 	void StartGame();
 	void ProcessInput();
 
-	Renderer mRenderer;
-	RenderingSystem mRenderSystem;
+	Engine::ECS::GameWorld mWorld;
+	std::shared_ptr<Renderer> mRenderer;
 
 	bool mShouldQuit;
 };

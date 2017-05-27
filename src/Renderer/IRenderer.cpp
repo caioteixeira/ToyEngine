@@ -7,6 +7,6 @@ IRenderer::~IRenderer()
 void IRenderer::Init(int width, int height)
 {
 }
-void IRenderer::RenderFrame()
+void IRenderer::RenderFrame(FramePacket& packet)
 {
 }
