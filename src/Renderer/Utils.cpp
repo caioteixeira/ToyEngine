@@ -27,7 +27,7 @@ void LoadSubMesh(std::vector<Vertex>& vertices, std::vector<int>& indices, tinyo
 	}
 }
 
-void Utils::LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::vector<SubmeshData>& outSubmeshes, std::unordered_map<std::string, MaterialData> outMaterials)
+void Utils::LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::vector<SubmeshDesc>& outSubmeshes, std::unordered_map<std::string, MaterialDesc> outMaterials)
 {
 	//Init tinyobj loader
 	tinyobj::attrib_t attrib;
@@ -41,7 +41,7 @@ void Utils::LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::ve
 
 	for (const auto& shape : shapes)
 	{
-		SubmeshData data;
+		SubmeshDesc data;
 		LoadSubMesh(vertices, data.indices, attrib, shape);
 		data.materialName = materials[shape.mesh.material_ids[0]].name;
 		outSubmeshes.push_back(data);
@@ -49,7 +49,7 @@ void Utils::LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::ve
 
 	for( const auto& material : materials)
 	{
-		MaterialData data;
+		MaterialDesc data;
 		data.name = material.name;
 
 		data.properties = material.illum == 1 ?  Diffuse : None;

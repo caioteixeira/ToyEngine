@@ -45,7 +45,7 @@ void Game::RunLoop()
 
 void Game::StartGame()
 {
-	mWorld.SetRenderer(mRenderer);
+	mWorld.Init(mRenderer);
 }
 
 void Game::ProcessInput()

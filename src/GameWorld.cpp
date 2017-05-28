@@ -7,26 +7,39 @@ using namespace Engine::ECS;
 
 GameWorld::GameWorld()
 {
-	entityx::Entity cameraEntity = entities.Create();
-
-	Vector3 cameraPos(0, -10, 0);
-	cameraEntity.Assign<Transform>(cameraPos);
-	cameraEntity.Assign<Camera>();
-
-	systems.Add<RenderingSystem>();
-	systems.Configure();
-
-	systems.System<RenderingSystem>();
 }
 
 GameWorld::~GameWorld()
 {
 }
 
-void GameWorld::SetRenderer(std::shared_ptr<Renderer> renderer)
+void GameWorld::Init(std::shared_ptr<Renderer> renderer)
 {
-	auto renderingSystem = systems.System<RenderingSystem>();
+	entityx::Entity cameraEntity = entities.Create();
+
+	Vector3 cameraPos(0, -10, 0);
+	cameraEntity.Assign<Transform>(cameraPos);
+	cameraEntity.Assign<Camera>();
+
+	auto renderingSystem = systems.Add<RenderingSystem>();
+	systems.Configure();
 	renderingSystem->SetRenderer(renderer);
+	mRenderer = renderer;
+}
+
+void GameWorld::LoadObjLevel(const std::string& path)
+{
+	auto resourceManager = mRenderer->GetResourceManager();
+
+	std::vector<Mesh> meshes;
+	resourceManager->LoadObjFile(path, meshes);
+
+	for (Mesh mesh : meshes)
+	{
+		entityx::Entity meshEntity = entities.Create();
+		meshEntity.Assign<Mesh>(mesh);
+		meshEntity.Assign<Transform>(Vector3::Zero);
+	}
 }
 
 void GameWorld::Update(float deltaTime)

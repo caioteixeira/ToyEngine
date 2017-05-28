@@ -60,11 +60,32 @@ TexturePtr D3D11ResourceManager::LoadTexture(const std::string& path) const
 	return std::make_shared<Texture>(graphicsTexture, width, height);
 }
 
+MaterialPtr D3D11ResourceManager::CreateMaterial(Utils::MaterialDesc desc)
+{
+	auto material = std::make_shared<Material>();
+	material->ambientColor = desc.ambient;
+	material->diffuseColor = desc.diffuse;
+	material->specularColor = desc.specular;
+	material->shininess = desc.shininess;
+
+	//TODO: Properly set illumination properties
+	material->SetProperty(Diffuse);
+
+	//TODO: Load textures
+	if(!desc.diffuseTexName.empty())
+	{
+		material->diffuseTexture = GetTexture(desc.diffuseTexName);
+		material->SetProperty(DiffuseTexture);
+	}
+
+	return material;
+}
+
 void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh>& outMeshes)
 {
 	std::vector<Vertex> vertices = {};
-	std::vector<Utils::SubmeshData> meshes = {};
-	std::unordered_map<std::string, Utils::MaterialData> materialMap = {};
+	std::vector<Utils::SubmeshDesc> meshes = {};
+	std::unordered_map<std::string, Utils::MaterialDesc> materialMap = {};
 
 	Utils::LoadObjFile(path, vertices, meshes, materialMap);
 
@@ -72,17 +93,10 @@ void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 		EBF_VertexBuffer, ECPUAF_Neither, EGBU_Immutable);
 
 	std::unordered_map<std::string, MaterialPtr> materials = {};
-	for(auto materialData : materialMap)
+	for(auto desc : materialMap)
 	{
-		auto material = std::make_shared<Material>();
-		material->ambientColor = materialData.second.ambient;
-		material->diffuseColor = materialData.second.diffuse;
-		material->specularColor = materialData.second.specular;
-		material->shininess = materialData.second.shininess;
-
-		//TODO: Load textures
-		material->diffuseTexture = GetTexture(materialData.second.diffuseTexName);
-		materials[materialData.first] = material;
+		auto material = CreateMaterial(desc.second);
+		materials[desc.first] = material;
 	}
 
 	for(auto meshData : meshes)

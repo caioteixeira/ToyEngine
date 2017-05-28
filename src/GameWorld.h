@@ -10,8 +10,11 @@ namespace Engine::ECS
 	public:
 		GameWorld();
 		~GameWorld();
-		void SetRenderer(std::shared_ptr<Renderer> renderer);
 
+		void Init(std::shared_ptr<Renderer> renderer);
+		void LoadObjLevel(const std::string& path);
 		void Update(float deltaTime);
+	private:
+		std::shared_ptr<Renderer> mRenderer;
 	};
 }

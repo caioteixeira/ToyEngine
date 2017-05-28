@@ -25,6 +25,8 @@ struct Material
 
 	TexturePtr diffuseTexture;
 	TexturePtr specularTexture;
+
+	void SetProperty(MaterialProperties property);
 };
 
 typedef std::shared_ptr<Material> MaterialPtr;

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "../Utils.h"
 
 #if DX11
 #include "../IResourceManager.h"
@@ -21,6 +22,7 @@ private:
 	void RegisterInputLayout(const std::string& layoutName, InputLayoutPtr layout);
 
 	TexturePtr LoadTexture(const std::string& path) const;
+	MaterialPtr CreateMaterial(Utils::MaterialDesc desc);
 	MeshGeometryPtr LoadMeshGeometry(const std::string& path, const std::string& inputLayoutName);
 
 	std::unordered_map<std::string, MeshGeometryPtr> mGeometryCache;
