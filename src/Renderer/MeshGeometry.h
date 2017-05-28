@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Renderer.h"
+#include "Types.h"
 
 //TODO: Implement support to submeshes
 struct MeshGeometry

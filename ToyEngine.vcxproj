@@ -274,9 +274,14 @@
     <ClInclude Include="src\Renderer\D3D11\D3D11ResourceManager.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12Device.h" />
     <ClInclude Include="src\Renderer\D3DCommon\D3DHelpers.h" />
+    <ClInclude Include="src\Renderer\Material.h" />
     <ClInclude Include="src\Renderer\FramePacket.h" />
+    <ClInclude Include="src\Renderer\Mesh.h" />
     <ClInclude Include="src\Renderer\MeshGeometry.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
+    <ClInclude Include="src\Renderer\IResourceManager.h" />
+    <ClInclude Include="src\Renderer\Texture.h" />
+    <ClInclude Include="src\Renderer\Types.h" />
     <ClInclude Include="src\Renderer\Utils.h" />
     <ClInclude Include="src\Renderer\Vertex.h" />
     <ClInclude Include="src\RenderingSystem.h" />
@@ -302,7 +307,11 @@
     <ClCompile Include="src\Renderer\D3D11\D3D11ResourceManager.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Device.cpp" />
     <ClCompile Include="src\Renderer\IRenderer.cpp" />
+    <ClCompile Include="src\Renderer\Material.cpp" />
+    <ClCompile Include="src\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Renderer\MeshGeometry.cpp" />
+    <ClCompile Include="src\Renderer\IResourceManager.cpp" />
+    <ClCompile Include="src\Renderer\Texture.cpp" />
     <ClCompile Include="src\Renderer\Utils.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Renderer.cpp" />

@@ -1,5 +1,7 @@
-﻿#if DX11
+﻿#include "../Mesh.h"
+#if DX11
 #include "D3D11ResourceManager.h"
+#include "D3D11GraphicsDevice.h"
 #include "../Utils.h"
 
 D3D11ResourceManager::D3D11ResourceManager(D3D11GraphicsDevice& device)
@@ -25,6 +27,19 @@ MeshGeometryPtr D3D11ResourceManager::GetMeshGeometry(const std::string& path, c
 	return geo;
 }
 
+TexturePtr D3D11ResourceManager::GetTexture(const std::string& path)
+{
+	auto it = mTextureCache.find(path);
+	if (it != mTextureCache.end())
+	{
+		return it->second;
+	}
+
+	auto texture = LoadTexture(path);
+	mTextureCache.emplace(path, texture);
+	return texture;
+}
+
 InputLayoutPtr D3D11ResourceManager::GetInputLayout(const std::string& layoutName)
 {
 	auto ret = mInputLayoutCache.find(layoutName);
@@ -34,6 +49,53 @@ InputLayoutPtr D3D11ResourceManager::GetInputLayout(const std::string& layoutNam
 void D3D11ResourceManager::RegisterInputLayout(const std::string& layoutName, InputLayoutPtr layout)
 {
 	mInputLayoutCache[layoutName] = layout;
+}
+
+TexturePtr D3D11ResourceManager::LoadTexture(const std::string& path) const
+{
+	int width;
+	int height;
+	auto graphicsTexture = mDevice.CreateTextureFromFile(path.c_str(), width, height);
+
+	return std::make_shared<Texture>(graphicsTexture, width, height);
+}
+
+void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh>& outMeshes)
+{
+	std::vector<Vertex> vertices = {};
+	std::vector<Utils::SubmeshData> meshes = {};
+	std::unordered_map<std::string, Utils::MaterialData> materialMap = {};
+
+	Utils::LoadObjFile(path, vertices, meshes, materialMap);
+
+	auto vertexBuffer = mDevice.CreateGraphicsBuffer(vertices.data(), vertices.size() * sizeof(Vertex),
+		EBF_VertexBuffer, ECPUAF_Neither, EGBU_Immutable);
+
+	std::unordered_map<std::string, MaterialPtr> materials = {};
+	for(auto materialData : materialMap)
+	{
+		auto material = std::make_shared<Material>();
+		material->ambientColor = materialData.second.ambient;
+		material->diffuseColor = materialData.second.diffuse;
+		material->specularColor = materialData.second.specular;
+		material->shininess = materialData.second.shininess;
+
+		//TODO: Load textures
+		material->diffuseTexture = GetTexture(materialData.second.diffuseTexName);
+		materials[materialData.first] = material;
+	}
+
+	for(auto meshData : meshes)
+	{
+		auto indexBuffer = mDevice.CreateGraphicsBuffer(meshData.indices.data(), meshData.indices.size() * sizeof(size_t),
+			EBF_IndexBuffer, ECPUAF_Neither, EGBU_Immutable);
+		auto inputLayout = GetInputLayout("PositionNormalTexture");
+		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, inputLayout);
+		auto material = materials[meshData.materialName];
+
+		Mesh mesh(geo, material);
+		outMeshes.push_back(mesh);
+	}
 }
 
 MeshGeometryPtr D3D11ResourceManager::LoadMeshGeometry(const std::string& path, const std::string& inputLayoutName)
@@ -50,7 +112,7 @@ MeshGeometryPtr D3D11ResourceManager::LoadMeshGeometry(const std::string& path, 
 	
 	MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, inputLayout);
 
-	return nullptr;
+	return geo;
 }
 #endif
 

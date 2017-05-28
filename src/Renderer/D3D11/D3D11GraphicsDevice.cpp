@@ -1,5 +1,7 @@
+#include <iostream>
 #ifdef DX11
 #include "D3D11GraphicsDevice.h"
+#include <WICTextureLoader.h>
 
 void AutoReleaseD3D(ID3D11DeviceChild* inResource)
 {
@@ -249,6 +251,39 @@ GraphicsBufferPtr D3D11GraphicsDevice::CreateGraphicsBuffer(const void* rawData,
 	ThrowIfFailed(hr, "Problem Creating Vertex Buffer!");
 
 	return GraphicsBufferPtr(ret, AutoReleaseD3D);
+}
+
+GraphicsTexturePtr D3D11GraphicsDevice::CreateTextureFromFile(const char* path, int& outWidth, int& outHeight)
+{
+	std::string fileStr(path);
+	std::string extension = fileStr.substr(fileStr.find_last_of('.'));
+	const size_t cSize = strlen(path) + 1;
+
+	size_t retCount;
+	std::wstring wc(cSize, L'#');
+	mbstowcs_s(&retCount, &wc[0], cSize, path, _TRUNCATE);
+	ID3D11ShaderResourceView* toRet = nullptr;
+	ID3D11Resource* texture = nullptr;
+	HRESULT hr = -1;
+	
+	if (extension == ".png" || extension == ".bmp" || extension == ".PNG" || extension == ".BMP")
+	{
+		hr = DirectX::CreateWICTextureFromFile(mDevice, wc.c_str(), &texture, &toRet);
+	}
+	else
+	{
+		//TODO: Use logger class
+		std::cerr << "GraphicsDriver can only load images of type DDS, PNG, or BMP." << std::endl;
+	}
+	ThrowIfFailed(hr == S_OK, "Problem Creating Texture From File");
+
+
+	CD3D11_TEXTURE2D_DESC textureDesc;
+	((ID3D11Texture2D*)texture)->GetDesc(&textureDesc);
+	outWidth = textureDesc.Width;
+	outHeight = textureDesc.Height;
+
+	return GraphicsTexturePtr(toRet, AutoReleaseD3D);
 }
 
 RasterizerStatePtr D3D11GraphicsDevice::CreateRasterizerState(EFillMode fillMode) const
