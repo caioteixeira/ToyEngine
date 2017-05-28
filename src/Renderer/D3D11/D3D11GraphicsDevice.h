@@ -16,22 +16,28 @@ public:
 		return mBackBufferRenderTarget;
 	}
 
-	VertexShaderPtr CreateVertexShader(const std::vector<char>& compiledShaderCode);
-	PixelShaderPtr CreatePixelShader(const std::vector<char>& compiledShaderCode);
+	bool CompileShaderFromFile(const char* inFileName, const char* szEntryPoint, const char* szShaderModel, std::vector<char>& outCompiledShaderCode) const;
+	VertexShaderPtr CreateVertexShader(const std::vector<char>& compiledShaderCode) const;
+	PixelShaderPtr CreatePixelShader(const std::vector<char>& compiledShaderCode) const;
 	InputLayoutPtr CreateInputLayout(const InputLayoutElement* elements, int numElements, const std::vector<char>& compiledVertexShader) const;
 	GraphicsBufferPtr CreateGraphicsBuffer(const void* rawData, int rawDataSize, EBindflags bindFlags, ECPUAccessFlags cpuAccessFlags, EGraphicsBufferUsage usage) const;
 	GraphicsTexturePtr CreateTextureFromFile(const char* inFileName, int& outWidth, int& outHeight);
+	DepthStencilPtr CreateDepthStencil(int inWidth, int inHeight) const;
 
 	RasterizerStatePtr CreateRasterizerState(EFillMode inFillMode) const;
+	DepthStencilStatePtr CreateDepthStencilState(bool inDepthTestEnable, EComparisonFunc inDepthComparisonFunction) const;
+	BlendStatePtr CreateBlendState(bool inEnableBlend) const;
+	SamplerStatePtr CreateSamplerState() const;
 
 	void SetRenderTarget(RenderTargetPtr renderTarget);
 	void SetDepthStencil(DepthStencilPtr depthStencil);
 	void SetViewPort(float x, float y, float width, float height) const;
 	void SetPrimitiveTopology(EPrimitiveTopology topology) const;
 
-	void SetDepthStencilState(DepthStencilStatePtr inDepthStencilState);
+	void SetDepthStencilState(DepthStencilStatePtr inDepthStencilState) const;
 	void SetRasterizerState(RasterizerStatePtr inRasterizerStatePtr) const;
-	void SetBlendState(BlendStatePtr inBlendState);
+	void SetBlendState(BlendStatePtr inBlendState) const;
+	void SetPSSamplerState(SamplerStatePtr inSamplerState, int inStartSlot) const;
 
 	void ClearBackBuffer(const Vector3& inColor, float inAlpha) const;
 	void ClearRenderTarget(RenderTargetPtr inRenderTarget, const Vector3& inColor, float inAlpha) const;

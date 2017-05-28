@@ -46,6 +46,7 @@ void Game::RunLoop()
 void Game::StartGame()
 {
 	mWorld.Init(mRenderer);
+	mWorld.LoadObjLevel("capsule.obj");
 }
 
 void Game::ProcessInput()

@@ -5,7 +5,7 @@
 
 #include <unordered_map>
 
-void LoadSubMesh(std::vector<Vertex>& vertices, std::vector<int>& indices, tinyobj::attrib_t attrib, const std::vector<tinyobj::shape_t>::value_type& shape)
+void LoadSubMesh(std::vector<Vertex>& vertices, std::vector<int>& indices, tinyobj::attrib_t & attrib, const tinyobj::shape_t& shape)
 {
 	for(const auto& index: shape.mesh.indices)
 	{

@@ -16,10 +16,10 @@ public:
 	void LoadObjFile(const std::string& path, std::vector<Mesh>& outMeshes);
 	MeshGeometryPtr GetMeshGeometry(const std::string& path, const std::string& inputLayoutName);
 	TexturePtr GetTexture(const std::string & path);
-private:
-	D3D11GraphicsDevice& mDevice;
 	InputLayoutPtr GetInputLayout(const std::string& layoutName);
 	void RegisterInputLayout(const std::string& layoutName, InputLayoutPtr layout);
+private:
+	D3D11GraphicsDevice& mDevice;
 
 	TexturePtr LoadTexture(const std::string& path) const;
 	MaterialPtr CreateMaterial(Utils::MaterialDesc desc);

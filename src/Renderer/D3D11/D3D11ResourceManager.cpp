@@ -7,6 +7,7 @@
 D3D11ResourceManager::D3D11ResourceManager(D3D11GraphicsDevice& device)
 	: mDevice(device)
 {
+	
 }
 
 D3D11ResourceManager::~D3D11ResourceManager()
