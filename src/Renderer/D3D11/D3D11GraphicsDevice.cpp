@@ -523,10 +523,70 @@ void D3D11GraphicsDevice::ClearRenderTarget(RenderTargetPtr renderTarget, const 
 	mImmediateContext->ClearRenderTargetView(renderTarget.get(), color);
 }
 
+void D3D11GraphicsDevice::ClearDepthStencil(DepthStencilPtr inDepthStencil, float inDepth) const
+{
+	mImmediateContext->ClearDepthStencilView(inDepthStencil.get(), D3D11_CLEAR_DEPTH, inDepth, 0);
+}
+
 void D3D11GraphicsDevice::SetPSSamplerState(SamplerStatePtr inSamplerState, int inStartSlot) const
 {
 	auto sampler = inSamplerState.get();
 	mImmediateContext->PSSetSamplers(inStartSlot, 1, &sampler);
+}
+
+void D3D11GraphicsDevice::SetInputLayout(InputLayoutPtr inLayout) const
+{
+	mImmediateContext->IASetInputLayout(inLayout.get());
+}
+
+void D3D11GraphicsDevice::SetVertexBuffer(GraphicsBufferPtr inBuffer, uint32_t inVertexSize) const
+{
+	auto buffer = inBuffer.get();
+	uint32_t offset = 0;
+	mImmediateContext->IASetVertexBuffers(0, 1, &buffer, &inVertexSize, &offset);
+}
+
+void D3D11GraphicsDevice::SetIndexBuffer(GraphicsBufferPtr inBuffer) const
+{
+	mImmediateContext->IASetIndexBuffer(inBuffer.get(), DXGI_FORMAT_R32_UINT, 0);
+}
+
+void D3D11GraphicsDevice::SetVertexShader(VertexShaderPtr inVertexShader) const
+{
+	mImmediateContext->VSSetShader(inVertexShader.get(), nullptr, 0);
+}
+
+void D3D11GraphicsDevice::SetVSConstantBuffer(GraphicsBufferPtr inBuffer, int inStartSlot) const
+{
+	auto buffer = inBuffer.get();
+	mImmediateContext->VSSetConstantBuffers(inStartSlot, 1, &buffer);
+}
+
+void D3D11GraphicsDevice::SetPixelShader(PixelShaderPtr pixelShader) const
+{
+	mImmediateContext->PSSetShader(pixelShader.get(), nullptr, 0);
+}
+
+void D3D11GraphicsDevice::SetPSTexture(GraphicsTexturePtr inTexture, int inStartSlot) const
+{
+	auto texture = inTexture.get();
+	mImmediateContext->PSSetShaderResources(inStartSlot, 1, &texture);
+}
+
+void D3D11GraphicsDevice::SetPSConstantBuffer(GraphicsBufferPtr inBuffer, int inStartSlot) const
+{
+	auto buffer = inBuffer.get();
+	mImmediateContext->PSSetConstantBuffers(inStartSlot, 1, &buffer);
+}
+
+void D3D11GraphicsDevice::Draw(int vertexCount, int startVertexIndex) const
+{
+	mImmediateContext->Draw(vertexCount, startVertexIndex);
+}
+
+void D3D11GraphicsDevice::DrawIndexed(int indexCount, int startIndexLocation, int baseLocation) const
+{
+	mImmediateContext->DrawIndexed(indexCount, startIndexLocation, baseLocation);
 }
 
 void D3D11GraphicsDevice::Present() const

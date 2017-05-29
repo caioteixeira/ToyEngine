@@ -33,6 +33,7 @@ private:
 	PixelShaderPtr mPixelShader;
 	VertexShaderPtr mVertexShader;
 	SamplerStatePtr mDefaultSampler;
+	GraphicsBufferPtr mConstantBuffer;
 
 	SDL_Window* mWindow;
 	int mWidth = 0;

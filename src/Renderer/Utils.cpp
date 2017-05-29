@@ -27,7 +27,7 @@ void LoadSubMesh(std::vector<Vertex>& vertices, std::vector<int>& indices, tinyo
 	}
 }
 
-void Utils::LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::vector<SubmeshDesc>& outSubmeshes, std::unordered_map<std::string, MaterialDesc> outMaterials)
+void Utils::LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::vector<SubmeshDesc>& outSubmeshes, std::unordered_map<std::string, MaterialDesc>& outMaterials)
 {
 	//Init tinyobj loader
 	tinyobj::attrib_t attrib;

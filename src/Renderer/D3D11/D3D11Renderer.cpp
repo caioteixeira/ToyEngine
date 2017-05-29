@@ -1,6 +1,8 @@
+#include "../FramePacket.h"
 #ifdef DX11
 #include "D3D11Renderer.h"
 #include "D3D11ResourceManager.h"
+#include "../ConstantBufferStructs.h"
 
 D3D11Renderer::D3D11Renderer()
 	: mWindow(nullptr)
@@ -30,6 +32,11 @@ bool D3D11Renderer::Init(int width, int height)
 	InitFrameBuffer();
 
 	InitShaders();
+	
+	GlobalConstants initial;
+	initial.projMatrix = Matrix::CreatePerspectiveFieldOfView(DirectX::XM_PI / 4.f,
+		float(mWidth) / float(mHeight), 0.1f, 10.f);
+	mConstantBuffer = mGraphicsDevice->CreateGraphicsBuffer(&initial, sizeof(GlobalConstants), EBF_ConstantBuffer, ECPUAF_CanWrite, EGBU_Dynamic);
 
 	return true;
 }
@@ -74,13 +81,31 @@ void D3D11Renderer::InitShaders()
 void D3D11Renderer::RenderFrame(FramePacket& packet)
 {
 	Clear();
-	//TODO: Draw
+	
+	mGraphicsDevice->SetVertexShader(mVertexShader);
+	mGraphicsDevice->SetPixelShader(mPixelShader);
+
+	mGraphicsDevice->SetVSConstantBuffer(mConstantBuffer, 0);
+	mGraphicsDevice->SetPSConstantBuffer(mConstantBuffer, 0);
+
+	mGraphicsDevice->SetPSSamplerState(mDefaultSampler, 0);
+
+	for(MeshElement element : packet.meshes)
+	{
+		mGraphicsDevice->SetInputLayout(element.mesh->GetInputLayout());
+		mGraphicsDevice->SetVertexBuffer(element.mesh->GetVertexBuffer(), sizeof(Vertex));
+		mGraphicsDevice->SetIndexBuffer(element.mesh->GetIndexBuffer());
+		mGraphicsDevice->SetPSTexture(element.material->diffuseTexture->GetGraphicsTexture(), 0);
+		mGraphicsDevice->DrawIndexed(element.mesh->indexCount, 0, 0);
+	}
+
 	Present();
 }
 
 void D3D11Renderer::Clear() const
 {
 	mGraphicsDevice->ClearBackBuffer(Vector3::Zero, 1.0f);
+	mGraphicsDevice->ClearDepthStencil(mDepthBuffer, 1.0f);
 }
 
 void D3D11Renderer::Present() const

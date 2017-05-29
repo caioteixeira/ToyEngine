@@ -4,11 +4,13 @@
 //TODO: Implement support to submeshes
 struct MeshGeometry
 {
-	MeshGeometry(GraphicsBufferPtr mVertexBuffer, GraphicsBufferPtr mIndexBuffer, InputLayoutPtr mInputLayout);
+	MeshGeometry(GraphicsBufferPtr mVertexBuffer, GraphicsBufferPtr mIndexBuffer, int indexCount, InputLayoutPtr mInputLayout);
 
 	GraphicsBufferPtr GetVertexBuffer() const { return mVertexBuffer; }
 	GraphicsBufferPtr GetIndexBuffer() const { return mIndexBuffer; }
+	InputLayoutPtr GetInputLayout() const { return mInputLayout;  }
 
+	int indexCount;
 private:
 	GraphicsBufferPtr mVertexBuffer;
 	GraphicsBufferPtr mIndexBuffer;

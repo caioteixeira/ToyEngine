@@ -102,10 +102,10 @@ void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 
 	for(auto meshData : meshes)
 	{
-		auto indexBuffer = mDevice.CreateGraphicsBuffer(meshData.indices.data(), meshData.indices.size() * sizeof(size_t),
+		auto indexBuffer = mDevice.CreateGraphicsBuffer(meshData.indices.data(), meshData.indices.size() * sizeof(int),
 			EBF_IndexBuffer, ECPUAF_Neither, EGBU_Immutable);
-		auto inputLayout = GetInputLayout("PositionNormalTexture");
-		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, inputLayout);
+		auto inputLayout = GetInputLayout("positionnormaltexcoord");
+		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, meshData.indices.size(), inputLayout);
 		auto material = materials[meshData.materialName];
 
 		Mesh mesh(geo, material);
@@ -125,7 +125,7 @@ MeshGeometryPtr D3D11ResourceManager::LoadMeshGeometry(const std::string& path, 
 		EBF_IndexBuffer, ECPUAF_Neither, EGBU_Immutable);
 	auto inputLayout = GetInputLayout(inputLayoutName);
 	
-	MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, inputLayout);
+	MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, indices.size(), inputLayout);
 
 	return geo;
 }

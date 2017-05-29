@@ -6,6 +6,8 @@ class Mesh
 {
 public:
 	Mesh(MeshGeometryPtr geometry, MaterialPtr material);
+	MeshGeometryPtr GetGeometry() const { return mGeometry; }
+	MaterialPtr GetMaterial() const { return mMaterial; }
 
 private:
 	MeshGeometryPtr mGeometry;

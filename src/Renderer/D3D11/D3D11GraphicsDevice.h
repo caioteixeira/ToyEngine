@@ -38,9 +38,20 @@ public:
 	void SetRasterizerState(RasterizerStatePtr inRasterizerStatePtr) const;
 	void SetBlendState(BlendStatePtr inBlendState) const;
 	void SetPSSamplerState(SamplerStatePtr inSamplerState, int inStartSlot) const;
+	void SetInputLayout(InputLayoutPtr inLayout) const;
+	void SetVertexBuffer(GraphicsBufferPtr inBuffer, uint32_t inVertexSize) const;
+	void SetIndexBuffer(GraphicsBufferPtr inBuffer) const;
+	void SetVertexShader(VertexShaderPtr inVertexShader) const;
+	void SetVSConstantBuffer(GraphicsBufferPtr inBuffer, int inStartSlot) const;
+	void SetPixelShader(PixelShaderPtr inPixelShader) const;
+	void SetPSTexture(GraphicsTexturePtr inTexture, int inStartSlot) const;
+	void SetPSConstantBuffer(GraphicsBufferPtr inBuffer, int inStartSlot) const;
 
 	void ClearBackBuffer(const Vector3& inColor, float inAlpha) const;
 	void ClearRenderTarget(RenderTargetPtr inRenderTarget, const Vector3& inColor, float inAlpha) const;
+	void ClearDepthStencil(DepthStencilPtr inDepthStencil, float inDepth) const;
+	void Draw(int vertexCount, int startVertexIndex) const;
+	void DrawIndexed(int indexCount, int startIndexLocation, int baseLocation) const;
 	void Present() const;
 private:
 	void CreateDevice();
