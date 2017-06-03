@@ -256,6 +256,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\ConstantRotation.h" />
     <ClInclude Include="src\Renderer\ConstantBufferStructs.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Core\Asset.h" />
@@ -275,6 +276,7 @@
     <ClInclude Include="src\Renderer\D3D11\D3D11ResourceManager.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12Device.h" />
     <ClInclude Include="src\Renderer\D3DCommon\D3DHelpers.h" />
+    <ClInclude Include="src\Renderer\D3DCommon\RotateObjectSystem.h" />
     <ClInclude Include="src\Renderer\Material.h" />
     <ClInclude Include="src\Renderer\FramePacket.h" />
     <ClInclude Include="src\Renderer\Mesh.h" />
@@ -307,6 +309,7 @@
     <ClCompile Include="src\ECS\System.cc" />
     <ClCompile Include="src\Renderer\D3D11\D3D11ResourceManager.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Device.cpp" />
+    <ClCompile Include="src\Renderer\D3DCommon\RotateObjectSystem.cpp" />
     <ClCompile Include="src\Renderer\IRenderer.cpp" />
     <ClCompile Include="src\Renderer\Material.cpp" />
     <ClCompile Include="src\Renderer\Mesh.cpp" />

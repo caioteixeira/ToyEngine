@@ -323,7 +323,7 @@ GraphicsBufferPtr D3D11GraphicsDevice::CreateGraphicsBuffer(const void* rawData,
 	ZeroMemory(&bd, sizeof bd);
 
 	bd.Usage = static_cast<D3D11_USAGE>(bufferUsage);
-	bd.ByteWidth = rawDataSize;
+	bd.ByteWidth = static_cast<UINT>(rawDataSize);
 
 	bd.BindFlags = bindFlags;
 
@@ -334,7 +334,7 @@ GraphicsBufferPtr D3D11GraphicsDevice::CreateGraphicsBuffer(const void* rawData,
 
 	ID3D11Buffer* ret = nullptr;
 	HRESULT hr = mDevice->CreateBuffer(&bd, rawData ? &initialData : nullptr, &ret);
-	ThrowIfFailed(hr, "Problem Creating Vertex Buffer!");
+	ThrowIfFailed(hr, "Problem Creating GraphicsBuffer Buffer!");
 
 	return GraphicsBufferPtr(ret, AutoReleaseD3D);
 }
@@ -414,7 +414,7 @@ RasterizerStatePtr D3D11GraphicsDevice::CreateRasterizerState(EFillMode fillMode
 	desc.FillMode = static_cast<D3D11_FILL_MODE>(fillMode);
 
 	//TODO: Set cull mode
-	desc.CullMode = D3D11_CULL_NONE;
+	desc.CullMode = D3D11_CULL_BACK;
 
 	ID3D11RasterizerState* state;
 	auto hr = mDevice->CreateRasterizerState(&desc, &state);
@@ -577,6 +577,18 @@ void D3D11GraphicsDevice::SetPSConstantBuffer(GraphicsBufferPtr inBuffer, int in
 {
 	auto buffer = inBuffer.get();
 	mImmediateContext->PSSetConstantBuffers(inStartSlot, 1, &buffer);
+}
+
+void* D3D11GraphicsDevice::MapBuffer(GraphicsBufferPtr buffer) const
+{
+	D3D11_MAPPED_SUBRESOURCE mapped;
+	mImmediateContext->Map(buffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	return mapped.pData;
+}
+
+void D3D11GraphicsDevice::UnmapBuffer(GraphicsBufferPtr buffer) const
+{
+	mImmediateContext->Unmap(buffer.get(), 0);
 }
 
 void D3D11GraphicsDevice::Draw(int vertexCount, int startVertexIndex) const

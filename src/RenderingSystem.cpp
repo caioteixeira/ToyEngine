@@ -31,16 +31,30 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
 	entityx::ComponentHandle<Camera> camera;
 	for(auto entity : es.entities_with_components(transform, camera))
 	{
-		packet.viewMatrix = Matrix::CreateLookAt(transform.get()->position , Vector3::Zero, Vector3::Up);
+		packet.viewMatrix = camera.get()->viewMatrix;
+
+		//TODO: Add support to multiple cameras
 		break;
 	};
 
 	entityx::ComponentHandle<Mesh> mesh;
-	for(auto entity : es.entities_with_components(mesh))
+	for(auto entity : es.entities_with_components(mesh, transform))
 	{
 		MeshElement element;
-		element.mesh = mesh.get()->GetGeometry();
-		element.material = mesh.get()->GetMaterial();
+		auto meshPosition = transform->position;
+		auto meshScale = transform->scale;
+		auto meshRotation = transform->rotation;
+		auto meshGeometry = mesh->geometry;
+		auto material = mesh->material;
+		auto buffer = mesh->perObjectBuffer;
+
+		auto quat = Quaternion::CreateFromYawPitchRoll(meshRotation.x, meshRotation.y, meshRotation.z);
+
+		element.worldTransform = Matrix::CreateScale(meshScale) * 
+			Matrix::CreateFromQuaternion(quat) * Matrix::CreateTranslation(meshPosition);
+		element.mesh = meshGeometry;
+		element.material = material;
+		element.constantBuffer = buffer;
 		packet.meshes.push_back(element);
 	}
 

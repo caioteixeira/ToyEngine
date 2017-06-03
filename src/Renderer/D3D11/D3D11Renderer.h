@@ -14,6 +14,8 @@ public:
 	virtual ~D3D11Renderer();
 	void InitFrameBuffer();
 	void InitShaders();
+	void DrawMeshElement(MeshElement& element) const;
+	void UpdateGlobalConstants(FramePacket& packet) const;
 	bool Init(int width, int height);
 	void RenderFrame(FramePacket& packet);
 	D3D11ResourceManager* GetResourceManager() { return mResourceManager.get(); }
@@ -25,6 +27,8 @@ private:
 	std::unique_ptr<class D3D11GraphicsDevice> mGraphicsDevice;
 	std::unique_ptr<D3D11ResourceManager> mResourceManager;
 
+	Matrix mProj;
+
 	DepthStencilPtr mDepthBuffer;
 	DepthStencilStatePtr mMeshDepthState;
 	BlendStatePtr mMeshBlendState;
@@ -33,7 +37,7 @@ private:
 	PixelShaderPtr mPixelShader;
 	VertexShaderPtr mVertexShader;
 	SamplerStatePtr mDefaultSampler;
-	GraphicsBufferPtr mConstantBuffer;
+	GraphicsBufferPtr mCameraBuffer;
 
 	SDL_Window* mWindow;
 	int mWidth = 0;

@@ -1,4 +1,5 @@
 ﻿#include "../Mesh.h"
+#include "../ConstantBufferStructs.h"
 #if DX11
 #include "D3D11ResourceManager.h"
 #include "D3D11GraphicsDevice.h"
@@ -102,13 +103,16 @@ void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 
 	for(auto meshData : meshes)
 	{
-		auto indexBuffer = mDevice.CreateGraphicsBuffer(meshData.indices.data(), meshData.indices.size() * sizeof(int),
+		auto indexBuffer = mDevice.CreateGraphicsBuffer(meshData.indices.data(), meshData.indices.size() * sizeof(size_t),
 			EBF_IndexBuffer, ECPUAF_Neither, EGBU_Immutable);
 		auto inputLayout = GetInputLayout("positionnormaltexcoord");
 		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, meshData.indices.size(), inputLayout);
 		auto material = materials[meshData.materialName];
 
-		Mesh mesh(geo, material);
+		Mesh mesh;
+		mesh.geometry = geo;
+		mesh.material = material;
+		mesh.perObjectBuffer = mDevice.CreateGraphicsBuffer(nullptr, sizeof(PerObjectConstants), EBF_ConstantBuffer, ECPUAF_CanWrite, EGBU_Dynamic);;
 		outMeshes.push_back(mesh);
 	}
 }
@@ -116,7 +120,7 @@ void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 MeshGeometryPtr D3D11ResourceManager::LoadMeshGeometry(const std::string& path, const std::string& inputLayoutName)
 {
 	std::vector<Vertex> vertices = {};
-	std::vector<int> indices = {};
+	std::vector<size_t> indices = {};
 	Utils::LoadModel(path, vertices, indices);
 
 	auto vertexBuffer = mDevice.CreateGraphicsBuffer(vertices.data(), vertices.size() * sizeof(Vertex), 

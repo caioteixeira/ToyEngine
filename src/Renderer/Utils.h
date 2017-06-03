@@ -9,7 +9,7 @@ namespace Utils
 {
 	struct SubmeshDesc
 	{
-		std::vector<int> indices;
+		std::vector<size_t> indices;
 		std::string materialName;
 	};
 
@@ -35,5 +35,5 @@ namespace Utils
 	 * \param vertices 
 	 * \param indices 
 	 */
-	void LoadModel(const std::string& path, std::vector<Vertex>& vertices, std::vector<int>& indices);
+	void LoadModel(const std::string& path, std::vector<Vertex>& vertices, std::vector<size_t>& indices);
 }

@@ -47,6 +47,9 @@ public:
 	void SetPSTexture(GraphicsTexturePtr inTexture, int inStartSlot) const;
 	void SetPSConstantBuffer(GraphicsBufferPtr inBuffer, int inStartSlot) const;
 
+	void* MapBuffer(GraphicsBufferPtr buffer) const;
+	void UnmapBuffer(GraphicsBufferPtr buffer) const;
+
 	void ClearBackBuffer(const Vector3& inColor, float inAlpha) const;
 	void ClearRenderTarget(RenderTargetPtr inRenderTarget, const Vector3& inColor, float inAlpha) const;
 	void ClearDepthStencil(DepthStencilPtr inDepthStencil, float inDepth) const;

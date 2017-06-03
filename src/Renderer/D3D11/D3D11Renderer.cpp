@@ -32,11 +32,10 @@ bool D3D11Renderer::Init(int width, int height)
 	InitFrameBuffer();
 
 	InitShaders();
-	
-	GlobalConstants initial;
-	initial.projMatrix = Matrix::CreatePerspectiveFieldOfView(DirectX::XM_PI / 4.f,
-		float(mWidth) / float(mHeight), 0.1f, 10.f);
-	mConstantBuffer = mGraphicsDevice->CreateGraphicsBuffer(&initial, sizeof(GlobalConstants), EBF_ConstantBuffer, ECPUAF_CanWrite, EGBU_Dynamic);
+
+	mProj = Matrix::CreatePerspectiveFieldOfView(DirectX::XMConvertToRadians(90.0f),
+	                                             static_cast<float>(mWidth) / static_cast<float>(mHeight), 0.1f, 20.0f);
+	mCameraBuffer = mGraphicsDevice->CreateGraphicsBuffer(nullptr, sizeof(GlobalConstants), EBF_ConstantBuffer, ECPUAF_CanWrite, EGBU_Dynamic);
 
 	return true;
 }
@@ -78,25 +77,51 @@ void D3D11Renderer::InitShaders()
 	mGraphicsDevice->SetPSSamplerState(mDefaultSampler, 0);
 }
 
+void D3D11Renderer::DrawMeshElement(MeshElement& element) const
+{
+	PerObjectConstants objectConstants;
+	objectConstants.worldTransform = element.worldTransform;
+	void* buffer = mGraphicsDevice->MapBuffer(element.constantBuffer);
+	memcpy(buffer, &objectConstants, sizeof(PerObjectConstants));
+	mGraphicsDevice->UnmapBuffer(element.constantBuffer);
+
+	mGraphicsDevice->SetVSConstantBuffer(element.constantBuffer, 1);
+
+	mGraphicsDevice->SetInputLayout(element.mesh->GetInputLayout());
+	mGraphicsDevice->SetVertexBuffer(element.mesh->GetVertexBuffer(), sizeof(Vertex));
+	mGraphicsDevice->SetIndexBuffer(element.mesh->GetIndexBuffer());
+	mGraphicsDevice->SetPSTexture(element.material->diffuseTexture->GetGraphicsTexture(), 0);
+	mGraphicsDevice->DrawIndexed(element.mesh->indexCount, 0, 0);
+}
+
+void D3D11Renderer::UpdateGlobalConstants(FramePacket& packet) const
+{
+	GlobalConstants constants;
+	constants.projMatrix = packet.viewMatrix *  mProj;
+	void* buffer = mGraphicsDevice->MapBuffer(mCameraBuffer);
+	memcpy(buffer, &constants, sizeof(GlobalConstants));
+	mGraphicsDevice->UnmapBuffer(mCameraBuffer);
+}
+
 void D3D11Renderer::RenderFrame(FramePacket& packet)
 {
 	Clear();
-	
+
+	mGraphicsDevice->SetDepthStencilState(mMeshDepthState);
+	mGraphicsDevice->SetBlendState(mMeshBlendState);
+	mGraphicsDevice->SetPSSamplerState(mDefaultSampler, 0);
+
 	mGraphicsDevice->SetVertexShader(mVertexShader);
 	mGraphicsDevice->SetPixelShader(mPixelShader);
 
-	mGraphicsDevice->SetVSConstantBuffer(mConstantBuffer, 0);
-	mGraphicsDevice->SetPSConstantBuffer(mConstantBuffer, 0);
+	UpdateGlobalConstants(packet);
 
-	mGraphicsDevice->SetPSSamplerState(mDefaultSampler, 0);
+	mGraphicsDevice->SetVSConstantBuffer(mCameraBuffer, 0);
+	mGraphicsDevice->SetPSConstantBuffer(mCameraBuffer, 0);
 
 	for(MeshElement element : packet.meshes)
 	{
-		mGraphicsDevice->SetInputLayout(element.mesh->GetInputLayout());
-		mGraphicsDevice->SetVertexBuffer(element.mesh->GetVertexBuffer(), sizeof(Vertex));
-		mGraphicsDevice->SetIndexBuffer(element.mesh->GetIndexBuffer());
-		mGraphicsDevice->SetPSTexture(element.material->diffuseTexture->GetGraphicsTexture(), 0);
-		mGraphicsDevice->DrawIndexed(element.mesh->indexCount, 0, 0);
+		DrawMeshElement(element);
 	}
 
 	Present();

@@ -2,14 +2,9 @@
 #include "MeshGeometry.h"
 #include "Material.h"
 
-class Mesh
+struct Mesh
 {
-public:
-	Mesh(MeshGeometryPtr geometry, MaterialPtr material);
-	MeshGeometryPtr GetGeometry() const { return mGeometry; }
-	MaterialPtr GetMaterial() const { return mMaterial; }
-
-private:
-	MeshGeometryPtr mGeometry;
-	MaterialPtr mMaterial;
+	MeshGeometryPtr geometry;
+	MaterialPtr material;
+	GraphicsBufferPtr perObjectBuffer;
 };

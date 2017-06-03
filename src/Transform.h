@@ -3,7 +3,7 @@
 
 struct Transform
 {
-	Transform(Vector3 pos) : position(pos) {};
-
-	Vector3 position;
+	Vector3 position = Vector3::Zero;
+	Vector3 rotation = Vector3::Zero;
+	Vector3 scale = Vector3::One;
 };

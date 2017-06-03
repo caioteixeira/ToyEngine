@@ -5,3 +5,8 @@ struct GlobalConstants
 {
 	Matrix projMatrix;
 };
+
+struct PerObjectConstants
+{
+	Matrix worldTransform;
+};
