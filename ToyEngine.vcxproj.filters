@@ -144,10 +144,10 @@
     <ClInclude Include="src\Renderer\ConstantBufferStructs.h">
       <Filter>Source Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\D3DCommon\RotateObjectSystem.h">
+    <ClInclude Include="src\ConstantRotation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ConstantRotation.h">
+    <ClInclude Include="src\RotateObjectSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -221,7 +221,7 @@
     <ClCompile Include="src\Renderer\IResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\D3DCommon\RotateObjectSystem.cpp">
+    <ClCompile Include="src\RotateObjectSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

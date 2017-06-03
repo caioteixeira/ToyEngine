@@ -22,7 +22,7 @@ public:
 	InputLayoutPtr CreateInputLayout(const InputLayoutElement* elements, int numElements, const std::vector<char>& compiledVertexShader) const;
 	GraphicsBufferPtr CreateGraphicsBuffer(const void* rawData, int rawDataSize, EBindflags bindFlags, ECPUAccessFlags cpuAccessFlags, EGraphicsBufferUsage usage) const;
 	GraphicsTexturePtr CreateTextureFromFile(const char* inFileName, int& outWidth, int& outHeight);
-	DepthStencilPtr CreateDepthStencil(int inWidth, int inHeight) const;
+	DepthStencilPtr CreateDepthStencil() const;
 
 	RasterizerStatePtr CreateRasterizerState(EFillMode inFillMode) const;
 	DepthStencilStatePtr CreateDepthStencilState(bool inDepthTestEnable, EComparisonFunc inDepthComparisonFunction) const;

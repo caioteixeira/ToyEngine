@@ -7,6 +7,8 @@
 #include "../IRenderer.h"
 #include "D3D11ResourceManager.h"
 
+struct MeshElement;
+
 class D3D11Renderer : public IRenderer
 {
 public:

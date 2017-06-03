@@ -14,9 +14,12 @@ void LoadSubMesh(std::vector<Vertex>& vertices, std::vector<size_t>& indices, ti
 		vertex.position.y = attrib.vertices[3 * index.vertex_index + 1];
 		vertex.position.z = attrib.vertices[3 * index.vertex_index + 2];
 
-		vertex.normal.y = attrib.normals[3 * index.normal_index + 0];
-		vertex.normal.x = attrib.normals[3 * index.normal_index + 1];
-		vertex.normal.z = attrib.normals[3 * index.normal_index + 2];
+		if(attrib.normals.size() > 0)
+		{
+			vertex.normal.y = attrib.normals[3 * index.normal_index + 0];
+			vertex.normal.x = attrib.normals[3 * index.normal_index + 1];
+			vertex.normal.z = attrib.normals[3 * index.normal_index + 2];
+		}
 
 		vertex.texCoord.x = attrib.texcoords[2 * index.texcoord_index + 0];
 		vertex.texCoord.y = 1.0f - attrib.texcoords[2 * index.texcoord_index + 1];
@@ -34,7 +37,7 @@ void Utils::LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::ve
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
 	std::string err;
-	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str()))
+	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str(), "Assets/"))
 	{
 		throw std::runtime_error(err);
 	}

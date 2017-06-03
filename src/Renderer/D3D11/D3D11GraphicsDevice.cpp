@@ -128,7 +128,7 @@ HRESULT D3D11GraphicsDevice::CreateSwapChain(UINT backBufferWidth, UINT backBuff
 		DXGI_SWAP_CHAIN_DESC1 sd;
 		ZeroMemory(&sd, sizeof(sd));
 		sd.Width = backBufferWidth;
-		sd.Height = backBufferWidth;
+		sd.Height = backBufferHeight;
 		sd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		sd.SampleDesc.Count = 1;
 		sd.SampleDesc.Quality = 0;
@@ -291,7 +291,7 @@ VertexShaderPtr D3D11GraphicsDevice::CreateVertexShader(const std::vector< char 
 {
 	ID3D11VertexShader* toRet = nullptr;
 	HRESULT hr = mDevice->CreateVertexShader(compiledShader.data(), compiledShader.size(), nullptr, &toRet);
-	ThrowIfFailed(hr == S_OK, "Failure Creating Vertex Shader From Compiled Shader Code");
+	ThrowIfFailed(hr, "Failure Creating Vertex Shader From Compiled Shader Code");
 
 	return VertexShaderPtr(toRet, AutoReleaseD3D);
 }
@@ -301,7 +301,7 @@ PixelShaderPtr D3D11GraphicsDevice::CreatePixelShader(const std::vector< char >&
 {
 	ID3D11PixelShader* toRet = nullptr;
 	HRESULT hr = mDevice->CreatePixelShader(compiledShader.data(), compiledShader.size(), nullptr, &toRet);
-	ThrowIfFailed(hr == S_OK, "Failure Creating Pixel Shader From Compiled Shader Code");
+	ThrowIfFailed(hr, "Failure Creating Pixel Shader From Compiled Shader Code");
 	return PixelShaderPtr(toRet, AutoReleaseD3D);
 }
 
@@ -361,7 +361,7 @@ GraphicsTexturePtr D3D11GraphicsDevice::CreateTextureFromFile(const char* path, 
 		//TODO: Use logger class
 		std::cerr << "GraphicsDriver can only load images of type DDS, PNG, or BMP." << std::endl;
 	}
-	ThrowIfFailed(hr == S_OK, "Problem Creating Texture From File");
+	ThrowIfFailed(hr, "Problem Creating Texture From File");
 
 
 	CD3D11_TEXTURE2D_DESC textureDesc;
@@ -372,14 +372,14 @@ GraphicsTexturePtr D3D11GraphicsDevice::CreateTextureFromFile(const char* path, 
 	return GraphicsTexturePtr(toRet, AutoReleaseD3D);
 }
 
-DepthStencilPtr D3D11GraphicsDevice::CreateDepthStencil(int inWidth, int inHeight) const
+DepthStencilPtr D3D11GraphicsDevice::CreateDepthStencil() const
 {
 	ID3D11Texture2D* depthStencilTexture;
 	// Create depth stencil texture
 	D3D11_TEXTURE2D_DESC descDepth;
 	ZeroMemory(&descDepth, sizeof(descDepth));
-	descDepth.Width = inWidth;
-	descDepth.Height = inHeight;
+	descDepth.Width = mWindowWidth;
+	descDepth.Height = mWindowHeight;
 	descDepth.MipLevels = 1;
 	descDepth.ArraySize = 1;
 	descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -390,7 +390,7 @@ DepthStencilPtr D3D11GraphicsDevice::CreateDepthStencil(int inWidth, int inHeigh
 	descDepth.CPUAccessFlags = 0;
 	descDepth.MiscFlags = 0;
 	HRESULT hr = mDevice->CreateTexture2D(&descDepth, nullptr, &depthStencilTexture);
-	ThrowIfFailed(hr == S_OK, "Problem Creating Depth Stencil");
+	ThrowIfFailed(hr, "Problem Creating Depth Stencil");
 
 	ID3D11DepthStencilView* toRet = nullptr;
 
@@ -401,7 +401,7 @@ DepthStencilPtr D3D11GraphicsDevice::CreateDepthStencil(int inWidth, int inHeigh
 	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDSV.Texture2D.MipSlice = 0;
 	hr = mDevice->CreateDepthStencilView(depthStencilTexture, &descDSV, &toRet);
-	ThrowIfFailed(hr == S_OK, "Problem Creating Depth Stencil");
+	ThrowIfFailed(hr, "Problem Creating Depth Stencil");
 
 	return DepthStencilPtr(toRet, AutoReleaseD3D);
 }
@@ -414,7 +414,11 @@ RasterizerStatePtr D3D11GraphicsDevice::CreateRasterizerState(EFillMode fillMode
 	desc.FillMode = static_cast<D3D11_FILL_MODE>(fillMode);
 
 	//TODO: Set cull mode
-	desc.CullMode = D3D11_CULL_BACK;
+	desc.CullMode = D3D11_CULL_NONE;
+	desc.FrontCounterClockwise = false;
+	desc.MultisampleEnable = false;
+	desc.ScissorEnable = false;
+	desc.SlopeScaledDepthBias = 0.0f;
 
 	ID3D11RasterizerState* state;
 	auto hr = mDevice->CreateRasterizerState(&desc, &state);
@@ -445,7 +449,7 @@ DepthStencilStatePtr D3D11GraphicsDevice::CreateDepthStencilState(bool inDepthTe
 
 	ID3D11DepthStencilState* toRet = nullptr;
 	HRESULT hr = mDevice->CreateDepthStencilState(&dsDesc, &toRet);
-	ThrowIfFailed(hr == S_OK, "Problem Creating Depth Stencil");
+	ThrowIfFailed(hr, "Problem Creating Depth Stencil");
 
 	return DepthStencilStatePtr(toRet, AutoReleaseD3D);
 }
@@ -466,7 +470,7 @@ BlendStatePtr D3D11GraphicsDevice::CreateBlendState(bool inEnableBlend) const
 
 	ID3D11BlendState* toRet;
 	auto hr = mDevice->CreateBlendState(&desc, &toRet);
-	ThrowIfFailed(hr == S_OK, "Problem Creating Blend State");
+	ThrowIfFailed(hr, "Problem Creating Blend State");
 
 	return BlendStatePtr(toRet, AutoReleaseD3D);
 }
@@ -484,7 +488,7 @@ SamplerStatePtr D3D11GraphicsDevice::CreateSamplerState() const
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	ID3D11SamplerState* toRet = nullptr;
 	HRESULT hr = mDevice->CreateSamplerState(&sampDesc, &toRet);
-	ThrowIfFailed(hr == S_OK, "Failure Creating Sampler State");
+	ThrowIfFailed(hr, "Failure Creating Sampler State");
 
 	return SamplerStatePtr(toRet, AutoReleaseD3D);
 }

@@ -36,7 +36,6 @@ bool Game::Init()
 
 void Game::RunLoop()
 {
-	auto startTime = std::chrono::high_resolution_clock::now();
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	while(!mShouldQuit)
 	{
@@ -55,7 +54,7 @@ void Game::RunLoop()
 void Game::StartGame()
 {
 	mWorld.Init(mRenderer);
-	mWorld.LoadObjLevel("capsule.obj");
+	mWorld.LoadObjLevel("Assets/lost_empire.obj");
 }
 
 void Game::ProcessInput()

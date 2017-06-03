@@ -4,7 +4,7 @@
 
 inline void ThrowIfFailed(HRESULT hr, char* str = nullptr)
 {
-	if(FAILED(hr))
+	if(hr != S_OK)
 	{
 		if(str != nullptr)
 		{

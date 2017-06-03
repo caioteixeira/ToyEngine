@@ -57,7 +57,9 @@ TexturePtr D3D11ResourceManager::LoadTexture(const std::string& path) const
 {
 	int width;
 	int height;
-	auto graphicsTexture = mDevice.CreateTextureFromFile(path.c_str(), width, height);
+	std::string finalPath("Assets/");
+	finalPath = finalPath + path;
+	auto graphicsTexture = mDevice.CreateTextureFromFile(finalPath.c_str(), width, height);
 
 	return std::make_shared<Texture>(graphicsTexture, width, height);
 }

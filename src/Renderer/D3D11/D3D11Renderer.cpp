@@ -1,8 +1,8 @@
-#include "../FramePacket.h"
 #ifdef DX11
 #include "D3D11Renderer.h"
 #include "D3D11ResourceManager.h"
 #include "../ConstantBufferStructs.h"
+#include "../FramePacket.h"
 
 D3D11Renderer::D3D11Renderer()
 	: mWindow(nullptr)
@@ -34,7 +34,7 @@ bool D3D11Renderer::Init(int width, int height)
 	InitShaders();
 
 	mProj = Matrix::CreatePerspectiveFieldOfView(DirectX::XMConvertToRadians(90.0f),
-	                                             static_cast<float>(mWidth) / static_cast<float>(mHeight), 0.1f, 20.0f);
+	                                             static_cast<float>(mWidth) / static_cast<float>(mHeight), 0.5f, 500.0f);
 	mCameraBuffer = mGraphicsDevice->CreateGraphicsBuffer(nullptr, sizeof(GlobalConstants), EBF_ConstantBuffer, ECPUAF_CanWrite, EGBU_Dynamic);
 
 	return true;
@@ -45,7 +45,7 @@ void D3D11Renderer::InitFrameBuffer()
 	auto rasterizerState = mGraphicsDevice->CreateRasterizerState(EFM_Solid);
 	mGraphicsDevice->SetRasterizerState(rasterizerState);
 
-	mDepthBuffer = mGraphicsDevice->CreateDepthStencil(mWidth, mHeight);
+	mDepthBuffer = mGraphicsDevice->CreateDepthStencil();
 	mGraphicsDevice->SetDepthStencil(mDepthBuffer);
 
 	mMeshDepthState = mGraphicsDevice->CreateDepthStencilState(true, EComparisonFunc::ECF_Less);
@@ -109,17 +109,17 @@ void D3D11Renderer::RenderFrame(FramePacket& packet)
 
 	mGraphicsDevice->SetDepthStencilState(mMeshDepthState);
 	mGraphicsDevice->SetBlendState(mMeshBlendState);
-	mGraphicsDevice->SetPSSamplerState(mDefaultSampler, 0);
 
 	mGraphicsDevice->SetVertexShader(mVertexShader);
 	mGraphicsDevice->SetPixelShader(mPixelShader);
+	mGraphicsDevice->SetPSSamplerState(mDefaultSampler, 0);
 
 	UpdateGlobalConstants(packet);
 
 	mGraphicsDevice->SetVSConstantBuffer(mCameraBuffer, 0);
 	mGraphicsDevice->SetPSConstantBuffer(mCameraBuffer, 0);
 
-	for(MeshElement element : packet.meshes)
+	for(MeshElement& element : packet.meshes)
 	{
 		DrawMeshElement(element);
 	}

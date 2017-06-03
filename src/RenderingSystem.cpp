@@ -31,7 +31,8 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
 	entityx::ComponentHandle<Camera> camera;
 	for(auto entity : es.entities_with_components(transform, camera))
 	{
-		packet.viewMatrix = camera.get()->viewMatrix;
+		auto viewMatrix = Matrix::CreateLookAt(transform->position, Vector3::Zero, Vector3::Up);
+		packet.viewMatrix = viewMatrix;
 
 		//TODO: Add support to multiple cameras
 		break;

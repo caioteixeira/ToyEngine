@@ -3,7 +3,7 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "ConstantRotation.h"
-#include "Renderer/D3DCommon/RotateObjectSystem.h"
+#include "RotateObjectSystem.h"
 
 using namespace Engine::ECS;
 
@@ -19,11 +19,10 @@ void GameWorld::Init(std::shared_ptr<Renderer> renderer)
 {
 	entityx::Entity cameraEntity = entities.Create();
 
-	Vector3 cameraPos(2.0 , 2.0, 2.0);
+	Vector3 cameraPos(30.0 , 30.0, 30.0);
 	cameraEntity.Assign<Transform>()->position = cameraPos;
-	auto camera = cameraEntity.Assign<Camera>();
+	cameraEntity.Assign<Camera>();
 	//TODO: Temporarilly look at 0,0 every frame
-	camera.get()->viewMatrix = Matrix::CreateLookAt(cameraPos, Vector3::Zero, Vector3::Up);
 
 	auto renderingSystem = systems.Add<RenderingSystem>();
 	systems.Configure();
@@ -45,7 +44,7 @@ void GameWorld::LoadObjLevel(const std::string& path)
 		entityx::Entity meshEntity = entities.Create();
 		meshEntity.Assign<Mesh>(mesh);
 		meshEntity.Assign<Transform>();
-		meshEntity.Assign<ConstantRotation>(20.0f, 10.0f, 10.0f);
+		meshEntity.Assign<ConstantRotation>(0.2f, 0.0f, 0.0f);
 	}
 }
 
