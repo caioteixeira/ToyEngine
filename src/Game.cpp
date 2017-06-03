@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "ECS/quick.h"
 #include "GameWorld.h"
+#include <chrono>
 
 using namespace Engine;
 
@@ -35,11 +36,19 @@ bool Game::Init()
 
 void Game::RunLoop()
 {
+	auto startTime = std::chrono::high_resolution_clock::now();
+	auto currentTime = std::chrono::high_resolution_clock::now();
 	while(!mShouldQuit)
 	{
+		auto now = std::chrono::high_resolution_clock::now();
+		auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - currentTime).count();
+		currentTime = now;
+
 		ProcessInput();
 		//TODO: Run systems
-		mWorld.Update(0.1f);
+		mWorld.Update(delta);
+
+		std::cout << "dt: " << delta << std::endl;
 	}
 }
 
