@@ -39,7 +39,7 @@ void GameWorld::LoadObjLevel(const std::string& path)
 	std::vector<Mesh> meshes;
 	resourceManager->LoadObjFile(path, meshes);
 
-	for (Mesh mesh : meshes)
+	for (Mesh& mesh : meshes)
 	{
 		entityx::Entity meshEntity = entities.Create();
 		meshEntity.Assign<Mesh>(mesh);

@@ -21,7 +21,7 @@ public:
 	PixelShaderPtr CreatePixelShader(const std::vector<char>& compiledShaderCode) const;
 	InputLayoutPtr CreateInputLayout(const InputLayoutElement* elements, int numElements, const std::vector<char>& compiledVertexShader) const;
 	GraphicsBufferPtr CreateGraphicsBuffer(const void* rawData, int rawDataSize, EBindflags bindFlags, ECPUAccessFlags cpuAccessFlags, EGraphicsBufferUsage usage) const;
-	GraphicsTexturePtr CreateTextureFromFile(const char* inFileName, int& outWidth, int& outHeight);
+	GraphicsTexturePtr CreateTextureFromFile(const char* inFileName, int& outWidth, int& outHeight) const;
 	DepthStencilPtr CreateDepthStencil() const;
 
 	RasterizerStatePtr CreateRasterizerState(EFillMode inFillMode) const;

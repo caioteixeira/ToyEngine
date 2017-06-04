@@ -339,7 +339,7 @@ GraphicsBufferPtr D3D11GraphicsDevice::CreateGraphicsBuffer(const void* rawData,
 	return GraphicsBufferPtr(ret, AutoReleaseD3D);
 }
 
-GraphicsTexturePtr D3D11GraphicsDevice::CreateTextureFromFile(const char* path, int& outWidth, int& outHeight)
+GraphicsTexturePtr D3D11GraphicsDevice::CreateTextureFromFile(const char* path, int& outWidth, int& outHeight) const
 {
 	std::string fileStr(path);
 	std::string extension = fileStr.substr(fileStr.find_last_of('.'));
@@ -362,7 +362,6 @@ GraphicsTexturePtr D3D11GraphicsDevice::CreateTextureFromFile(const char* path, 
 		std::cerr << "GraphicsDriver can only load images of type DDS, PNG, or BMP." << std::endl;
 	}
 	ThrowIfFailed(hr, "Problem Creating Texture From File");
-
 
 	CD3D11_TEXTURE2D_DESC textureDesc;
 	((ID3D11Texture2D*)texture)->GetDesc(&textureDesc);
