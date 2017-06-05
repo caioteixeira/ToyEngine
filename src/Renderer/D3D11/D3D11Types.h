@@ -1,4 +1,6 @@
 #pragma once
+
+#if DX11
 #include <memory>
 #include "../../WindowsHeaders.h"
 
@@ -93,3 +95,5 @@ typedef std::shared_ptr<ID3D11ShaderResourceView>	GraphicsTexturePtr;
 typedef std::shared_ptr<ID3D11DepthStencilState>	DepthStencilStatePtr;
 typedef std::shared_ptr<ID3D11RasterizerState>		RasterizerStatePtr;
 typedef std::shared_ptr<ID3D11BlendState>			BlendStatePtr;
+
+#endif

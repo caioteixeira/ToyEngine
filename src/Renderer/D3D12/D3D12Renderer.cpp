@@ -27,7 +27,7 @@ bool D3D12Renderer::Init(int width, int height)
 	return true;
 }
 
-void D3D12Renderer::RenderFrame()
+void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 {
 	//TODO: WIP Clear is clearing and swapping buffers
 	Clear();
