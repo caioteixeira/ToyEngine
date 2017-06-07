@@ -96,4 +96,17 @@ typedef std::shared_ptr<ID3D11DepthStencilState>	DepthStencilStatePtr;
 typedef std::shared_ptr<ID3D11RasterizerState>		RasterizerStatePtr;
 typedef std::shared_ptr<ID3D11BlendState>			BlendStatePtr;
 
+struct PipelineState
+{
+	VertexShaderPtr vertexShader;
+	PixelShaderPtr pixelShader;
+	InputLayoutPtr inputLayout;
+
+	BlendStatePtr blendState;
+	RasterizerStatePtr rasterizerState;
+	DepthStencilStatePtr depthStencilState;
+	SamplerStatePtr SamplerStatePtr;
+};
+typedef std::shared_ptr<PipelineState> PipelineStatePtr;
+
 #endif

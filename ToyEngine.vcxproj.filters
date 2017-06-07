@@ -150,6 +150,9 @@
     <ClInclude Include="src\RotateObjectSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer\D3D12\D3D12Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Renderer\D3D11\D3D11GraphicsDevice.cpp">

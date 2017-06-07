@@ -92,6 +92,12 @@ struct GraphicsBuffer
 };
 typedef  std::shared_ptr<GraphicsBuffer>  GraphicsBufferPtr;
 
+struct PipelineState
+{
+	ID3D12PipelineState * PSO;
+};
+typedef std::shared_ptr<PipelineState> PipelineStatePtr;
+
 //typedef std::shared_ptr<ID3D11InputLayout>			InputLayoutPtr;
 //typedef std::shared_ptr<ID3D11PixelShader>			PixelShaderPtr;
 //typedef std::shared_ptr<ID3D11VertexShader>			VertexShaderPtr;
