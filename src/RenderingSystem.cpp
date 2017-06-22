@@ -3,6 +3,8 @@
 #include "Renderer/FramePacket.h"
 #include "Transform.h"
 #include "Camera.h"
+#include "Core/imgui/imgui.h"
+#include "Core/imgui/imgui_impl_dx11.h"
 
 RenderingSystem::RenderingSystem()
 {
@@ -18,13 +20,27 @@ void RenderingSystem::SetRenderer(std::shared_ptr<Renderer> renderer)
 	mRenderer = renderer;
 }
 
+void ShowImGUISample()
+{
+	// 1. Show a simple window
+	// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
+	{
+		ImGui::Text("Hello, world!");;
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	}
+}
+
 void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& events, entityx::TimeDelta dt)
 {
+	ImGui_ImplDX11_NewFrame();
+
 	if(mRenderer == nullptr)
 	{
 		std::cerr << "Renderer is undefined" << std::endl;
 		return;
 	}
+
+	ShowImGUISample();
 
 	FramePacket packet;
 	entityx::ComponentHandle<Transform> transform;

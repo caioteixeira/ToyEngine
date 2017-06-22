@@ -16,6 +16,16 @@ public:
 		return mBackBufferRenderTarget;
 	}
 
+	ID3D11DeviceContext * GetImmediateContext() const
+	{
+		return mImmediateContext;
+	}
+
+	ID3D11Device * GetDevice() const
+	{
+		return mDevice;
+	}
+
 	bool CompileShaderFromFile(const char* inFileName, const char* szEntryPoint, const char* szShaderModel, std::vector<char>& outCompiledShaderCode) const;
 	VertexShaderPtr CreateVertexShader(const std::vector<char>& compiledShaderCode) const;
 	PixelShaderPtr CreatePixelShader(const std::vector<char>& compiledShaderCode) const;

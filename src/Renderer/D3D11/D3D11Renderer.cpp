@@ -3,6 +3,8 @@
 #include "D3D11ResourceManager.h"
 #include "../ConstantBufferStructs.h"
 #include "../FramePacket.h"
+#include "../../Core/imgui/imgui.h"
+#include "../../Core/imgui/imgui_impl_dx11.h"
 
 D3D11Renderer::D3D11Renderer()
 	: mWindow(nullptr)
@@ -36,6 +38,9 @@ bool D3D11Renderer::Init(int width, int height)
 	mProj = Matrix::CreatePerspectiveFieldOfView(DirectX::XMConvertToRadians(90.0f),
 	                                             static_cast<float>(mWidth) / static_cast<float>(mHeight), 0.5f, 500.0f);
 	mCameraBuffer = mGraphicsDevice->CreateGraphicsBuffer(nullptr, sizeof(GlobalConstants), EBF_ConstantBuffer, ECPUAF_CanWrite, EGBU_Dynamic);
+
+	//Setup ImGUI
+	ImGui_ImplDX11_Init(GetActiveWindow(), mGraphicsDevice->GetDevice(), mGraphicsDevice->GetImmediateContext());
 
 	return true;
 }
@@ -123,6 +128,8 @@ void D3D11Renderer::RenderFrame(FramePacket& packet)
 	{
 		DrawMeshElement(element);
 	}
+
+	ImGui::Render();
 
 	Present();
 }
