@@ -8,6 +8,7 @@ using namespace Engine;
 Game::Game(): 
 	mWorld()
 	,mShouldQuit(false)
+	,mInput(*this)
 {
 	mRenderer = std::make_shared<Renderer>();
 }
@@ -43,11 +44,9 @@ void Game::RunLoop()
 		auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - currentTime).count();
 		currentTime = now;
 
-		ProcessInput();
+		mInput.ProcessInput();
 		//TODO: Run systems
 		mWorld.Update(delta);
-
-		std::cout << "dt: " << delta << std::endl;
 	}
 }
 
@@ -55,23 +54,4 @@ void Game::StartGame()
 {
 	mWorld.Init(mRenderer);
 	mWorld.LoadObjLevel("Assets/lost_empire.obj");
-}
-
-void Game::ProcessInput()
-{
-	//TODO: Move to an input manager
-	// Poll events from SDL
-	SDL_Event event;
-	while (SDL_PollEvent(&event))
-	{
-		switch (event.type)
-		{
-		case SDL_QUIT:
-			mShouldQuit = true;
-			break;
-		default:
-			// Ignore other events
-			break;
-		}
-	}
 }

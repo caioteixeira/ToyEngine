@@ -256,6 +256,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\InputManager.h" />
+    <ClInclude Include="src\Renderer\D3D12\D3D12CommandQueue.h" />
+    <ClInclude Include="src\Renderer\D3D12\D3D12CommandAllocatorPool.h" />
+    <ClInclude Include="src\Renderer\D3D12\D3D12CommandContext.h" />
     <ClInclude Include="src\ConstantRotation.h" />
     <ClInclude Include="src\Core\imgui\imconfig.h" />
     <ClInclude Include="src\Core\imgui\imgui.h" />
@@ -309,6 +313,10 @@
     <ClInclude Include="src\GameWorld.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\InputManager.cpp" />
+    <ClCompile Include="src\Renderer\D3D12\D3D12CommandQueue.cpp" />
+    <ClCompile Include="src\Renderer\D3D12\D3D12CommandAllocatorPool.cpp" />
+    <ClCompile Include="src\Renderer\D3D12\D3D12CommandContext.cpp" />
     <ClCompile Include="src\Core\Asset.cpp" />
     <ClCompile Include="src\Core\AssetCache.cpp" />
     <ClCompile Include="src\Core\imgui\imgui.cpp" />

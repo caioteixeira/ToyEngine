@@ -3,6 +3,7 @@
 #include "Renderer/Renderer.h"
 #include "RenderingSystem.h"
 #include "GameWorld.h"
+#include "InputManager.h"
 
 class Game
 {
@@ -11,13 +12,14 @@ public:
 	~Game();
 	bool Init();
 	void RunLoop();
+	void QuitGame() { mShouldQuit = true; }
 
 private:
 	void StartGame();
-	void ProcessInput();
 
 	Engine::ECS::GameWorld mWorld;
 	std::shared_ptr<Renderer> mRenderer;
+	InputManager mInput;
 
 	bool mShouldQuit;
 };
