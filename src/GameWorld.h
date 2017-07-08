@@ -13,7 +13,7 @@ namespace Engine::ECS
 
 		void Init(std::shared_ptr<Renderer> renderer);
 		void LoadObjLevel(const std::string& path);
-		void Update(float deltaTime);
+		void Update(double deltaTime);
 	private:
 		std::shared_ptr<Renderer> mRenderer;
 	};

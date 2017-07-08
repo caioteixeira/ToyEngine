@@ -7,7 +7,10 @@
 
 void LoadSubMesh(std::vector<Vertex>& vertices, std::vector<size_t>& indices, tinyobj::attrib_t & attrib, const tinyobj::shape_t& shape)
 {
-	for(const auto& index: shape.mesh.indices)
+	auto allocSize = shape.mesh.indices.size();
+	indices.reserve(allocSize);
+
+	for(const auto& index : shape.mesh.indices)
 	{
 		Vertex vertex = {};
 		vertex.position.x = attrib.vertices[3 * index.vertex_index + 0];
@@ -37,10 +40,23 @@ void Utils::LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::ve
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
 	std::string err;
+
+	SDL_Log("Started to load Obj File");
 	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str(), "Assets/"))
 	{
 		throw std::runtime_error(err);
 	}
+	SDL_Log("Succesfully loaded obj file");
+
+	//Define vertices alloc size
+	size_t allocSize = 0;
+	for(const auto& shape : shapes)
+	{
+		allocSize += shape.mesh.indices.size();
+	}
+	vertices.reserve(allocSize);
+	SDL_Log("Succesfully allocated vertices memory");
+
 
 	for (const auto& shape : shapes)
 	{
@@ -48,6 +64,8 @@ void Utils::LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::ve
 		LoadSubMesh(vertices, data.indices, attrib, shape);
 		data.materialName = materials[shape.mesh.material_ids[0]].name;
 		outSubmeshes.push_back(data);
+
+		SDL_Log("Succesfully loaded a submesh");
 	}
 
 	for( const auto& material : materials)

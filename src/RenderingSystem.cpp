@@ -34,11 +34,7 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
 {
 	ImGui_ImplDX11_NewFrame();
 
-	if(mRenderer == nullptr)
-	{
-		std::cerr << "Renderer is undefined" << std::endl;
-		return;
-	}
+	assert(mRenderer != nullptr);
 
 	ShowImGUISample();
 

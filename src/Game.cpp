@@ -41,7 +41,7 @@ void Game::RunLoop()
 	while(!mShouldQuit)
 	{
 		auto now = std::chrono::high_resolution_clock::now();
-		auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - currentTime).count();
+		auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - currentTime).count() / 1000.0;
 		currentTime = now;
 
 		mInput.ProcessInput();
@@ -53,5 +53,5 @@ void Game::RunLoop()
 void Game::StartGame()
 {
 	mWorld.Init(mRenderer);
-	mWorld.LoadObjLevel("Assets/lost_empire.obj");
+	mWorld.LoadObjLevel("Assets/rungholt.obj");
 }
