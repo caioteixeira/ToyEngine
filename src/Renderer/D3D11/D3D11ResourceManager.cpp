@@ -91,20 +91,21 @@ void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 	std::vector<Utils::SubmeshDesc> meshes = {};
 	std::unordered_map<std::string, Utils::MaterialDesc> materialMap = {};
 
-	Utils::LoadObjFile(path, vertices, meshes, materialMap);
-
-	auto vertexBuffer = mDevice.CreateGraphicsBuffer(vertices.data(), vertices.size() * sizeof(Vertex),
-		EBF_VertexBuffer, ECPUAF_Neither, EGBU_Immutable);
+	Utils::LoadObjFile(path, meshes, materialMap);
 
 	std::unordered_map<std::string, MaterialPtr> materials = {};
-	for(auto desc : materialMap)
+	for(auto& desc : materialMap)
 	{
 		auto material = CreateMaterial(desc.second);
 		materials[desc.first] = material;
+
+		SDL_Log("Renderer: Succesfully loaded a material");
 	}
 
-	for(auto meshData : meshes)
+	for(auto& meshData : meshes)
 	{
+		auto vertexBuffer = mDevice.CreateGraphicsBuffer(meshData.vertices.data(), meshData.vertices.size() * sizeof(Vertex),
+			EBF_VertexBuffer, ECPUAF_Neither, EGBU_Immutable);
 		auto indexBuffer = mDevice.CreateGraphicsBuffer(meshData.indices.data(), meshData.indices.size() * sizeof(size_t),
 			EBF_IndexBuffer, ECPUAF_Neither, EGBU_Immutable);
 		auto inputLayout = GetInputLayout("positionnormaltexcoord");
@@ -116,7 +117,11 @@ void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 		mesh.material = material;
 		mesh.perObjectBuffer = mDevice.CreateGraphicsBuffer(nullptr, sizeof(PerObjectConstants), EBF_ConstantBuffer, ECPUAF_CanWrite, EGBU_Dynamic);;
 		outMeshes.push_back(mesh);
+
+		SDL_Log("Renderer: Succesfully loaded a mesh element");
 	}
+
+	SDL_Log("Renderer: Succesfully loaded OBJ File");
 }
 
 MeshGeometryPtr D3D11ResourceManager::LoadMeshGeometry(const std::string& path, const std::string& inputLayoutName)

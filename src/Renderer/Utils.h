@@ -9,6 +9,7 @@ namespace Utils
 {
 	struct SubmeshDesc
 	{
+		std::vector<Vertex> vertices;
 		std::vector<size_t> indices;
 		std::string materialName;
 	};
@@ -27,7 +28,7 @@ namespace Utils
 		std::string specularTexName = "";
 	};
 
-	void LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::vector<SubmeshDesc>& outSubmeshes, std::unordered_map<std::string, MaterialDesc>& outMaterials);
+	void LoadObjFile(std::string path,  std::vector<SubmeshDesc>& outSubmeshes, std::unordered_map<std::string, MaterialDesc>& outMaterials);
 
 	/**
 	 * \brief Loads an obj file and merges its vertices on a unique geometry

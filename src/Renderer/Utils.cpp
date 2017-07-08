@@ -9,6 +9,7 @@ void LoadSubMesh(std::vector<Vertex>& vertices, std::vector<size_t>& indices, ti
 {
 	auto allocSize = shape.mesh.indices.size();
 	indices.reserve(allocSize);
+	vertices.reserve(allocSize);
 
 	for(const auto& index : shape.mesh.indices)
 	{
@@ -33,9 +34,8 @@ void LoadSubMesh(std::vector<Vertex>& vertices, std::vector<size_t>& indices, ti
 	}
 }
 
-void Utils::LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::vector<SubmeshDesc>& outSubmeshes, std::unordered_map<std::string, MaterialDesc>& outMaterials)
+void Utils::LoadObjFile(std::string path, std::vector<SubmeshDesc>& outSubmeshes, std::unordered_map<std::string, MaterialDesc>& outMaterials)
 {
-	//Init tinyobj loader
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
@@ -48,20 +48,10 @@ void Utils::LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::ve
 	}
 	SDL_Log("Succesfully loaded obj file");
 
-	//Define vertices alloc size
-	size_t allocSize = 0;
-	for(const auto& shape : shapes)
-	{
-		allocSize += shape.mesh.indices.size();
-	}
-	vertices.reserve(allocSize);
-	SDL_Log("Succesfully allocated vertices memory");
-
-
 	for (const auto& shape : shapes)
 	{
 		SubmeshDesc data;
-		LoadSubMesh(vertices, data.indices, attrib, shape);
+		LoadSubMesh(data.vertices, data.indices, attrib, shape);
 		data.materialName = materials[shape.mesh.material_ids[0]].name;
 		outSubmeshes.push_back(data);
 
@@ -82,6 +72,8 @@ void Utils::LoadObjFile(std::string path, std::vector<Vertex>& vertices, std::ve
 		data.diffuseTexName = material.diffuse_texname;
 		data.specularTexName = material.specular_texname;
 		outMaterials[data.name] = data;
+
+		SDL_Log("Succesfully loaded a material");
 	}
 }
 
