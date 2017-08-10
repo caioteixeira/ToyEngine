@@ -15,15 +15,21 @@ D3D12GraphicsDevice::D3D12GraphicsDevice(void *window)
 	mWindowHeight = rc.bottom - rc.top;
 
 	InitDevice();
+
+	mCopyQueue = std::make_unique<D3D12CommandQueue>(D3D12_COMMAND_LIST_TYPE_COPY, mDevice.Get());
+	mGraphicsQueue = std::make_unique<D3D12CommandQueue>(D3D12_COMMAND_LIST_TYPE_DIRECT, mDevice.Get());
+
 	OnResize();
 }
 
 D3D12GraphicsDevice::~D3D12GraphicsDevice()
 {
+
 }
 
 void D3D12GraphicsDevice::ClearBackBuffer(const Vector3& inColor, float alpha)
 {
+	/*
 	// Reuse the memory associated with command recording.
 	// We can only reset when the associated command lists have finished execution on the GPU.
 	ThrowIfFailed(mDirectCmdListAlloc->Reset());
@@ -64,19 +70,39 @@ void D3D12GraphicsDevice::ClearBackBuffer(const Vector3& inColor, float alpha)
 	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
 	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-	// swap the back and front buffers
-	ThrowIfFailed(mSwapChain->Present(0, 0));
-	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
-
 	// Wait until frame commands are complete.  This waiting is inefficient and is
 	// done for simplicity.  Later we will show how to organize our rendering code
 	// so we do not have to wait per frame.
 	FlushCommandQueue();
+	*/
 }
 
-void D3D12GraphicsDevice::Present() const
+void D3D12GraphicsDevice::CreateCommandList(D3D12_COMMAND_LIST_TYPE type, ID3D12GraphicsCommandList** list, ID3D12CommandAllocator** allocator)
 {
-	
+	auto result = mDevice->CreateCommandAllocator(type,
+		IID_PPV_ARGS(allocator));
+	ThrowIfFailed(result, "Failed to create command allocator!");
+
+	if(type == D3D12_COMMAND_LIST_TYPE_COPY)
+	{
+		*allocator = mCopyQueue->GetAllocator();
+	}
+	else
+	{
+		*allocator = mGraphicsQueue->GetAllocator();
+	}
+
+
+	result = mDevice->CreateCommandList(1, type, *allocator,
+		nullptr, IID_PPV_ARGS(list));
+	ThrowIfFailed(result, "Failed to create command list!");
+}
+
+void D3D12GraphicsDevice::Present()
+{
+	// swap the back and front buffers
+	ThrowIfFailed(mSwapChain->Present(0, 0));
+	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 }
 
 void D3D12GraphicsDevice::InitDevice()
@@ -110,8 +136,9 @@ void D3D12GraphicsDevice::InitDevice()
 		ThrowIfFailed(result, "Failed to create device!");
 	}
 
-	result = mDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence));
-	ThrowIfFailed(result, "Failed to create fence!");
+	//TODO: Handle fence
+	//result = mDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence));
+	//ThrowIfFailed(result, "Failed to create fence!");
 
 	mRtvDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	mDsvDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
@@ -126,6 +153,7 @@ void D3D12GraphicsDevice::InitDevice()
 
 void D3D12GraphicsDevice::InitCommandObjects()
 {
+	/*
 	HRESULT result;
 
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
@@ -145,10 +173,12 @@ void D3D12GraphicsDevice::InitCommandObjects()
 
 	//Start off closed so we can reset it on first use
 	mCommandList->Close();
+	*/
 }
 
 void D3D12GraphicsDevice::FlushCommandQueue()
 {
+	/*
 	mCurrentFence++;
 
 	ThrowIfFailed(
@@ -168,6 +198,7 @@ void D3D12GraphicsDevice::FlushCommandQueue()
 		WaitForSingleObject(eventHandle, INFINITE);
 		CloseHandle(eventHandle);
 	}
+	*/
 }
 
 ID3D12Resource* D3D12GraphicsDevice::CurrentBackBuffer()
@@ -190,6 +221,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE D3D12GraphicsDevice::DepthStencilView()
 
 void D3D12GraphicsDevice::OnResize()
 {
+	/*
 	assert(mDevice);
 	assert(mSwapChain);
 	assert(mDirectCmdListAlloc);
@@ -283,10 +315,12 @@ void D3D12GraphicsDevice::OnResize()
 	mScreenViewport.MaxDepth = 1.0f;
 
 	mScissorRect = { 0, 0, static_cast<int>(mWindowWidth), static_cast<int>(mWindowHeight) };
+	*/
 }
 
 void D3D12GraphicsDevice::CreateSwapChain()
 {
+	/*
 	mSwapChain.Reset();
 
 	DXGI_SWAP_CHAIN_DESC desc;
@@ -307,6 +341,7 @@ void D3D12GraphicsDevice::CreateSwapChain()
 	desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	HRESULT result = mdxgiFactory->CreateSwapChain(mCommandQueue.Get(), &desc, mSwapChain.GetAddressOf());
+	*/
 }
 
 void D3D12GraphicsDevice::CreateRtvAndDsvDescriptorHeaps()

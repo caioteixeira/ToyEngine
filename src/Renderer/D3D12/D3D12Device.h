@@ -1,9 +1,14 @@
 #pragma once
 #ifdef DX12
 
+#include <memory>
+
 #include "../../WindowsHeaders.h"
 #include "../../Math.h"
+#include "D3D12CommandQueue.h"
 #include "d3dx12.h"
+
+class D3D12CommandQueue;
 
 class D3D12GraphicsDevice
 {
@@ -12,7 +17,12 @@ public:
 	~D3D12GraphicsDevice();
 
 	void ClearBackBuffer(const Vector3& inColor, float inAlpha);
-	void Present() const;
+
+	void CreateCommandList(D3D12_COMMAND_LIST_TYPE type, ID3D12GraphicsCommandList** list, ID3D12CommandAllocator** allocator);
+
+	void Present();
+
+	ID3D12Device* GetDevice() const { return mDevice.Get(); }
 private:
 	void InitDevice();
 	void InitCommandObjects();
@@ -39,13 +49,10 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;
 	Microsoft::WRL::ComPtr<ID3D12Device> mDevice;
 
-	Microsoft::WRL::ComPtr<ID3D12Fence> mFence;
 	UINT64 mCurrentFence = 0;
 
-	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mDirectCmdListAlloc;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> mCommandList;
-	
+	std::unique_ptr<D3D12CommandQueue> mGraphicsQueue;
+	std::unique_ptr<D3D12CommandQueue> mCopyQueue;
 
 	static const int SwapChainBufferCount = 2;
 	int mCurrBackBuffer = 0;

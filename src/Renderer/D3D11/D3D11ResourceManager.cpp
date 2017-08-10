@@ -82,6 +82,8 @@ MaterialPtr D3D11ResourceManager::CreateMaterial(Utils::MaterialDesc desc)
 		material->SetProperty(DiffuseTexture);
 	}
 
+	//TODO: Setup pipeline state
+
 	return material;
 }
 
@@ -109,7 +111,7 @@ void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 		auto indexBuffer = mDevice.CreateGraphicsBuffer(meshData.indices.data(), meshData.indices.size() * sizeof(size_t),
 			EBF_IndexBuffer, ECPUAF_Neither, EGBU_Immutable);
 		auto inputLayout = GetInputLayout("positionnormaltexcoord");
-		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, meshData.indices.size(), inputLayout);
+		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, meshData.indices.size());
 		auto material = materials[meshData.materialName];
 
 		Mesh mesh;
@@ -134,9 +136,8 @@ MeshGeometryPtr D3D11ResourceManager::LoadMeshGeometry(const std::string& path, 
 		EBF_VertexBuffer, ECPUAF_Neither, EGBU_Immutable);
 	auto indexBuffer = mDevice.CreateGraphicsBuffer(indices.data(), indices.size() * sizeof(size_t), 
 		EBF_IndexBuffer, ECPUAF_Neither, EGBU_Immutable);
-	auto inputLayout = GetInputLayout(inputLayoutName);
 	
-	MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, indices.size(), inputLayout);
+	MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, indices.size());
 
 	return geo;
 }

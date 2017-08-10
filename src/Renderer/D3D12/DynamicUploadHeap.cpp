@@ -1,4 +1,5 @@
-﻿#include "DynamicUploadHeap.h"
+﻿#if DX12
+#include "DynamicUploadHeap.h"
 
 DynamicUploadHeap::DynamicUploadHeap(bool isCPUAcessible, D3D12GraphicsDevice* device, size_t initialSize)
 	: mIsCPUAccessible(isCPUAcessible), mDevice(device)
@@ -50,3 +51,5 @@ void DynamicUploadHeap::FinishFrame(uint64_t frameNum, uint64_t numCompletedFram
 		mRingBuffers.erase(mRingBuffers.begin(), mRingBuffers.begin() + numBuffersToDelete);
 	}
 }
+
+#endif

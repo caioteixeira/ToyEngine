@@ -30,7 +30,7 @@ bool D3D12CommandQueue::IsFenceComplete(uint64_t fenceValue)
 	// completed fence value to regress.
 	if (fenceValue > mLastCompletedFenceValue)
 	{
-		mLastCompletedFenceValue = std::max(mLastCompletedFenceValue, mFence->GetCompletedValue());
+		mLastCompletedFenceValue = max(mLastCompletedFenceValue, mFence->GetCompletedValue());
 	}
 
 	return fenceValue <= mLastCompletedFenceValue;
@@ -52,6 +52,49 @@ void D3D12CommandQueue::WaitForFence(uint64_t fence)
 		WaitForSingleObject(mFenceEventHandle, INFINITE);
 		mLastCompletedFenceValue = fence;
 	}
+}
+
+uint64_t D3D12CommandQueue::ExecuteCommandList(ID3D12CommandList* list)
+{
+	std::lock_guard<std::mutex> lock(mFenceMutex);
+
+	auto hr = static_cast<ID3D12GraphicsCommandList*>(list)->Close();
+	ThrowIfFailed(hr, "Failed to close command list!");
+
+	mCommandQueue->ExecuteCommandLists(1, &list);
+
+	mCommandQueue->Signal(mFence, mNextFenceValue);
+
+	return mNextFenceValue++;
+}
+
+uint64_t D3D12CommandQueue::FinishCommandContext(D3D12CommandContext& context, bool waitForCompletion)
+{
+	//TODO: Flush resource barriers
+
+	uint64_t fence = ExecuteCommandList(context.mCommandList);
+
+	StoreAllocator(fence, context.mAllocator);
+	context.mAllocator = nullptr;
+
+	if(waitForCompletion)
+	{
+		WaitForFence(fence);
+	}
+
+	//TODO: FreeContext;
+
+	return fence;
+}
+
+ID3D12CommandAllocator* D3D12CommandQueue::GetAllocator()
+{
+	return mAllocatorPool.GetAllocator(mFence->GetCompletedValue());
+}
+
+void D3D12CommandQueue::StoreAllocator(uint64_t fence, ID3D12CommandAllocator* allocator)
+{
+	mAllocatorPool.StoreAllocator(fence, allocator);
 }
 
 #endif

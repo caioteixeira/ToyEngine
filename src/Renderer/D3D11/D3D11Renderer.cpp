@@ -92,7 +92,7 @@ void D3D11Renderer::DrawMeshElement(MeshElement& element) const
 
 	mGraphicsDevice->SetVSConstantBuffer(element.constantBuffer, 1);
 
-	mGraphicsDevice->SetInputLayout(element.mesh->GetInputLayout());
+	mGraphicsDevice->SetInputLayout(element.material->pipelineState->inputLayout);
 	mGraphicsDevice->SetVertexBuffer(element.mesh->GetVertexBuffer(), sizeof(Vertex));
 	mGraphicsDevice->SetIndexBuffer(element.mesh->GetIndexBuffer());
 	mGraphicsDevice->SetPSTexture(element.material->diffuseTexture->GetGraphicsTexture(), 0);

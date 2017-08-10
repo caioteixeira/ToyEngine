@@ -148,7 +148,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\ToyEngine\External\TinyObjLoader;$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\External\TinyObjLoader;$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>EnginePCH.h</PrecompiledHeaderFile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>DX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>

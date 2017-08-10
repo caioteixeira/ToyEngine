@@ -33,6 +33,11 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 	Clear();
 }
 
+D3D12ResourceManager * D3D12Renderer::GetResourceManager()
+{
+	return mResourceManager.get();
+}
+
 void D3D12Renderer::Clear()
 {
 	mGraphicsDevice->ClearBackBuffer(Vector3::Zero, 1.0f);

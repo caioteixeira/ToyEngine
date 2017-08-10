@@ -1,3 +1,4 @@
+#if DX12
 #include "D3D12CommandAllocatorPool.h"
 
 D3D12CommandAllocatorPool::D3D12CommandAllocatorPool(D3D12_COMMAND_LIST_TYPE type, ID3D12Device* device) :
@@ -53,3 +54,5 @@ void D3D12CommandAllocatorPool::StoreAllocator(uint64_t fenceValue, ID3D12Comman
 
 	mFreeQueue.push(std::make_pair(fenceValue, allocator));
 }
+
+#endif

@@ -3,10 +3,15 @@
 
 #include "D3D12Types.h"
 
+class D3D12CommandQueue;
+class D3D12GraphicsDevice;
+
 class D3D12CommandContext
 {
+friend D3D12CommandQueue;
+
 public:
-	D3D12CommandContext();
+	explicit D3D12CommandContext(D3D12_COMMAND_LIST_TYPE type, D3D12GraphicsDevice* device);
 	~D3D12CommandContext();
 
 	void Flush(bool waitCompletion = false);
@@ -22,6 +27,9 @@ public:
 
 private:
 	ID3D12GraphicsCommandList* mCommandList;
+	ID3D12CommandAllocator* mAllocator;
+
+	D3D12GraphicsDevice* mDevice;
 };
 #endif
 

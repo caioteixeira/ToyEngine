@@ -92,19 +92,25 @@ struct GraphicsBuffer
 };
 typedef  std::shared_ptr<GraphicsBuffer>  GraphicsBufferPtr;
 
+struct GraphicsTexture
+{
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> uploadHeap = nullptr;
+};
+typedef std::shared_ptr<GraphicsTexture> GraphicsTexturePtr;
+
 struct PipelineState
 {
 	ID3D12PipelineState * PSO;
 };
 typedef std::shared_ptr<PipelineState> PipelineStatePtr;
 
-//typedef std::shared_ptr<ID3D11InputLayout>			InputLayoutPtr;
+// typedef std::shared_ptr<ID3D12InputLayout>			InputLayoutPtr;
 //typedef std::shared_ptr<ID3D11PixelShader>			PixelShaderPtr;
 //typedef std::shared_ptr<ID3D11VertexShader>			VertexShaderPtr;
 //typedef std::shared_ptr<ID3D11RenderTargetView>		RenderTargetPtr;
 //typedef std::shared_ptr<ID3D11DepthStencilView>		DepthStencilPtr;
 //typedef std::shared_ptr<ID3D11SamplerState>			SamplerStatePtr;
-//typedef std::shared_ptr<ID3D11ShaderResourceView>	GraphicsTexturePtr;
 //typedef std::shared_ptr<ID3D11DepthStencilState>	DepthStencilStatePtr;
 //typedef std::shared_ptr<ID3D11RasterizerState>		RasterizerStatePtr;
 //typedef std::shared_ptr<ID3D11BlendState>			BlendStatePtr;

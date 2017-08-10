@@ -7,10 +7,14 @@ void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 
 MeshGeometryPtr D3D12ResourceManager::GetMeshGeometry(const std::string& path, const std::string& inputLayoutName)
 {
+	//TODO: Implement
+	return nullptr;
 }
 
 TexturePtr D3D12ResourceManager::GetTexture(const std::string& path)
 {
+	//TODO: Implement
+	return nullptr;
 }
 
 #endif
