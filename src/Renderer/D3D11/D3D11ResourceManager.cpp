@@ -83,6 +83,10 @@ MaterialPtr D3D11ResourceManager::CreateMaterial(Utils::MaterialDesc desc)
 	}
 
 	//TODO: Setup pipeline state
+	auto pipelineState = std::make_shared<PipelineState>();
+	pipelineState->inputLayout = GetInputLayout("positionnormaltexcoord");
+
+	material->pipelineState = pipelineState;
 
 	return material;
 }
@@ -110,7 +114,6 @@ void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 			EBF_VertexBuffer, ECPUAF_Neither, EGBU_Immutable);
 		auto indexBuffer = mDevice.CreateGraphicsBuffer(meshData.indices.data(), meshData.indices.size() * sizeof(size_t),
 			EBF_IndexBuffer, ECPUAF_Neither, EGBU_Immutable);
-		auto inputLayout = GetInputLayout("positionnormaltexcoord");
 		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, meshData.indices.size());
 		auto material = materials[meshData.materialName];
 
