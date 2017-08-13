@@ -16,6 +16,7 @@ public:
 	uint64_t ExecuteCommandList(ID3D12CommandList* List);
 	uint64_t FinishCommandContext(D3D12CommandContext& context, bool waitForCompletion = false);
 	ID3D12CommandAllocator * GetAllocator();
+	ID3D12CommandQueue * GetCommandQueue();
 	void StoreAllocator(uint64_t fence, ID3D12CommandAllocator* allocator);
 private:
 

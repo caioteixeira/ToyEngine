@@ -6,7 +6,6 @@
 #include "../../WindowsHeaders.h"
 #include "../../Math.h"
 #include "D3D12CommandQueue.h"
-#include "d3dx12.h"
 
 class D3D12CommandQueue;
 
@@ -46,7 +45,7 @@ private:
 	D3D12_RECT mScissorRect;
 
 	Microsoft::WRL::ComPtr<IDXGIFactory4> mdxgiFactory;
-	Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;
+	Microsoft::WRL::ComPtr<IDXGISwapChain3> mSwapChain;
 	Microsoft::WRL::ComPtr<ID3D12Device> mDevice;
 
 	UINT64 mCurrentFence = 0;
@@ -65,6 +64,8 @@ private:
 	UINT mRtvDescriptorSize = 0;
 	UINT mDsvDescriptorSize = 0;
 	UINT mCbvSrvUavDescriptorSize = 0;
+
+	const DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 };
 
 #endif

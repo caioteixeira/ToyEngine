@@ -53,5 +53,5 @@ void Game::RunLoop()
 void Game::StartGame()
 {
 	mWorld.Init(mRenderer);
-	mWorld.LoadObjLevel("Assets/rungholt.obj");
+	mWorld.LoadObjLevel("Assets/house.obj");
 }

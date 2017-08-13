@@ -92,6 +92,11 @@ ID3D12CommandAllocator* D3D12CommandQueue::GetAllocator()
 	return mAllocatorPool.GetAllocator(mFence->GetCompletedValue());
 }
 
+ID3D12CommandQueue * D3D12CommandQueue::GetCommandQueue()
+{
+	return mCommandQueue;
+}
+
 void D3D12CommandQueue::StoreAllocator(uint64_t fence, ID3D12CommandAllocator* allocator)
 {
 	mAllocatorPool.StoreAllocator(fence, allocator);
