@@ -7,14 +7,14 @@
 class D3D12CommandQueue
 {
 public:
-	D3D12CommandQueue(D3D12_COMMAND_LIST_TYPE type, ID3D12Device * device);
+	D3D12CommandQueue(D3D12_COMMAND_LIST_TYPE type, D3D12GraphicsDevice * device);
 	~D3D12CommandQueue();
 
 	bool IsFenceComplete(uint64_t FenceValue);
 	void WaitForFence(uint64_t fence);
+	void WaitForIdle() { WaitForFence(mNextFenceValue - 1); };
 
 	uint64_t ExecuteCommandList(ID3D12CommandList* List);
-	uint64_t FinishCommandContext(D3D12CommandContext& context, bool waitForCompletion = false);
 	ID3D12CommandAllocator * GetAllocator();
 	ID3D12CommandQueue * GetCommandQueue();
 	void StoreAllocator(uint64_t fence, ID3D12CommandAllocator* allocator);

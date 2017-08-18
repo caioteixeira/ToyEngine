@@ -32,11 +32,11 @@ void ShowImGUISample()
 
 void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& events, entityx::TimeDelta dt)
 {
-	ImGui_ImplDX11_NewFrame();
+	//ImGui_ImplDX11_NewFrame();
 
 	assert(mRenderer != nullptr);
 
-	ShowImGUISample();
+	//ShowImGUISample();
 
 	FramePacket packet;
 	entityx::ComponentHandle<Transform> transform;

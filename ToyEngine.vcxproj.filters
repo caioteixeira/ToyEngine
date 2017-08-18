@@ -192,10 +192,7 @@
     <ClInclude Include="src\Renderer\D3D12\d3dx12.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\D3D12\DynamicUploadHeap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Renderer\D3D12\GPURingBuffer.h">
+    <ClInclude Include="src\Renderer\D3D12\D3D12CommandContextManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -299,10 +296,7 @@
     <ClCompile Include="src\InputManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\D3D12\DynamicUploadHeap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\D3D12\GPURingBuffer.cpp">
+    <ClCompile Include="src\Renderer\D3D12\D3D12CommandContextManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

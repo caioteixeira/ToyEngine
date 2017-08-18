@@ -8,6 +8,7 @@
 #include "D3D12CommandQueue.h"
 
 class D3D12CommandQueue;
+class CommandContextManager;
 
 class D3D12GraphicsDevice
 {
@@ -17,11 +18,10 @@ public:
 
 	void ClearBackBuffer(const Vector3& inColor, float inAlpha);
 
-	void CreateCommandList(D3D12_COMMAND_LIST_TYPE type, ID3D12GraphicsCommandList** list, ID3D12CommandAllocator** allocator);
-
 	void Present();
 
 	ID3D12Device* GetDevice() const { return mDevice.Get(); }
+	CommandContextManager* GetCommandContextManager() const { return mCommandListManager.get(); }
 private:
 	void InitDevice();
 	void InitCommandObjects();
@@ -37,6 +37,8 @@ private:
 
 	void CreateRtvAndDsvDescriptorHeaps();
 
+	std::unique_ptr<CommandContextManager> mCommandListManager;
+
 	HWND mWindow;
 	UINT mWindowWidth;
 	UINT mWindowHeight;
@@ -45,13 +47,10 @@ private:
 	D3D12_RECT mScissorRect;
 
 	Microsoft::WRL::ComPtr<IDXGIFactory4> mdxgiFactory;
-	Microsoft::WRL::ComPtr<IDXGISwapChain3> mSwapChain;
+	Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;
 	Microsoft::WRL::ComPtr<ID3D12Device> mDevice;
 
 	UINT64 mCurrentFence = 0;
-
-	std::unique_ptr<D3D12CommandQueue> mGraphicsQueue;
-	std::unique_ptr<D3D12CommandQueue> mCopyQueue;
 
 	static const int SwapChainBufferCount = 2;
 	int mCurrBackBuffer = 0;

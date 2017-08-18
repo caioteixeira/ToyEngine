@@ -2,6 +2,7 @@
 #ifdef DX12
 #include "D3D12Device.h"
 #include "d3dx12.h"
+#include "D3D12CommandContextManager.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace std;
@@ -26,73 +27,29 @@ D3D12GraphicsDevice::~D3D12GraphicsDevice()
 
 void D3D12GraphicsDevice::ClearBackBuffer(const Vector3& inColor, float alpha)
 {
-	/*
-	// Reuse the memory associated with command recording.
-	// We can only reset when the associated command lists have finished execution on the GPU.
-	ThrowIfFailed(mDirectCmdListAlloc->Reset());
-
-	// A command list can be reset after it has been added to the command queue via ExecuteCommandList.
-	// Reusing the command list reuses memory.
-	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
+	auto context = mCommandListManager->AllocateContext();
 
 	// Indicate a state transition on the resource usage.
-	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+	context->TransitionResource(CurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	// Set the viewport and scissor rect.  This needs to be reset whenever the command list is reset.
-	mCommandList->RSSetViewports(1, &mScreenViewport);
-	mCommandList->RSSetScissorRects(1, &mScissorRect);
+	context->SetViewport(mScreenViewport);
+	context->SetScissor(mScissorRect);
 
 	// Clear the back buffer and depth buffer.
-	float clearColor[4];
-	clearColor[0] = inColor.x;
-	clearColor[1] = inColor.y;
-	clearColor[2] = inColor.z;
-	clearColor[3] = alpha;
-
-	mCommandList->ClearRenderTargetView(CurrentBackBufferView(), clearColor, 0, nullptr);
-	mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+	Color clearColor(inColor.x, inColor.y, inColor.z, alpha);
+	context->ClearRenderTargetView(CurrentBackBufferView(), clearColor);
+	context->ClearDepthStencilView(DepthStencilView(), 1.0f, 0);
 
 	// Specify the buffers we are going to render to.
-	mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
+	context->SetRenderTarget(CurrentBackBufferView(), DepthStencilView());
 
 	// Indicate a state transition on the resource usage.
-	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+	context->TransitionResource(CurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
-	// Done recording commands.
-	ThrowIfFailed(mCommandList->Close());
-
-	// Add the command list to the queue for execution.
-	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
-	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
-
-	// Wait until frame commands are complete.  This waiting is inefficient and is
-	// done for simplicity.  Later we will show how to organize our rendering code
-	// so we do not have to wait per frame.
-	FlushCommandQueue();
-	*/
-}
-
-void D3D12GraphicsDevice::CreateCommandList(D3D12_COMMAND_LIST_TYPE type, ID3D12GraphicsCommandList** list, ID3D12CommandAllocator** allocator)
-{
-	auto result = mDevice->CreateCommandAllocator(type,
-		IID_PPV_ARGS(allocator));
-	ThrowIfFailed(result, "Failed to create command allocator!");
-
-	if(type == D3D12_COMMAND_LIST_TYPE_COPY)
-	{
-		*allocator = mCopyQueue->GetAllocator();
-	}
-	else
-	{
-		*allocator = mGraphicsQueue->GetAllocator();
-	}
-
-
-	result = mDevice->CreateCommandList(1, type, *allocator,
-		nullptr, IID_PPV_ARGS(list));
-	ThrowIfFailed(result, "Failed to create command list!");
+	context->Finish(true);
 }
 
 void D3D12GraphicsDevice::Present()
@@ -151,15 +108,14 @@ void D3D12GraphicsDevice::InitDevice()
 	//TODO: Fallback to WARP device
 	assert(mDevice != nullptr);
 
-	//InitCommandObjects();
+	InitCommandObjects();
 	CreateSwapChain();
 	CreateRtvAndDsvDescriptorHeaps();
 }
 
 void D3D12GraphicsDevice::InitCommandObjects()
 {
-	mCopyQueue = std::make_unique<D3D12CommandQueue>(D3D12_COMMAND_LIST_TYPE_COPY, mDevice.Get());
-	mGraphicsQueue = std::make_unique<D3D12CommandQueue>(D3D12_COMMAND_LIST_TYPE_DIRECT, mDevice.Get());
+	mCommandListManager = std::make_unique<CommandContextManager>(this);
 }
 
 void D3D12GraphicsDevice::FlushCommandQueue()
@@ -193,7 +149,7 @@ void D3D12GraphicsDevice::OnResize()
 	//TODO: Flush command queues
 
 	//TODO: Get from context pool
-	D3D12CommandContext commandContext(D3D12_COMMAND_LIST_TYPE_DIRECT, this);
+	D3D12CommandContext* commandContext = mCommandListManager->AllocateContext();
 
 	//Release previous resources
 	for (int i = 0; i < SwapChainBufferCount; ++i)
@@ -228,6 +184,8 @@ void D3D12GraphicsDevice::OnResize()
 	depthStencilDesc.MipLevels = 1;
 	depthStencilDesc.Format = mDepthStencilFormat;
 	depthStencilDesc.SampleDesc.Count = 1;
+	depthStencilDesc.SampleDesc.Quality = 0;
+	depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
 	D3D12_CLEAR_VALUE optClear;
@@ -253,11 +211,11 @@ void D3D12GraphicsDevice::OnResize()
 	mDevice->CreateDepthStencilView(mDepthStencilBuffer.Get(), &dsvDesc, DepthStencilView());
 
 	// Transition the resource from its initial state to be used as a depth buffer.
-	commandContext.BeginResourceTransition(mDepthStencilBuffer.Get(), 
+	commandContext->TransitionResource(mDepthStencilBuffer.Get(),
 		D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 	//Finish and wait context completion
-	commandContext.Finish(true);
+	commandContext->Finish(true);
 
 	mScreenViewport.TopLeftX = 0;
 	mScreenViewport.TopLeftY = 0;
@@ -266,7 +224,7 @@ void D3D12GraphicsDevice::OnResize()
 	mScreenViewport.MinDepth = 0.0f;
 	mScreenViewport.MaxDepth = 1.0f;
 
-	mScissorRect = { 0, 0, mWindowWidth, mWindowHeight };
+	mScissorRect = { 0, 0, (LONG) mWindowWidth, (LONG) mWindowHeight };
 }
 
 void D3D12GraphicsDevice::CreateSwapChain()
@@ -290,11 +248,12 @@ void D3D12GraphicsDevice::CreateSwapChain()
 	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-	HRESULT result = mdxgiFactory->CreateSwapChain(mGraphicsQueue->GetCommandQueue(), &desc, reinterpret_cast<IDXGISwapChain1**>(mSwapChain.GetAddressOf));
+	auto& graphicsQueue = mCommandListManager->GetGraphicsQueue();
+	HRESULT result = mdxgiFactory->CreateSwapChain(graphicsQueue.GetCommandQueue(), &desc, mSwapChain.GetAddressOf());
 	ThrowIfFailed(result, "ERROR! Failed to create swap chain");
 
 	//TODO: Create buffers
-	mCurrBackBuffer = mSwapChain->GetCurrentBackBufferIndex();
+	mCurrBackBuffer = 0;
 }
 
 void D3D12GraphicsDevice::CreateRtvAndDsvDescriptorHeaps()

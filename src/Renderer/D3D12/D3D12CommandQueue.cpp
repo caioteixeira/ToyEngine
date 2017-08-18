@@ -2,8 +2,8 @@
 #include "D3D12CommandQueue.h"
 #include <algorithm>
 
-D3D12CommandQueue::D3D12CommandQueue(D3D12_COMMAND_LIST_TYPE type, ID3D12Device* device):
-	mType(type), mDevice(device), mAllocatorPool(mType, device)
+D3D12CommandQueue::D3D12CommandQueue(D3D12_COMMAND_LIST_TYPE type, D3D12GraphicsDevice* device):
+	mType(type), mDevice(device->GetDevice()), mAllocatorPool(mType, mDevice)
 {
 	//TODO: add asserts
 
@@ -66,25 +66,6 @@ uint64_t D3D12CommandQueue::ExecuteCommandList(ID3D12CommandList* list)
 	mCommandQueue->Signal(mFence, mNextFenceValue);
 
 	return mNextFenceValue++;
-}
-
-uint64_t D3D12CommandQueue::FinishCommandContext(D3D12CommandContext& context, bool waitForCompletion)
-{
-	//TODO: Flush resource barriers
-
-	uint64_t fence = ExecuteCommandList(context.mCommandList);
-
-	StoreAllocator(fence, context.mAllocator);
-	context.mAllocator = nullptr;
-
-	if(waitForCompletion)
-	{
-		WaitForFence(fence);
-	}
-
-	//TODO: FreeContext;
-
-	return fence;
 }
 
 ID3D12CommandAllocator* D3D12CommandQueue::GetAllocator()

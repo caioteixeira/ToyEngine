@@ -29,8 +29,10 @@ bool D3D12Renderer::Init(int width, int height)
 
 void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 {
-	//TODO: WIP Clear is clearing and swapping buffers
 	Clear();
+
+
+	Present();
 }
 
 D3D12ResourceManager * D3D12Renderer::GetResourceManager()
@@ -45,6 +47,6 @@ void D3D12Renderer::Clear()
 
 void D3D12Renderer::Present()
 {
-
+	mGraphicsDevice->Present();
 }
 #endif
