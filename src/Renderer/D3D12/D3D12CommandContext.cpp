@@ -2,9 +2,10 @@
 #include "D3D12Device.h"
 #include "D3D12CommandContext.h"
 #include "D3D12CommandContextManager.h"
+#include "DynamicUploadHeap.h"
 
 D3D12CommandContext::D3D12CommandContext(D3D12_COMMAND_LIST_TYPE type, D3D12GraphicsDevice* device)
-	: mDevice(device)
+	: mDevice(device), mUploadHeap(true, device, 1024)
 {
 	mContextManager = mDevice->GetCommandContextManager();
 	mContextManager->CreateCommandList(type, &mCommandList, &mAllocator);
@@ -32,6 +33,18 @@ uint64_t D3D12CommandContext::Finish(bool waitCompletion)
 	mContextManager->FreeContext(this);
 
 	return fenceValue;
+}
+
+void D3D12CommandContext::CopyBuffer(GraphicsResourcePtr dest, GraphicsResourcePtr src)
+{
+	TransitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST);
+	TransitionResource(src, D3D12_RESOURCE_STATE_COPY_SOURCE);
+	mCommandList->CopyResource(dest->buffer.Get(), src->buffer.Get());
+}
+
+DynamicAllocation D3D12CommandContext::ReserveUploadMemory(size_t sizeInBytes)
+{
+	return mUploadHeap.Allocate(sizeInBytes);
 }
 
 void D3D12CommandContext::ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE & rtvHandle, Color& clearColor)
@@ -73,6 +86,12 @@ void D3D12CommandContext::TransitionResource(ID3D12Resource * resource, D3D12_RE
 	//TODO: Cache multiple barriers and delay submission
 	mCommandList->ResourceBarrier(1, &barrierDesc);
 
+}
+
+void D3D12CommandContext::TransitionResource(GraphicsResourcePtr resource, D3D12_RESOURCE_STATES state)
+{
+	TransitionResource(resource->buffer.Get(), resource->state, state);
+	resource->state = state;
 }
 
 void D3D12CommandContext::Reset()

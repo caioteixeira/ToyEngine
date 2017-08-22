@@ -1,5 +1,7 @@
 ﻿#if DX12
 #include "DynamicUploadHeap.h"
+#include "D3D12Device.h"
+#include "GPURingBuffer.h"
 
 DynamicUploadHeap::DynamicUploadHeap(bool isCPUAcessible, D3D12GraphicsDevice* device, size_t initialSize)
 	: mIsCPUAccessible(isCPUAcessible), mDevice(device)

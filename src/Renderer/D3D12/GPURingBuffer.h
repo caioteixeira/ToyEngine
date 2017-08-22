@@ -4,7 +4,7 @@
 #include <utility>
 #include <cstdint>
 #include <deque>
-#include "D3D12Device.h"
+#include "../../WindowsHeaders.h"
 
 struct DynamicAllocation
 {
@@ -25,6 +25,8 @@ public:
 	static const size_t invalidOffset = static_cast<size_t>(-1);
 
 	GPURingBuffer(size_t maxSize, ID3D12Device* device, bool allowCPUAccess);
+
+	~GPURingBuffer();
 
 	GPURingBuffer(GPURingBuffer && rhs);
 	GPURingBuffer& operator = (GPURingBuffer&& rhs);

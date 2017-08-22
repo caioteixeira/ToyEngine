@@ -1,7 +1,10 @@
 ﻿#pragma once
 #if DX12
 
+#include <vector>
 #include "GPURingBuffer.h"
+
+class D3D12GraphicsDevice;
 
 class DynamicUploadHeap
 {

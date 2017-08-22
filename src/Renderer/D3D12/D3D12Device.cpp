@@ -2,6 +2,7 @@
 #ifdef DX12
 #include "D3D12Device.h"
 #include "d3dx12.h"
+#include "D3D12CommandContext.h"
 #include "D3D12CommandContextManager.h"
 
 using Microsoft::WRL::ComPtr;
@@ -23,6 +24,60 @@ D3D12GraphicsDevice::D3D12GraphicsDevice(void *window)
 D3D12GraphicsDevice::~D3D12GraphicsDevice()
 {
 
+}
+
+GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string & name, UINT numElements, UINT elementSize, const void * initialData)
+{
+	auto buffer = std::make_shared<GraphicsBuffer>();
+	buffer->elementSize = elementSize;
+	buffer->numElements = numElements;
+
+	auto resource = std::make_shared<GraphicsResource>();
+	resource->bufferSize = numElements * elementSize;
+	resource->state = D3D12_RESOURCE_STATE_COMMON;
+
+	buffer->resource = resource;
+
+	//Allocate buffer
+	D3D12_HEAP_PROPERTIES heapProperties;
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProperties.CreationNodeMask = 1;
+	heapProperties.VisibleNodeMask = 1;
+
+	D3D12_RESOURCE_DESC desc = {};
+	desc.Alignment = 0;
+	desc.DepthOrArraySize = 1;
+	desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	desc.Format = DXGI_FORMAT_UNKNOWN;
+	desc.Height = 1;
+	desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	desc.MipLevels = 1;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Width = (UINT64)resource->bufferSize;
+
+	auto result = mDevice->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &desc, 
+		resource->state, nullptr, IID_PPV_ARGS(&resource->buffer));
+	ThrowIfFailed(result, "ERROR! Failed to initialize buffer");
+
+	//Copies initial data
+	if (initialData)
+	{
+		auto context = mCommandListManager->AllocateContext();
+		auto mem = context->ReserveUploadMemory(resource->bufferSize);
+		memcpy(mem.CPUAddress, initialData, resource->bufferSize);
+
+		context->TransitionResource(resource, D3D12_RESOURCE_STATE_COPY_DEST);
+		context->GetCommandList()->CopyBufferRegion(resource->buffer.Get(), 0, mem.buffer, 0, resource->bufferSize );
+		context->TransitionResource(resource, D3D12_RESOURCE_STATE_GENERIC_READ);
+
+		context->Finish(true);
+	}
+
+	return buffer;
 }
 
 void D3D12GraphicsDevice::ClearBackBuffer(const Vector3& inColor, float alpha)

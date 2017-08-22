@@ -23,6 +23,7 @@ bool D3D12Renderer::Init(int width, int height)
 	}
 
 	mGraphicsDevice = std::make_unique<D3D12GraphicsDevice>(GetActiveWindow());
+	mResourceManager = std::make_unique<D3D12ResourceManager>(mGraphicsDevice.get());
 
 	return true;
 }
@@ -30,7 +31,6 @@ bool D3D12Renderer::Init(int width, int height)
 void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 {
 	Clear();
-
 
 	Present();
 }

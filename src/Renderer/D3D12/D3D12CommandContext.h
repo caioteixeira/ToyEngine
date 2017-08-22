@@ -3,6 +3,7 @@
 
 #include "../../Math.h"
 #include "D3D12Types.h"
+#include "DynamicUploadHeap.h"
 
 class D3D12CommandQueue;
 class D3D12GraphicsDevice;
@@ -24,7 +25,8 @@ public:
 	uint64_t Flush(bool waitCompletion = false);
 	uint64_t Finish(bool waitCompletion = false);
 
-	void CopyBuffer(GraphicsBufferPtr dest, GraphicsBufferPtr src);
+	void CopyBuffer(GraphicsResourcePtr dest, GraphicsResourcePtr src);
+	DynamicAllocation ReserveUploadMemory(size_t sizeInBytes);
 
 	void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle, Color& clearColor);
 	void ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE& dsvHandle, float depth, UINT8 stencil);
@@ -41,6 +43,9 @@ public:
 	void DrawIndexed(int indexCount, int startIndexLocation, int baseVertexLocation = 0);
 
 	void TransitionResource(ID3D12Resource * resource, D3D12_RESOURCE_STATES stateBefore, D3D12_RESOURCE_STATES stateAfter);
+	void TransitionResource(GraphicsResourcePtr resource, D3D12_RESOURCE_STATES state);
+
+	ID3D12GraphicsCommandList* GetCommandList() { return mCommandList; }
 
 	void Reset();
 private:
@@ -49,6 +54,8 @@ private:
 
 	CommandContextManager* mContextManager;
 	D3D12GraphicsDevice* mDevice;
+
+	DynamicUploadHeap mUploadHeap;
 };
 #endif
 

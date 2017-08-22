@@ -4,15 +4,14 @@
 #include <memory>
 #include "../../WindowsHeaders.h"
 
-//enum EBindflags
-//{
-//	EBF_VertexBuffer = D3D11_BIND_VERTEX_BUFFER,
-//	EBF_IndexBuffer = D3D11_BIND_INDEX_BUFFER,
-//	EBF_ConstantBuffer = D3D11_BIND_CONSTANT_BUFFER,
-//	EBF_ShaderResource = D3D11_BIND_SHADER_RESOURCE,
-//	EBF_RenderTarget = D3D11_BIND_RENDER_TARGET,
-//	EBF_DeptStencil = D3D11_BIND_DEPTH_STENCIL
-//};
+#define D3D12_GPU_VIRTUAL_ADDRESS_NULL      ((D3D12_GPU_VIRTUAL_ADDRESS)0)
+#define D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN   ((D3D12_GPU_VIRTUAL_ADDRESS)-1)
+
+enum EGraphicsBufferTypes
+{	EGBT_VertexBuffer,
+	EGBT_IndexBuffer,
+};
+
 //
 //enum EGraphicsBufferUsage
 //{
@@ -84,11 +83,23 @@ enum ETextureFormat
 //	}
 //};
 
+struct GraphicsResource
+{
+	Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
+	unsigned bufferSize;
+
+	D3D12_RESOURCE_STATES state;
+};
+typedef std::shared_ptr<GraphicsResource> GraphicsResourcePtr;
+
 struct GraphicsBuffer
 {
-	Microsoft::WRL::ComPtr<ID3D12Resource> buffer = nullptr;
-	UINT byteStride;
-	UINT byteSize;
+	GraphicsResourcePtr resource = nullptr;
+	unsigned elementSize;
+	unsigned numElements;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE UAV;
+	D3D12_CPU_DESCRIPTOR_HANDLE SRV;
 };
 typedef  std::shared_ptr<GraphicsBuffer>  GraphicsBufferPtr;
 

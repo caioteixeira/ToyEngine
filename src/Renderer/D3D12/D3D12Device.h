@@ -6,15 +6,21 @@
 #include "../../WindowsHeaders.h"
 #include "../../Math.h"
 #include "D3D12CommandQueue.h"
+#include "D3D12Types.h"
 
 class D3D12CommandQueue;
 class CommandContextManager;
+class D3D12CommandContext;
 
 class D3D12GraphicsDevice
 {
+
 public:
+
 	D3D12GraphicsDevice(void *window);
 	~D3D12GraphicsDevice();
+
+	GraphicsBufferPtr CreateGraphicsBuffer(const std::string& name, UINT numElements, UINT elementSize, const void* initialData);
 
 	void ClearBackBuffer(const Vector3& inColor, float inAlpha);
 

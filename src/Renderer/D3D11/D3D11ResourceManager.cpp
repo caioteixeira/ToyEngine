@@ -1,6 +1,6 @@
-﻿#include "../Mesh.h"
+﻿#if DX11
+#include "../Mesh.h"
 #include "../ConstantBufferStructs.h"
-#if DX11
 #include "D3D11ResourceManager.h"
 #include "D3D11GraphicsDevice.h"
 #include "../Utils.h"

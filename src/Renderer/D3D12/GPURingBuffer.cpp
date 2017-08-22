@@ -51,6 +51,33 @@ GPURingBuffer::GPURingBuffer(size_t maxSize, ID3D12Device* device, bool allowCPU
 	}
 }
 
+GPURingBuffer::~GPURingBuffer()
+{
+	Destroy();
+}
+
+GPURingBuffer::GPURingBuffer(GPURingBuffer && rhs) :
+	mCPUVirtualAddress(rhs.mCPUVirtualAddress),
+	mGPUVirtualAddress(rhs.mGPUVirtualAddress),
+	mBuffer(std::move(rhs.mBuffer))
+{
+	rhs.mCPUVirtualAddress = nullptr;
+	rhs.mGPUVirtualAddress = 0;
+	rhs.mBuffer.Reset();
+}
+
+GPURingBuffer & GPURingBuffer::operator=(GPURingBuffer && rhs)
+{
+	Destroy();
+	mCPUVirtualAddress = rhs.mCPUVirtualAddress;
+	mGPUVirtualAddress = rhs.mGPUVirtualAddress;
+	mBuffer = std::move(rhs.mBuffer);
+	rhs.mCPUVirtualAddress = 0;
+	rhs.mGPUVirtualAddress = 0;
+
+	return *this;
+}
+
 DynamicAllocation GPURingBuffer::Allocate(size_t size)
 {
 	auto offset = GetAllocationOffset(size);
@@ -133,6 +160,17 @@ size_t GPURingBuffer::GetAllocationOffset(size_t size)
 	}
 
 	return invalidOffset;
+}
+
+void GPURingBuffer::Destroy()
+{
+	if (mCPUVirtualAddress)
+	{
+		mBuffer->Unmap(0, nullptr);
+	}
+	mCPUVirtualAddress = 0;
+	mGPUVirtualAddress = 0;
+	mBuffer.Reset();
 }
 
 #endif
