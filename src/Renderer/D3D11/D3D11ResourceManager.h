@@ -22,7 +22,7 @@ private:
 	D3D11GraphicsDevice& mDevice;
 
 	TexturePtr LoadTexture(const std::string& path) const;
-	MaterialPtr CreateMaterial(Utils::MaterialDesc desc);
+	MaterialPtr CreateMaterial(Utils::MaterialDesc& desc);
 	MeshGeometryPtr LoadMeshGeometry(const std::string& path, const std::string& inputLayoutName);
 
 	std::unordered_map<std::string, MeshGeometryPtr> mGeometryCache;

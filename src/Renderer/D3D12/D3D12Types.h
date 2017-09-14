@@ -97,22 +97,20 @@ struct GraphicsBuffer
 	GraphicsResourcePtr resource = nullptr;
 	unsigned elementSize;
 	unsigned numElements;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE UAV;
-	D3D12_CPU_DESCRIPTOR_HANDLE SRV;
 };
 typedef  std::shared_ptr<GraphicsBuffer>  GraphicsBufferPtr;
 
 struct GraphicsTexture
 {
-	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> uploadHeap = nullptr;
+	GraphicsResourcePtr resource;
+	D3D12_CPU_DESCRIPTOR_HANDLE SRV;
 };
 typedef std::shared_ptr<GraphicsTexture> GraphicsTexturePtr;
 
 struct PipelineState
 {
-	ID3D12PipelineState * PSO;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
 };
 typedef std::shared_ptr<PipelineState> PipelineStatePtr;
 

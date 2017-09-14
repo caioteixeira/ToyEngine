@@ -1,7 +1,10 @@
 ﻿#pragma once
 
 #if DX12
+#include <array>
 #include "../IResourceManager.h"
+#include "../Utils.h"
+#include "d3dx12.h"
 
 class D3D12GraphicsDevice;
 
@@ -15,6 +18,12 @@ public:
 	TexturePtr GetTexture(const std::string& path);
 
 private:
+	MaterialPtr CreateMaterial(Utils::MaterialDesc& desc);
+	PipelineStatePtr GetPipelineState(MaterialProperties properties);
+	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers();
+
+	//TODO: Create a pipeline cache for multiple bindings
+	PipelineStatePtr mDefaultPipeline;
 	D3D12GraphicsDevice* mDevice;
 };
 #endif

@@ -4,6 +4,8 @@
 #include "d3dx12.h"
 #include "D3D12CommandContext.h"
 #include "D3D12CommandContextManager.h"
+#include <WICTextureLoader.h>
+
 
 using Microsoft::WRL::ComPtr;
 using namespace std;
@@ -24,6 +26,56 @@ D3D12GraphicsDevice::D3D12GraphicsDevice(void *window)
 D3D12GraphicsDevice::~D3D12GraphicsDevice()
 {
 
+}
+
+ComPtr<ID3DBlob> D3D12GraphicsDevice::CompileShaderFromFile(const std::wstring & filename, const D3D_SHADER_MACRO * defines, const std::string & entrypoint, const std::string & target)
+{
+	UINT compileFlags = 0;
+
+#if defined(DEBUG) || defined(_DEBUG)
+	compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+
+	HRESULT hr = S_OK;
+
+	ComPtr<ID3DBlob> byteCode = nullptr;
+	ComPtr<ID3DBlob> errors;
+
+	hr = D3DCompileFromFile(filename.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, entrypoint.c_str(),
+		target.c_str(), compileFlags, 0, &byteCode, &errors);
+
+	if (errors != nullptr)
+	{
+		SDL_Log((char*)errors->GetBufferPointer());
+	}
+
+	ThrowIfFailed(hr, "ERROR! Failed to compile shader from file!");
+
+	return byteCode;
+}
+
+ComPtr<ID3D12RootSignature> D3D12GraphicsDevice::CreateRootSignature(CD3DX12_ROOT_SIGNATURE_DESC & desc)
+{
+	ComPtr<ID3DBlob> serializedRootSig = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+
+	HRESULT hr = D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, 
+		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+	if (errorBlob != nullptr)
+	{
+		SDL_Log((char*)errorBlob->GetBufferPointer());
+	}
+	ThrowIfFailed(hr);
+
+	ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+
+	hr = mDevice->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(rootSignature.GetAddressOf()));
+
+	ThrowIfFailed(hr, "ERROR! Unable to create root signature!");
+
+	return rootSignature;
 }
 
 GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string & name, UINT numElements, UINT elementSize, const void * initialData)
@@ -78,6 +130,49 @@ GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string & 
 	}
 
 	return buffer;
+}
+
+GraphicsTexturePtr D3D12GraphicsDevice::CreateTextureFromFile(const char * inFileName, int & outWidth, int & outHeight) const
+{
+	std::string fileStr(inFileName);
+	std::string extension = fileStr.substr(fileStr.find_last_of('.'));
+	const size_t cSize = strlen(inFileName) + 1;
+
+	size_t retCount;
+	std::wstring wc(cSize, L'#');
+	mbstowcs_s(&retCount, &wc[0], cSize, inFileName, _TRUNCATE);
+	HRESULT hr = -1;
+
+	std::unique_ptr<uint8_t[]> decodedData;
+	D3D12_SUBRESOURCE_DATA subresource;
+	auto texture = std::make_shared<GraphicsTexture>();
+
+	if (extension == ".png" || extension == ".bmp" || extension == ".PNG" || extension == ".BMP")
+	{
+		hr = DirectX::LoadWICTextureFromFile(mDevice.Get(), wc.c_str(), texture->resource->buffer.ReleaseAndGetAddressOf(), 
+			decodedData, subresource);
+	}
+	else
+	{
+		//TODO: Use logger class
+		SDL_Log("ERROR: GraphicsDriver can only load images of type DDS, PNG, or BMP.");
+	}
+	ThrowIfFailed(hr, "Problem Creating Texture From File");
+
+	const UINT64 uploadBufferSize = GetRequiredIntermediateSize(texture->resource->buffer.Get(), 0, 1);
+
+	auto context = mCommandListManager->AllocateContext();
+	auto mem = context->ReserveUploadMemory(uploadBufferSize);
+
+	UpdateSubresources(context->GetCommandList(), texture->resource->buffer.Get(), mem.buffer,
+		0, 0, 1, &subresource);
+	context->TransitionResource(texture->resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	context->Finish(true);
+
+	//TODO: Create SRV
+
+	return texture;
 }
 
 void D3D12GraphicsDevice::ClearBackBuffer(const Vector3& inColor, float alpha)

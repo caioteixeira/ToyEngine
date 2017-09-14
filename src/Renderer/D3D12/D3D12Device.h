@@ -7,6 +7,8 @@
 #include "../../Math.h"
 #include "D3D12CommandQueue.h"
 #include "D3D12Types.h"
+#include "d3dx12.h"
+
 
 class D3D12CommandQueue;
 class CommandContextManager;
@@ -20,7 +22,11 @@ public:
 	D3D12GraphicsDevice(void *window);
 	~D3D12GraphicsDevice();
 
+	Microsoft::WRL::ComPtr<ID3DBlob> CompileShaderFromFile(const std::wstring& filename, const D3D_SHADER_MACRO* defines, 
+		const std::string& entrypoint, const std::string& target);
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateRootSignature(CD3DX12_ROOT_SIGNATURE_DESC& desc);
 	GraphicsBufferPtr CreateGraphicsBuffer(const std::string& name, UINT numElements, UINT elementSize, const void* initialData);
+	GraphicsTexturePtr CreateTextureFromFile(const char* inFileName, int& outWidth, int& outHeight) const;
 
 	void ClearBackBuffer(const Vector3& inColor, float inAlpha);
 

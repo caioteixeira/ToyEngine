@@ -256,6 +256,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Utils.h" />
+    <ClInclude Include="src\EngineCore.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12CommandContextManager.h" />
     <ClInclude Include="src\InputManager.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12CommandQueue.h" />
@@ -315,6 +317,7 @@
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\WindowsHeaders.h" />
     <ClInclude Include="src\GameWorld.h" />
+    <ClInclude Include="src\Core\Allocators\VariableSizeMemoryBlockAllocator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Renderer\D3D12\D3D12CommandContextManager.cpp" />
@@ -353,6 +356,7 @@
     <ClCompile Include="src\Renderer\D3D11\D3D11GraphicsDevice.cpp" />
     <ClCompile Include="src\Renderer\D3D11\D3D11Renderer.cpp" />
     <ClCompile Include="src\GameWorld.cpp" />
+    <ClCompile Include="src\Core\Allocators\VariableSizeMemoryBlockAllocator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

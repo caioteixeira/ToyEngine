@@ -2,13 +2,37 @@
 #include <cassert>
 
 
-VariableSizeMemoryBlockAllocator::VariableSizeMemoryBlockAllocator()
+VariableSizeMemoryBlockAllocator::VariableSizeMemoryBlockAllocator(size_t maxSize)
+	: mMaxSize(maxSize), mFreeSize(maxSize), mFreeBlocksByOffset(), mFreeBlocksBySize()
 {
+}
+
+VariableSizeMemoryBlockAllocator::VariableSizeMemoryBlockAllocator(VariableSizeMemoryBlockAllocator && rhs) :
+	mFreeBlocksByOffset(std::move(rhs.mFreeBlocksByOffset)),
+	mFreeBlocksBySize(std::move(rhs.mFreeBlocksBySize)),
+	mMaxSize(rhs.mMaxSize),
+	mFreeSize(rhs.mFreeSize)
+{
+	rhs.mFreeSize = 0;
 }
 
 
 VariableSizeMemoryBlockAllocator::~VariableSizeMemoryBlockAllocator()
 {
+#ifdef _DEBUG
+	if (!mFreeBlocksByOffset.empty() || !mFreeBlocksBySize.empty())
+	{
+		assert(mFreeBlocksByOffset.size() == 1);
+		assert(mFreeBlocksByOffset.begin()->first == 0);
+		assert(mFreeBlocksByOffset.begin()->second.size == mMaxSize);
+		assert(mFreeBlocksByOffset.begin()->second.orderBySizeIterator == mFreeBlocksBySize.begin());
+		assert(mFreeBlocksBySize.size() == mFreeBlocksByOffset.size());
+
+		assert(mFreeBlocksBySize.size() == 1);
+		assert(mFreeBlocksBySize.begin()->first == mMaxSize);
+		assert(mFreeBlocksBySize.begin()->second == mFreeBlocksByOffset.begin());
+	}
+#endif
 }
 
 #ifdef _DEBUG

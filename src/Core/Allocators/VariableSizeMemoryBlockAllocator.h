@@ -26,8 +26,13 @@ class VariableSizeMemoryBlockAllocator
 
 
 public:
-	VariableSizeMemoryBlockAllocator();
+	VariableSizeMemoryBlockAllocator(size_t maxSize);
+	VariableSizeMemoryBlockAllocator(VariableSizeMemoryBlockAllocator&& rhs);
 	~VariableSizeMemoryBlockAllocator();
+
+	VariableSizeMemoryBlockAllocator& operator = (VariableSizeMemoryBlockAllocator&& rhs) = default;
+	VariableSizeMemoryBlockAllocator(const VariableSizeMemoryBlockAllocator&) = delete;
+	VariableSizeMemoryBlockAllocator& operator = (const VariableSizeMemoryBlockAllocator&) = delete;
 
 	size_t Allocate(size_t size);
 	void Free(size_t offset, size_t size);

@@ -64,7 +64,7 @@ TexturePtr D3D11ResourceManager::LoadTexture(const std::string& path) const
 	return std::make_shared<Texture>(graphicsTexture, width, height);
 }
 
-MaterialPtr D3D11ResourceManager::CreateMaterial(Utils::MaterialDesc desc)
+MaterialPtr D3D11ResourceManager::CreateMaterial(Utils::MaterialDesc& desc)
 {
 	auto material = std::make_shared<Material>();
 	material->ambientColor = desc.ambient;
