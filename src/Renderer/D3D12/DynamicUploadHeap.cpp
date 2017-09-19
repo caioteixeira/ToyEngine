@@ -13,7 +13,7 @@ DynamicAllocation DynamicUploadHeap::Allocate(size_t size, size_t alignment)
 {
 	const size_t alignmentMask = alignment - 1;
 
-	//TODO: Assert if alignment is power of two
+	assert((alignmentMask & alignment) == 0);
 
 	const size_t alignedSize = (size + alignmentMask) & ~alignmentMask;
 
@@ -21,8 +21,10 @@ DynamicAllocation DynamicUploadHeap::Allocate(size_t size, size_t alignment)
 	if(!allocation.buffer)
 	{
 		auto newMaxSize = mRingBuffers.back().GetMaxSize() * 2;
+
 		while(newMaxSize < size)
 		{
+			assert(newMaxSize > 0);
 			newMaxSize *= 2;
 		}
 

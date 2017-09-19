@@ -14,10 +14,10 @@ public:
 	~D3D12Renderer();
 	bool Init(int width, int height);
 	void RenderFrame(FramePacket & framePacket);
-	D3D12ResourceManager* GetResourceManager();
+	D3D12ResourceManager* GetResourceManager() const;
 private:
-	void Clear();
-	void Present();
+	void Clear() const;
+	void Present() const;
 
 	std::unique_ptr<class D3D12GraphicsDevice> mGraphicsDevice;
 	std::unique_ptr<D3D12ResourceManager> mResourceManager;
@@ -25,6 +25,8 @@ private:
 	SDL_Window* mWindow;
 	int mWidth = 0;
 	int mHeight = 0;
+
+	Matrix mProj;
 };
 
 #endif

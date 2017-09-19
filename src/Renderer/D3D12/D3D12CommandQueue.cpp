@@ -1,8 +1,11 @@
 #if DX12
 #include "D3D12CommandQueue.h"
 #include <algorithm>
+#include <thread>
+#include <chrono>
+#include <functional>
 
-D3D12CommandQueue::D3D12CommandQueue(D3D12_COMMAND_LIST_TYPE type, D3D12GraphicsDevice* device):
+D3D12CommandQueue::D3D12CommandQueue(D3D12_COMMAND_LIST_TYPE type, D3D12GraphicsDevice* device) :
 	mType(type), mDevice(device->GetDevice()), mAllocatorPool(mType, mDevice)
 {
 	//TODO: add asserts
@@ -39,7 +42,9 @@ bool D3D12CommandQueue::IsFenceComplete(uint64_t fenceValue)
 void D3D12CommandQueue::WaitForFence(uint64_t fence)
 {
 	if (IsFenceComplete(fence))
+	{
 		return;
+	}
 
 	// TODO:  Think about how this might affect a multi-threaded situation.  Suppose thread A
 	// wants to wait for fence 100, then thread B comes along and wants to wait for 99.  If
@@ -56,14 +61,15 @@ void D3D12CommandQueue::WaitForFence(uint64_t fence)
 
 uint64_t D3D12CommandQueue::ExecuteCommandList(ID3D12CommandList* list)
 {
-	std::lock_guard<std::mutex> lock(mFenceMutex);
-
 	auto hr = static_cast<ID3D12GraphicsCommandList*>(list)->Close();
 	ThrowIfFailed(hr, "Failed to close command list!");
+
+	std::lock_guard<std::mutex> lock(mFenceMutex);
 
 	mCommandQueue->ExecuteCommandLists(1, &list);
 
 	mCommandQueue->Signal(mFence, mNextFenceValue);
+	SDL_Log("Signaled %d", mNextFenceValue);
 
 	return mNextFenceValue++;
 }

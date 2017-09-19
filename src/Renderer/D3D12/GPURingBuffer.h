@@ -28,8 +28,8 @@ public:
 
 	~GPURingBuffer();
 
-	GPURingBuffer(GPURingBuffer && rhs);
-	GPURingBuffer& operator = (GPURingBuffer&& rhs);
+	GPURingBuffer(GPURingBuffer && rhs) noexcept;
+	GPURingBuffer& operator = (GPURingBuffer&& rhs) noexcept;
 	GPURingBuffer(const GPURingBuffer&) = delete;
 	GPURingBuffer& operator = (const GPURingBuffer&) = delete;
 

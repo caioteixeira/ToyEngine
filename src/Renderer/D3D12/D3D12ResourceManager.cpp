@@ -10,6 +10,7 @@
 D3D12ResourceManager::D3D12ResourceManager(D3D12GraphicsDevice * device)
 	: mDevice(device)
 {
+	mDefaultPipeline = GetPipelineState(Diffuse);
 }
 
 D3D12ResourceManager::~D3D12ResourceManager()
@@ -27,7 +28,7 @@ void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 	std::unordered_map<std::string, MaterialPtr> materials = {};
 	for (auto& desc : materialMap)
 	{
-		auto material = CreateMaterial(desc.second);
+		auto& material = CreateMaterial(desc.second);
 		materials[desc.first] = material;
 
 		SDL_Log("Renderer: Succesfully loaded a material");
@@ -39,11 +40,11 @@ void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 		auto indexBuffer = mDevice->CreateGraphicsBuffer("Index Buffer", meshData.indices.size(), sizeof(size_t), meshData.indices.data());
 
 		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, meshData.indices.size());
-		//auto material = materials[meshData.materialName];
+		auto material = materials[meshData.materialName];
 
 		Mesh mesh;
 		mesh.geometry = geo;
-		// mesh.material = material;
+		mesh.material = material;
 		outMeshes.push_back(mesh);
 
 		SDL_Log("Renderer: Succesfully loaded a mesh element");
@@ -74,6 +75,7 @@ MaterialPtr D3D12ResourceManager::CreateMaterial(Utils::MaterialDesc& desc)
 
 	//TODO: Properly set illumination properties
 	material->SetProperty(Diffuse);
+	material->pipelineState = mDefaultPipeline;
 
 	return material;
 }
@@ -88,15 +90,15 @@ PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties prope
 	slotRootParameter[1].InitAsConstantBufferView(1);
 
 	auto samplers = GetStaticSamplers();
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter,
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter,
 		(UINT)samplers.size(), samplers.data(),
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	state->rootSignature = mDevice->CreateRootSignature(rootSigDesc);
 
 	//Compile Shaders
-	auto vertexShader = mDevice->CompileShaderFromFile(L"Assets/BasicMesh.hlsl", nullptr, "VS", "vs_5_0");
-	auto pixelShader = mDevice->CompileShaderFromFile(L"Assets/BasicMesh.hlsl", nullptr, "PS", "vs_5_0");
+	auto vertexShader = mDevice->CompileShaderFromFile(L"Assets/BasicMeshDX12.hlsl", nullptr, "VS", "vs_5_0");
+	auto pixelShader = mDevice->CompileShaderFromFile(L"Assets/BasicMeshDX12.hlsl", nullptr, "PS", "ps_5_0");
 
 	std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout =
 	{
@@ -130,13 +132,10 @@ PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties prope
 	opaquePsoDesc.SampleMask = UINT_MAX;
 	opaquePsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	opaquePsoDesc.NumRenderTargets = 1;
-	//TODO: Get format from a unique place
-	opaquePsoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	opaquePsoDesc.RTVFormats[0] = mDevice->GetBackBufferFormat();
 	opaquePsoDesc.SampleDesc.Count = 1;
 	opaquePsoDesc.SampleDesc.Quality = 0;
-	//TODO: Get format from a unique place
-	opaquePsoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
+	opaquePsoDesc.DSVFormat = mDevice->GetDepthStencilFormat();
 
 	ThrowIfFailed(mDevice->GetDevice()->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&state->pipelineState)));
 

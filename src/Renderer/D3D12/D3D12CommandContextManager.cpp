@@ -37,7 +37,6 @@ void CommandContextManager::CreateCommandList(D3D12_COMMAND_LIST_TYPE type, ID3D
 	//TODO: Use Copy queue
 	*allocator = mGraphicsQueue.GetAllocator();
 
-
 	result = device->CreateCommandList(1, type, *allocator,
 		nullptr, IID_PPV_ARGS(list));
 	ThrowIfFailed(result, "ERROR: Failed to create command list!");
@@ -52,15 +51,18 @@ D3D12CommandContext * CommandContextManager::AllocateContext()
 
 	if (mAvailableContexts.empty())
 	{
+		SDL_Log("Create new command context");
 		ret = new D3D12CommandContext(D3D12_COMMAND_LIST_TYPE_DIRECT, mDevice);
 		mContextPool.emplace_back(ret);
 	}
 	else
 	{
+		SDL_Log("Pooled command context");
 		ret = mAvailableContexts.front();
 		mAvailableContexts.pop();
 		ret->Reset();
 	}
+	
 
 	assert(ret != nullptr);
 

@@ -10,8 +10,8 @@ cbuffer PER_OBJECT : register(b1)
 	float4x4 worldMatrix;
 }
 
-SamplerState DefaultSampler : register(s0);
-Texture2D DiffuseTexture : register(t0);
+//SamplerState DefaultSampler : register(s0);
+//Texture2D DiffuseTexture : register(t0);
 
 // Input structs for vertex and pixel shader
 struct VS_INPUT
@@ -49,5 +49,6 @@ PS_INPUT VS(VS_INPUT input)
 //--------------------------------------------------------------------------------------
 float4 PS(PS_INPUT input) : SV_Target
 {
-	return DiffuseTexture.Sample(DefaultSampler, input.mTex);
+	//return DiffuseTexture.Sample(DefaultSampler, input.mTex);
+	return input.mPos;
 }

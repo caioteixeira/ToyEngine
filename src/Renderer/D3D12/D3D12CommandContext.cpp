@@ -5,7 +5,7 @@
 #include "DynamicUploadHeap.h"
 
 D3D12CommandContext::D3D12CommandContext(D3D12_COMMAND_LIST_TYPE type, D3D12GraphicsDevice* device)
-	: mDevice(device), mUploadHeap(true, device, 1024)
+	: mDevice(device), mUploadHeap(true, device, 4092)
 {
 	mContextManager = mDevice->GetCommandContextManager();
 	mContextManager->CreateCommandList(type, &mCommandList, &mAllocator);
@@ -44,7 +44,7 @@ void D3D12CommandContext::CopyBuffer(GraphicsResourcePtr dest, GraphicsResourceP
 
 DynamicAllocation D3D12CommandContext::ReserveUploadMemory(size_t sizeInBytes)
 {
-	return mUploadHeap.Allocate(sizeInBytes);
+	return mUploadHeap.Allocate(sizeInBytes, 256);
 }
 
 void D3D12CommandContext::ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE & rtvHandle, Color& clearColor)
@@ -66,6 +66,62 @@ void D3D12CommandContext::ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE & ds
 void D3D12CommandContext::SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE& rtv, D3D12_CPU_DESCRIPTOR_HANDLE& dsv)
 {
 	mCommandList->OMSetRenderTargets(1, &rtv, true, &dsv);
+}
+
+void D3D12CommandContext::SetGraphicsRootSignature(ID3D12RootSignature * rootSignature)
+{
+	mCommandList->SetGraphicsRootSignature(rootSignature);
+}
+
+void D3D12CommandContext::SetPipelineState(PipelineStatePtr state)
+{
+	if(mActualPipelineState == state)
+	{
+		return;
+	}
+
+	mCommandList->SetPipelineState(state->pipelineState.Get());
+	mActualPipelineState = state;
+}
+
+void D3D12CommandContext::SetIndexBuffer(const GraphicsBufferPtr buffer)
+{
+	if (buffer->resource->state != D3D12_RESOURCE_STATE_INDEX_BUFFER)
+	{
+		TransitionResource(buffer->resource, D3D12_RESOURCE_STATE_INDEX_BUFFER);
+	}
+	auto view = buffer->GetIndexBufferView();
+	mCommandList->IASetIndexBuffer(&view);
+}
+
+void D3D12CommandContext::SetVertexBuffer(const GraphicsBufferPtr buffer)
+{
+	if (buffer->resource->state != D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER)
+	{
+		TransitionResource(buffer->resource, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	}
+	auto view = buffer->GetVertexBufferView();
+	mCommandList->IASetVertexBuffers(0, 1, &view);
+}
+
+void D3D12CommandContext::SetPrimitiveTopology(EPrimitiveTopology topology)
+{
+	mCommandList->IASetPrimitiveTopology(static_cast<D3D12_PRIMITIVE_TOPOLOGY>(topology));
+}
+
+void D3D12CommandContext::Draw(int vertexCount, int vertexStartOffset)
+{
+	mCommandList->DrawInstanced(vertexCount, 1, vertexStartOffset, 0);
+}
+
+void D3D12CommandContext::DrawIndexed(int indexCount, int startIndexLocation, int baseVertexLocation)
+{
+	mCommandList->DrawIndexedInstanced(indexCount, 1, startIndexLocation, baseVertexLocation, 0);
+}
+
+void D3D12CommandContext::SetGraphicsRootConstantBufferView(int slot, D3D12_GPU_VIRTUAL_ADDRESS location)
+{
+	mCommandList->SetGraphicsRootConstantBufferView((UINT) slot, location);
 }
 
 void D3D12CommandContext::TransitionResource(ID3D12Resource * resource, D3D12_RESOURCE_STATES stateBefore, D3D12_RESOURCE_STATES stateAfter)
@@ -99,9 +155,14 @@ void D3D12CommandContext::Reset()
 	assert(mCommandList != nullptr && mAllocator == nullptr);
 	mAllocator = mContextManager->GetGraphicsQueue().GetAllocator();
 	mCommandList->Reset(mAllocator, nullptr);
-}
 
-#endif
+	auto& queue = mContextManager->GetGraphicsQueue();
+	uint64_t currentFence = queue.GetActualFenceValue();
+	uint64_t fenceValue = queue.GetLastCompletedFenceValue();
+	mUploadHeap.FinishFrame(currentFence, fenceValue);
+
+	mActualPipelineState = nullptr;
+}
 
 void D3D12CommandContext::SetViewport(const D3D12_VIEWPORT & viewport)
 {
@@ -113,3 +174,7 @@ void D3D12CommandContext::SetScissor(const D3D12_RECT & rect)
 	assert(rect.left < rect.right && rect.top < rect.bottom);
 	mCommandList->RSSetScissorRects(1, &rect);
 }
+
+
+#endif
+

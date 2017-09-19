@@ -16,7 +16,7 @@ public:
 	DynamicUploadHeap& operator=(const DynamicUploadHeap&) = delete;
 	DynamicUploadHeap& operator=(DynamicUploadHeap&&) = delete;
 	
-	DynamicAllocation Allocate(size_t size, size_t alignment = 256);
+	DynamicAllocation Allocate(size_t size, size_t alignment = 1);
 
 	void FinishFrame(uint64_t frameNum, uint64_t numCompletedFrames);
 

@@ -129,7 +129,7 @@ void D3D11Renderer::RenderFrame(FramePacket& packet)
 		DrawMeshElement(element);
 	}
 
-	ImGui::Render();
+	//ImGui::Render();
 
 	Present();
 }

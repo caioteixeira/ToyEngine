@@ -78,7 +78,7 @@ ComPtr<ID3D12RootSignature> D3D12GraphicsDevice::CreateRootSignature(CD3DX12_ROO
 	return rootSignature;
 }
 
-GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string & name, UINT numElements, UINT elementSize, const void * initialData)
+GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string & name, size_t numElements, size_t elementSize, const void * initialData)
 {
 	auto buffer = std::make_shared<GraphicsBuffer>();
 	buffer->elementSize = elementSize;
@@ -118,12 +118,29 @@ GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string & 
 	//Copies initial data
 	if (initialData)
 	{
+		//Allocate buffer
+		D3D12_HEAP_PROPERTIES UploadHeapProps;
+		UploadHeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+		UploadHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		UploadHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		UploadHeapProps.CreationNodeMask = 1;
+		UploadHeapProps.VisibleNodeMask = 1;
+
+		desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		ComPtr<ID3D12Resource> uploadBuffer;
+		auto hr = mDevice->CreateCommittedResource(&UploadHeapProps, D3D12_HEAP_FLAG_NONE,
+			&desc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadBuffer));
+		ThrowIfFailed(hr);
+
 		auto context = mCommandListManager->AllocateContext();
-		auto mem = context->ReserveUploadMemory(resource->bufferSize);
-		memcpy(mem.CPUAddress, initialData, resource->bufferSize);
+		void* dest;
+		ThrowIfFailed(uploadBuffer->Map(0, nullptr, &dest));
+		memcpy(dest, initialData, resource->bufferSize);
+		uploadBuffer->Unmap(0, nullptr);
 
 		context->TransitionResource(resource, D3D12_RESOURCE_STATE_COPY_DEST);
-		context->GetCommandList()->CopyBufferRegion(resource->buffer.Get(), 0, mem.buffer, 0, resource->bufferSize );
+		context->GetCommandList()->CopyBufferRegion(resource->buffer.Get(), 0, uploadBuffer.Get(), 0, resource->bufferSize );
 		context->TransitionResource(resource, D3D12_RESOURCE_STATE_GENERIC_READ);
 
 		context->Finish(true);
@@ -161,10 +178,34 @@ GraphicsTexturePtr D3D12GraphicsDevice::CreateTextureFromFile(const char * inFil
 
 	const UINT64 uploadBufferSize = GetRequiredIntermediateSize(texture->resource->buffer.Get(), 0, 1);
 
-	auto context = mCommandListManager->AllocateContext();
-	auto mem = context->ReserveUploadMemory(uploadBufferSize);
+	//Allocate buffer
+	D3D12_HEAP_PROPERTIES UploadHeapProps;
+	UploadHeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+	UploadHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	UploadHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	UploadHeapProps.CreationNodeMask = 1;
+	UploadHeapProps.VisibleNodeMask = 1;
 
-	UpdateSubresources(context->GetCommandList(), texture->resource->buffer.Get(), mem.buffer,
+	D3D12_RESOURCE_DESC desc;
+	desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	desc.Alignment = 0;
+	desc.Height = 1;
+	desc.DepthOrArraySize = 1;
+	desc.MipLevels = 1;
+	desc.Format = DXGI_FORMAT_UNKNOWN;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	ComPtr<ID3D12Resource> uploadBuffer;
+	hr = mDevice->CreateCommittedResource(&UploadHeapProps, D3D12_HEAP_FLAG_NONE,
+		&desc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadBuffer));
+	ThrowIfFailed(hr);
+
+	auto context = mCommandListManager->AllocateContext();
+
+	UpdateSubresources(context->GetCommandList(), texture->resource->buffer.Get(), uploadBuffer.Get(),
 		0, 0, 1, &subresource);
 	context->TransitionResource(texture->resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
@@ -177,15 +218,19 @@ GraphicsTexturePtr D3D12GraphicsDevice::CreateTextureFromFile(const char * inFil
 
 void D3D12GraphicsDevice::ClearBackBuffer(const Vector3& inColor, float alpha)
 {
-	auto context = mCommandListManager->AllocateContext();
+	auto& graphicsQueue = mCommandListManager->GetGraphicsQueue();
+	graphicsQueue.WaitForFence(mPresentFences[mCurrBackBuffer]);
+	assert(mPresentFences[mCurrBackBuffer] <= graphicsQueue.GetActualFenceValue());
 
-	// Indicate a state transition on the resource usage.
-	context->TransitionResource(CurrentBackBuffer(),
-		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	auto context = mCommandListManager->AllocateContext();
 
 	// Set the viewport and scissor rect.  This needs to be reset whenever the command list is reset.
 	context->SetViewport(mScreenViewport);
 	context->SetScissor(mScissorRect);
+
+	// Indicate a state transition on the resource usage.
+	context->TransitionResource(CurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	// Clear the back buffer and depth buffer.
 	Color clearColor(inColor.x, inColor.y, inColor.z, alpha);
@@ -195,29 +240,44 @@ void D3D12GraphicsDevice::ClearBackBuffer(const Vector3& inColor, float alpha)
 	// Specify the buffers we are going to render to.
 	context->SetRenderTarget(CurrentBackBufferView(), DepthStencilView());
 
-	// Indicate a state transition on the resource usage.
-	context->TransitionResource(CurrentBackBuffer(),
-		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-
-	context->Finish(true);
+	context->Finish();
 }
 
 void D3D12GraphicsDevice::Present()
 {
 	// swap the back and front buffers
-	ThrowIfFailed(mSwapChain->Present(0, 0));
+	// Indicate a state transition on the resource usage.
+	auto context = mCommandListManager->AllocateContext();
+	context->TransitionResource(CurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+	mPresentFences[mCurrBackBuffer] = context->Finish();
+	const auto fence = mPresentFences[mCurrBackBuffer];
+
+	const auto hr = mSwapChain->Present(0, 0);
+	ThrowIfFailed(hr, "ERROR: Failed to present");
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 }
 
 void D3D12GraphicsDevice::InitDevice()
 {
-	Microsoft::WRL::ComPtr<ID3D12Device> device;
+	ComPtr<ID3D12Device> device;
 
 #if _DEBUG
-	Microsoft::WRL::ComPtr<ID3D12Debug> debugInterface;
+	ComPtr<ID3D12Debug> debugInterface;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
 	{
 		debugInterface->EnableDebugLayer();
+
+		ComPtr<ID3D12Debug1> debugInterface1;
+		auto r = SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&debugInterface1)));
+		if(r)
+		{
+			debugInterface1->SetEnableGPUBasedValidation(true);
+		}
+		else
+		{
+			SDL_Log("WARNING: Unable to enable D3D12 GPU based validation layer!");
+		}
 	}
 	else
 	{
@@ -266,6 +326,8 @@ void D3D12GraphicsDevice::InitDevice()
 void D3D12GraphicsDevice::InitCommandObjects()
 {
 	mCommandListManager = std::make_unique<CommandContextManager>(this);
+	auto & queue = mCommandListManager->GetGraphicsQueue();
+	mLastFrameSubmissionFence = queue.GetActualFenceValue();
 }
 
 void D3D12GraphicsDevice::FlushCommandQueue()
@@ -310,7 +372,7 @@ void D3D12GraphicsDevice::OnResize()
 
 	//Resize swap cahin
 	auto hr = mSwapChain->ResizeBuffers(SwapChainBufferCount, mWindowWidth, mWindowHeight, 
-		DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+		mBackBufferFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 	ThrowIfFailed(hr, "ERROR: Failed to resize swap chain!");
 	mCurrBackBuffer = 0;
 
@@ -322,6 +384,7 @@ void D3D12GraphicsDevice::OnResize()
 
 		mDevice->CreateRenderTargetView(mSwapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
 		rtvHeapHandle.Offset(1, mRtvDescriptorSize);
+		mPresentFences[i] = mCommandListManager->GetGraphicsQueue().GetLastCompletedFenceValue();
 	}
 
 	//Create depth stencil
@@ -386,7 +449,7 @@ void D3D12GraphicsDevice::CreateSwapChain()
 	desc.BufferDesc.Height = mWindowHeight;
 	desc.BufferDesc.RefreshRate.Numerator = 60;
 	desc.BufferDesc.RefreshRate.Denominator = 1;
-	desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.BufferDesc.Format = mBackBufferFormat;
 	desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	desc.SampleDesc.Count = 1;

@@ -56,24 +56,40 @@ GPURingBuffer::~GPURingBuffer()
 	Destroy();
 }
 
-GPURingBuffer::GPURingBuffer(GPURingBuffer && rhs) :
+GPURingBuffer::GPURingBuffer(GPURingBuffer && rhs) noexcept :
 	mCPUVirtualAddress(rhs.mCPUVirtualAddress),
 	mGPUVirtualAddress(rhs.mGPUVirtualAddress),
+	mMaxSize(rhs.mMaxSize),
+	mUsedSize(rhs.mUsedSize),
+	mTail(rhs.mTail),
+	mHead(rhs.mHead),
 	mBuffer(std::move(rhs.mBuffer))
 {
 	rhs.mCPUVirtualAddress = nullptr;
 	rhs.mGPUVirtualAddress = 0;
+	rhs.mMaxSize = 0;
+	rhs.mUsedSize = 0;
+	rhs.mHead = 0;
+	rhs.mTail = 0;
 	rhs.mBuffer.Reset();
 }
 
-GPURingBuffer & GPURingBuffer::operator=(GPURingBuffer && rhs)
+GPURingBuffer & GPURingBuffer::operator=(GPURingBuffer && rhs) noexcept
 {
 	Destroy();
 	mCPUVirtualAddress = rhs.mCPUVirtualAddress;
 	mGPUVirtualAddress = rhs.mGPUVirtualAddress;
+	mMaxSize = rhs.mMaxSize;
+	mUsedSize = rhs.mUsedSize;
+	mTail = rhs.mTail;
+	mHead = rhs.mHead;
 	mBuffer = std::move(rhs.mBuffer);
 	rhs.mCPUVirtualAddress = 0;
 	rhs.mGPUVirtualAddress = 0;
+	rhs.mMaxSize = 0;
+	rhs.mUsedSize = 0;
+	rhs.mTail = 0;
+	rhs.mHead = 0;
 
 	return *this;
 }
@@ -110,6 +126,8 @@ void GPURingBuffer::ReleaseCompletedFrames(uint64_t numCompletedFrames)
 	while(!mCompletedFrameTails.empty() && mCompletedFrameTails.front().first < numCompletedFrames)
 	{
 		auto &oldestFrameTail = mCompletedFrameTails.front().second;
+		const auto completed = mCompletedFrameTails.front().first;
+		SDL_Log("Releasing completed buffers, tail: %i", completed);
 		if(mUsedSize > 0)
 		{
 			if(oldestFrameTail > mHead)
@@ -168,9 +186,13 @@ void GPURingBuffer::Destroy()
 	{
 		mBuffer->Unmap(0, nullptr);
 	}
+
 	mCPUVirtualAddress = 0;
 	mGPUVirtualAddress = 0;
-	mBuffer.Reset();
+	if(mBuffer != nullptr)
+	{
+		mBuffer.Reset();
+	}
 }
 
 #endif

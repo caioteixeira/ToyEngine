@@ -158,6 +158,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\External\DirectXTK12\Bin\Desktop_2015_Win10\Win32\Debug;$(SolutionDir)\External\SDL\lib\x86</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>DirectXTK12.lib;dxgi.lib;SDL2.lib;SDL2main.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);D3D12.lib</AdditionalDependencies>
+      <EntryPointSymbol>Main</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)\external\SDL\lib\x86\*.dll" "$(OutDir)" /i /s /y</Command>
@@ -177,7 +178,17 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>DX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\External\TinyObjLoader;$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)\External\DirectXTK12\Bin\Desktop_2015_Win10\x64\Debug;$(SolutionDir)\External\SDL\lib\x64</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>DirectXTK12.lib;dxgi.lib;SDL2.lib;SDL2main.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);D3D12.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)\external\SDL\lib\x64\*.dll" "$(OutDir)" /i /s /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DX11 Release|Win32'">
     <ClCompile>

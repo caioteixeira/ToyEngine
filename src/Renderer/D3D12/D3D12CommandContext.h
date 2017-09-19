@@ -33,14 +33,20 @@ public:
 
 	void SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE& rtv, D3D12_CPU_DESCRIPTOR_HANDLE& dsv);
 
+	void SetGraphicsRootSignature(ID3D12RootSignature * rootSignature);
+	void SetPipelineState(PipelineStatePtr state);
+
 	void SetIndexBuffer(const GraphicsBufferPtr buffer);
 	void SetVertexBuffer(const GraphicsBufferPtr buffer);
+	void SetPrimitiveTopology(EPrimitiveTopology topology);
 
 	void SetViewport(const D3D12_VIEWPORT& viewport);
 	void SetScissor(const D3D12_RECT& rect);
 
 	void Draw(int vertexCount, int vertexStartOffset = 0);
 	void DrawIndexed(int indexCount, int startIndexLocation, int baseVertexLocation = 0);
+
+	void SetGraphicsRootConstantBufferView(int slot, D3D12_GPU_VIRTUAL_ADDRESS location);
 
 	void TransitionResource(ID3D12Resource * resource, D3D12_RESOURCE_STATES stateBefore, D3D12_RESOURCE_STATES stateAfter);
 	void TransitionResource(GraphicsResourcePtr resource, D3D12_RESOURCE_STATES state);
@@ -54,6 +60,8 @@ private:
 
 	CommandContextManager* mContextManager;
 	D3D12GraphicsDevice* mDevice;
+
+	PipelineStatePtr mActualPipelineState;
 
 	DynamicUploadHeap mUploadHeap;
 };

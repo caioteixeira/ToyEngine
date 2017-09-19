@@ -18,6 +18,11 @@ public:
 	ID3D12CommandAllocator * GetAllocator();
 	ID3D12CommandQueue * GetCommandQueue();
 	void StoreAllocator(uint64_t fence, ID3D12CommandAllocator* allocator);
+
+	uint64_t GetLastCompletedFenceValue() { return mLastCompletedFenceValue; }
+	uint64_t GetActualFenceValue() { return mFence->GetCompletedValue(); }
+	uint64_t GetLastSignaledFenceValue() { return mNextFenceValue - 1; }
+
 private:
 
 	const D3D12_COMMAND_LIST_TYPE mType;

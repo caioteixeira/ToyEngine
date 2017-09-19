@@ -45,10 +45,10 @@ enum EFillMode
 
 enum EPrimitiveTopology
 {
-	EPT_TriangleList = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-	EPT_TriangleStrip = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
-	EPT_LineList = D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
-	EPT_PointList = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST,
+	EPT_TriangleList = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+	EPT_TriangleStrip = D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
+	EPT_LineList = D3D_PRIMITIVE_TOPOLOGY_LINELIST,
+	EPT_PointList = D3D_PRIMITIVE_TOPOLOGY_POINTLIST
 };
 
 enum EComparisonFunc
@@ -86,7 +86,7 @@ enum ETextureFormat
 struct GraphicsResource
 {
 	Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
-	unsigned bufferSize;
+	size_t bufferSize;
 
 	D3D12_RESOURCE_STATES state;
 };
@@ -95,8 +95,26 @@ typedef std::shared_ptr<GraphicsResource> GraphicsResourcePtr;
 struct GraphicsBuffer
 {
 	GraphicsResourcePtr resource = nullptr;
-	unsigned elementSize;
-	unsigned numElements;
+	size_t elementSize;
+	size_t numElements;
+
+	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView()
+	{
+		D3D12_VERTEX_BUFFER_VIEW view;
+		view.BufferLocation = resource->buffer->GetGPUVirtualAddress();
+		view.StrideInBytes = static_cast<UINT>(elementSize);
+		view.SizeInBytes = static_cast<UINT>(resource->bufferSize);
+		return view;
+	};
+
+	D3D12_INDEX_BUFFER_VIEW GetIndexBufferView()
+	{
+		D3D12_INDEX_BUFFER_VIEW view;
+		view.BufferLocation = resource->buffer->GetGPUVirtualAddress();
+		view.Format = DXGI_FORMAT_R32_UINT;
+		view.SizeInBytes = static_cast<UINT>(resource->bufferSize);
+		return view;
+	};
 };
 typedef  std::shared_ptr<GraphicsBuffer>  GraphicsBufferPtr;
 
