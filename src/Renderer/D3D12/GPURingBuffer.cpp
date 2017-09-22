@@ -189,7 +189,7 @@ void GPURingBuffer::Destroy()
 	mGPUVirtualAddress = 0;
 	if(mBuffer != nullptr)
 	{
-		mBuffer.Reset();
+		mBuffer.ReleaseAndGetAddressOf();
 	}
 }
 

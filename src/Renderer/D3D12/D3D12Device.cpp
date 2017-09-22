@@ -162,11 +162,11 @@ GraphicsTexturePtr D3D12GraphicsDevice::CreateTextureFromFile(const char * inFil
 
 	std::unique_ptr<uint8_t[]> decodedData;
 	D3D12_SUBRESOURCE_DATA subresource;
-	auto texture = std::make_shared<GraphicsTexture>();
-
+	
+	ComPtr<ID3D12Resource> buffer;
 	if (extension == ".png" || extension == ".bmp" || extension == ".PNG" || extension == ".BMP")
 	{
-		hr = DirectX::LoadWICTextureFromFile(mDevice.Get(), wc.c_str(), texture->resource->buffer.ReleaseAndGetAddressOf(), 
+		hr = DirectX::LoadWICTextureFromFile(mDevice.Get(), wc.c_str(), buffer.ReleaseAndGetAddressOf(), 
 			decodedData, subresource);
 	}
 	else
@@ -176,42 +176,56 @@ GraphicsTexturePtr D3D12GraphicsDevice::CreateTextureFromFile(const char * inFil
 	}
 	ThrowIfFailed(hr, "Problem Creating Texture From File");
 
-	const UINT64 uploadBufferSize = GetRequiredIntermediateSize(texture->resource->buffer.Get(), 0, 1);
+	const UINT64 uploadBufferSize = GetRequiredIntermediateSize(buffer.Get(), 0, 1);
 
-	//Allocate buffer
-	D3D12_HEAP_PROPERTIES UploadHeapProps;
-	UploadHeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
-	UploadHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	UploadHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	UploadHeapProps.CreationNodeMask = 1;
-	UploadHeapProps.VisibleNodeMask = 1;
-
-	D3D12_RESOURCE_DESC desc;
-	desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	desc.Alignment = 0;
-	desc.Height = 1;
-	desc.DepthOrArraySize = 1;
-	desc.MipLevels = 1;
-	desc.Format = DXGI_FORMAT_UNKNOWN;
-	desc.SampleDesc.Count = 1;
-	desc.SampleDesc.Quality = 0;
-	desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	ComPtr<ID3D12Resource> uploadBuffer;
-	hr = mDevice->CreateCommittedResource(&UploadHeapProps, D3D12_HEAP_FLAG_NONE,
-		&desc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadBuffer));
-	ThrowIfFailed(hr);
+	// Create the GPU upload buffer.
+	ComPtr<ID3D12Resource> uploadHeap;
+	hr = mDevice->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize),
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(uploadHeap.GetAddressOf())
+	);
+	ThrowIfFailed(hr, "ERROR: Failed to create upload buffer");
 
 	auto context = mCommandListManager->AllocateContext();
-
-	UpdateSubresources(context->GetCommandList(), texture->resource->buffer.Get(), uploadBuffer.Get(),
+	
+	UpdateSubresources(context->GetCommandList(), buffer.Get(), uploadHeap.Get(),
 		0, 0, 1, &subresource);
-	context->TransitionResource(texture->resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	context->TransitionResource(buffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	context->Finish(true);
 
-	//TODO: Create SRV
+	//Create Descriptor Heap
+	ComPtr<ID3D12DescriptorHeap> descriptorHeap;
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+	srvHeapDesc.NumDescriptors = 1;
+	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	ThrowIfFailed(mDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&descriptorHeap)));
+
+	//Create SRV
+	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(descriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = buffer->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = buffer->GetDesc().MipLevels;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+	mDevice->CreateShaderResourceView(buffer.Get(), &srvDesc, hDescriptor);
+
+	//Fill texture object
+	auto resource = std::make_shared<GraphicsResource>();
+	resource->buffer = std::move(buffer);
+	resource->state = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+	auto texture = std::make_shared<GraphicsTexture>();
+	texture->resource = std::move(resource);
+	texture->descriptor = std::move(descriptorHeap);
 
 	return texture;
 }

@@ -21,9 +21,12 @@ private:
 	MaterialPtr CreateMaterial(Utils::MaterialDesc& desc);
 	PipelineStatePtr GetPipelineState(MaterialProperties properties);
 	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers();
+	TexturePtr LoadTexture(const std::string& path) const;
 
 	//TODO: Create a pipeline cache for multiple bindings
 	PipelineStatePtr mDefaultPipeline;
 	D3D12GraphicsDevice* mDevice;
+
+	std::unordered_map<std::string, TexturePtr> mTextureCache;
 };
 #endif

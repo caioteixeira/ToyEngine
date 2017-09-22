@@ -69,7 +69,6 @@ uint64_t D3D12CommandQueue::ExecuteCommandList(ID3D12CommandList* list)
 	mCommandQueue->ExecuteCommandLists(1, &list);
 
 	mCommandQueue->Signal(mFence, mNextFenceValue);
-	SDL_Log("Signaled %d", mNextFenceValue);
 
 	return mNextFenceValue++;
 }

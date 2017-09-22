@@ -40,7 +40,7 @@ void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 		auto indexBuffer = mDevice->CreateGraphicsBuffer("Index Buffer", meshData.indices.size(), sizeof(size_t), meshData.indices.data());
 
 		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, meshData.indices.size());
-		auto material = materials[meshData.materialName];
+		auto& material = materials[meshData.materialName];
 
 		Mesh mesh;
 		mesh.geometry = geo;
@@ -61,8 +61,15 @@ MeshGeometryPtr D3D12ResourceManager::GetMeshGeometry(const std::string& path, c
 
 TexturePtr D3D12ResourceManager::GetTexture(const std::string& path)
 {
-	//TODO: Implement
-	return nullptr;
+	auto it = mTextureCache.find(path);
+	if (it != mTextureCache.end())
+	{
+		return it->second;
+	}
+
+	auto texture = LoadTexture(path);
+	mTextureCache.emplace(path, texture);
+	return texture;
 }
 
 MaterialPtr D3D12ResourceManager::CreateMaterial(Utils::MaterialDesc& desc)
@@ -77,6 +84,8 @@ MaterialPtr D3D12ResourceManager::CreateMaterial(Utils::MaterialDesc& desc)
 	material->SetProperty(Diffuse);
 	material->pipelineState = mDefaultPipeline;
 
+	material->diffuseTexture = GetTexture(desc.diffuseTexName);
+
 	return material;
 }
 
@@ -84,13 +93,17 @@ PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties prope
 {
 	auto state = std::make_shared<PipelineState>();
 
+	CD3DX12_DESCRIPTOR_RANGE texTable;
+	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
 	// Create root signature
-	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
-	slotRootParameter[0].InitAsConstantBufferView(0);
-	slotRootParameter[1].InitAsConstantBufferView(1);
+	CD3DX12_ROOT_PARAMETER slotRootParameter[3];
+	slotRootParameter[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
+	slotRootParameter[1].InitAsConstantBufferView(0);
+	slotRootParameter[2].InitAsConstantBufferView(1);
 
 	auto samplers = GetStaticSamplers();
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter,
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(3, slotRootParameter,
 		(UINT)samplers.size(), samplers.data(),
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
@@ -194,6 +207,18 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> D3D12ResourceManager::GetStatic
 		pointWrap, pointClamp,
 		linearWrap, linearClamp,
 		anisotropicWrap, anisotropicClamp };
+}
+
+TexturePtr D3D12ResourceManager::LoadTexture(const std::string & path) const
+{
+	//TODO: Remove width and height from Texture class
+	int width = -1;
+	int height = -1;
+	std::string finalPath("Assets/");
+	finalPath = finalPath + path;
+	auto graphicsTexture = mDevice->CreateTextureFromFile(finalPath.c_str(), width, height);
+
+	return std::make_shared<Texture>(graphicsTexture, width, height);
 }
 
 #endif

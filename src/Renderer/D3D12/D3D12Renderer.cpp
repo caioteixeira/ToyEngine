@@ -57,19 +57,24 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 		PerObjectConstants objectConstants;
 		objectConstants.worldTransform = element.worldTransform;
 
-		auto objectCB = context->ReserveUploadMemory(sizeof(PerObjectConstants));
+		auto& objectCB = context->ReserveUploadMemory(sizeof(PerObjectConstants));
 		memcpy(objectCB.CPUAddress, &objectConstants, sizeof(PerObjectConstants));
 
-		auto pipelineState = element.material->pipelineState;
+		auto& material = element.material;
+		auto& pipelineState = material->pipelineState;
 		context->SetPipelineState(pipelineState);
 		context->SetGraphicsRootSignature(pipelineState->rootSignature.Get());
 
-		context->SetGraphicsRootConstantBufferView(0, globalCB.GPUAddress);
-		context->SetGraphicsRootConstantBufferView(1, objectCB.GPUAddress);
+		auto& textureDescriptor = material->diffuseTexture->GetGraphicsTexture()->descriptor;
+		context->SetDescriptorHeap(textureDescriptor);
 
 		context->SetIndexBuffer(element.mesh->GetIndexBuffer());
 		context->SetVertexBuffer(element.mesh->GetVertexBuffer());
-		context->SetPrimitiveTopology(EPT_TriangleStrip);
+		context->SetPrimitiveTopology(EPT_TriangleList);
+
+		context->SetGraphicsRootDescriptorTable(0, textureDescriptor->GetGPUDescriptorHandleForHeapStart());
+		context->SetGraphicsRootConstantBufferView(1, globalCB.GPUAddress);
+		context->SetGraphicsRootConstantBufferView(2, objectCB.GPUAddress);
 
 		context->DrawIndexed(element.mesh->indexCount, 0);
 	}

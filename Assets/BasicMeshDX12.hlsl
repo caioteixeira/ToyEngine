@@ -10,21 +10,26 @@ cbuffer PER_OBJECT : register(b1)
 	float4x4 worldMatrix;
 }
 
-//SamplerState DefaultSampler : register(s0);
-//Texture2D DiffuseTexture : register(t0);
+SamplerState pointWrapSampler : register(s0);
+SamplerState pointClampSampler : register(s1);
+SamplerState linearWrapSampler : register(s2);
+SamplerState linearClampSampler : register(s3);
+SamplerState anisotropicWrapSampler : register(s4);
+SamplerState anisotropicClampSampler : register(s5);
+Texture2D DiffuseTexture : register(t0);
 
 // Input structs for vertex and pixel shader
 struct VS_INPUT
 {
 	float3 mPos : POSITION;
 	float3 mNormal : NORMAL;
-	float2 mTex : TEXCOORD0;
+	float2 mTex : TEXCOORD;
 };
 
 struct PS_INPUT
 {
 	float4 mPos : SV_POSITION;
-	float2 mTex: TEXCOORD0;
+	float2 mTex: TEXCOORD;
 };
 
 //--------------------------------------------------------------------------------------
@@ -49,6 +54,5 @@ PS_INPUT VS(VS_INPUT input)
 //--------------------------------------------------------------------------------------
 float4 PS(PS_INPUT input) : SV_Target
 {
-	//return DiffuseTexture.Sample(DefaultSampler, input.mTex);
-	return input.mPos;
+	return DiffuseTexture.Sample(pointWrapSampler, input.mTex);
 }

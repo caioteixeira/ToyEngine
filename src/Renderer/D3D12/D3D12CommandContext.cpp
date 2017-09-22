@@ -68,9 +68,14 @@ void D3D12CommandContext::SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE& rtv, D3D1
 	mCommandList->OMSetRenderTargets(1, &rtv, true, &dsv);
 }
 
-void D3D12CommandContext::SetGraphicsRootSignature(ID3D12RootSignature * rootSignature)
+void D3D12CommandContext::SetGraphicsRootSignature(ID3D12RootSignature * rootSignature) const
 {
 	mCommandList->SetGraphicsRootSignature(rootSignature);
+}
+
+void D3D12CommandContext::SetGraphicsRootDescriptorTable(int index, D3D12_GPU_DESCRIPTOR_HANDLE descriptorTable) const
+{
+	mCommandList->SetGraphicsRootDescriptorTable(index, descriptorTable);
 }
 
 void D3D12CommandContext::SetPipelineState(PipelineStatePtr state)
@@ -82,6 +87,12 @@ void D3D12CommandContext::SetPipelineState(PipelineStatePtr state)
 
 	mCommandList->SetPipelineState(state->pipelineState.Get());
 	mActualPipelineState = state;
+}
+
+void D3D12CommandContext::SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap) const
+{
+	ID3D12DescriptorHeap* descriptorHeaps[] = { heap.Get() };
+	mCommandList->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
 void D3D12CommandContext::SetIndexBuffer(const GraphicsBufferPtr buffer)

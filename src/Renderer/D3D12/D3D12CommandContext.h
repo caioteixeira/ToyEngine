@@ -33,8 +33,11 @@ public:
 
 	void SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE& rtv, D3D12_CPU_DESCRIPTOR_HANDLE& dsv);
 
-	void SetGraphicsRootSignature(ID3D12RootSignature * rootSignature);
+	void SetGraphicsRootSignature(ID3D12RootSignature * rootSignature) const;
+	void SetGraphicsRootDescriptorTable(int index, D3D12_GPU_DESCRIPTOR_HANDLE descriptorTable) const;
 	void SetPipelineState(PipelineStatePtr state);
+	void SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap) const;
+	void SetDescriptorHeap(ID3D12DescriptorHeap* heap) const;
 
 	void SetIndexBuffer(const GraphicsBufferPtr buffer);
 	void SetVertexBuffer(const GraphicsBufferPtr buffer);

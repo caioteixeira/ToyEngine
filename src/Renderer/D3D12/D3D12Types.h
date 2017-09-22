@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "d3dx12.h"
 
 #if DX12
 #include <memory>
@@ -11,22 +12,6 @@ enum EGraphicsBufferTypes
 {	EGBT_VertexBuffer,
 	EGBT_IndexBuffer,
 };
-
-//
-//enum EGraphicsBufferUsage
-//{
-//	EGBU_Default = D3D11_USAGE_DEFAULT,
-//	EGBU_Immutable = D3D11_USAGE_IMMUTABLE,
-//	EGBU_Dynamic = D3D11_USAGE_DYNAMIC,
-//	EGBU_Staging = D3D11_USAGE_STAGING,
-//};
-
-//enum ECPUAccessFlags
-//{
-//	ECPUAF_Neither = 0,
-//	ECPUAF_CanWrite = D3D11_CPU_ACCESS_WRITE,
-//	ECPUAF_CanRead = D3D11_CPU_ACCESS_READ,
-//};
 
 enum EGFormat
 {
@@ -69,20 +54,6 @@ enum ETextureFormat
 	EXT_BGRA = DXGI_FORMAT_B8G8R8A8_UNORM,
 };
 
-//struct InputLayoutElement : D3D11_INPUT_ELEMENT_DESC
-//{
-//	InputLayoutElement(const char* inSemanticName, uint32_t inSemanticIndex, EGFormat inFormat, uint32_t inByteOffset)
-//	{
-//		SemanticName = inSemanticName;
-//		SemanticIndex = inSemanticIndex;
-//		Format = static_cast<DXGI_FORMAT>(inFormat);
-//		InputSlot = 0;
-//		AlignedByteOffset = inByteOffset;
-//		InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-//		InstanceDataStepRate = 0;
-//	}
-//};
-
 struct GraphicsResource
 {
 	Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
@@ -120,8 +91,15 @@ typedef  std::shared_ptr<GraphicsBuffer>  GraphicsBufferPtr;
 
 struct GraphicsTexture
 {
+	GraphicsTexture()
+	{
+		resource = std::make_shared<GraphicsResource>();
+	}
+
 	GraphicsResourcePtr resource;
-	D3D12_CPU_DESCRIPTOR_HANDLE SRV;
+	//CPU visible discriptor heap, this should not be binded directly to the pipeline, 
+	// but copied to the GPU visible heap every frame
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptor;
 };
 typedef std::shared_ptr<GraphicsTexture> GraphicsTexturePtr;
 
@@ -131,15 +109,5 @@ struct PipelineState
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
 };
 typedef std::shared_ptr<PipelineState> PipelineStatePtr;
-
-// typedef std::shared_ptr<ID3D12InputLayout>			InputLayoutPtr;
-//typedef std::shared_ptr<ID3D11PixelShader>			PixelShaderPtr;
-//typedef std::shared_ptr<ID3D11VertexShader>			VertexShaderPtr;
-//typedef std::shared_ptr<ID3D11RenderTargetView>		RenderTargetPtr;
-//typedef std::shared_ptr<ID3D11DepthStencilView>		DepthStencilPtr;
-//typedef std::shared_ptr<ID3D11SamplerState>			SamplerStatePtr;
-//typedef std::shared_ptr<ID3D11DepthStencilState>	DepthStencilStatePtr;
-//typedef std::shared_ptr<ID3D11RasterizerState>		RasterizerStatePtr;
-//typedef std::shared_ptr<ID3D11BlendState>			BlendStatePtr;
 
 #endif
