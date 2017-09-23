@@ -42,6 +42,8 @@ private:
 	GraphicsBufferPtr mCameraBuffer;
 
 	SDL_Window* mWindow;
+	char * mWindowName;
+
 	int mWidth = 0;
 	int mHeight = 0;
 };

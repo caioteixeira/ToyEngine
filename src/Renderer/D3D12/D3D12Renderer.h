@@ -22,6 +22,7 @@ private:
 	std::unique_ptr<class D3D12GraphicsDevice> mGraphicsDevice;
 	std::unique_ptr<D3D12ResourceManager> mResourceManager;
 
+	char * mWindowName;
 	SDL_Window* mWindow;
 	int mWidth = 0;
 	int mHeight = 0;

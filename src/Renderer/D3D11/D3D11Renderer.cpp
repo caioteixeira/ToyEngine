@@ -1,3 +1,4 @@
+#include <easy/profiler.h>
 #ifdef DX11
 #include "D3D11Renderer.h"
 #include "D3D11ResourceManager.h"
@@ -14,10 +15,12 @@ D3D11Renderer::D3D11Renderer()
 
 D3D11Renderer::~D3D11Renderer()
 {
+	delete[] mWindowName;
 }
 
 bool D3D11Renderer::Init(int width, int height)
 {
+	mWindowName = new char[200];
 	mWindow = SDL_CreateWindow("Toy Engine", 100, 100, width, height, 0);
 	mWidth = width;
 	mHeight = height;
@@ -110,6 +113,11 @@ void D3D11Renderer::UpdateGlobalConstants(FramePacket& packet) const
 
 void D3D11Renderer::RenderFrame(FramePacket& packet)
 {
+	snprintf(mWindowName, 200, "ToyEngine : %llu FPS", profiler::main_thread::frameTimeLocalAvg());
+	SDL_SetWindowTitle(mWindow, mWindowName);
+
+	EASY_FUNCTION();
+
 	Clear();
 
 	mGraphicsDevice->SetDepthStencilState(mMeshDepthState);

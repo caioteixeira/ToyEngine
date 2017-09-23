@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Core/imgui/imgui.h"
 #include "Core/imgui/imgui_impl_dx11.h"
+#include <easy/profiler.h>
 
 RenderingSystem::RenderingSystem()
 {
@@ -32,6 +33,8 @@ void ShowImGUISample()
 
 void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& events, entityx::TimeDelta dt)
 {
+	EASY_FUNCTION();
+
 	//ImGui_ImplDX11_NewFrame();
 
 	assert(mRenderer != nullptr);

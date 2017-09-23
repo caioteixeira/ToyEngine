@@ -12,10 +12,12 @@ D3D12Renderer::D3D12Renderer(): mWindow(nullptr)
 
 D3D12Renderer::~D3D12Renderer()
 {
+	delete[] mWindowName;
 }
 
 bool D3D12Renderer::Init(int width, int height)
 {
+	mWindowName = new char[200];
 	mWindow = SDL_CreateWindow("Toy Engine", 100, 100, width, height, 0);
 	mWidth = width;
 	mHeight = height;
@@ -37,7 +39,10 @@ bool D3D12Renderer::Init(int width, int height)
 
 void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 {
-	EASY_BLOCK("RenderFrame");
+	snprintf(mWindowName, 200, "ToyEngine : %llu FPS", profiler::main_thread::frameTimeLocalAvg());
+	SDL_SetWindowTitle(mWindow, mWindowName);
+
+	EASY_FUNCTION();
 
 	Clear();
 
@@ -97,11 +102,13 @@ D3D12ResourceManager * D3D12Renderer::GetResourceManager() const
 
 void D3D12Renderer::Clear() const
 {
+	EASY_FUNCTION();
 	mGraphicsDevice->ClearBackBuffer(Vector3(0.0f, 0.0f, 0.0f), 1.0f);
 }
 
 void D3D12Renderer::Present() const
 {
+	EASY_FUNCTION();
 	mGraphicsDevice->Present();
 }
 #endif
