@@ -112,7 +112,7 @@ void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 	{
 		auto vertexBuffer = mDevice.CreateGraphicsBuffer(meshData.vertices.data(), meshData.vertices.size() * sizeof(Vertex),
 			EBF_VertexBuffer, ECPUAF_Neither, EGBU_Immutable);
-		auto indexBuffer = mDevice.CreateGraphicsBuffer(meshData.indices.data(), meshData.indices.size() * sizeof(size_t),
+		auto indexBuffer = mDevice.CreateGraphicsBuffer(meshData.indices.data(), meshData.indices.size() * sizeof(uint32_t),
 			EBF_IndexBuffer, ECPUAF_Neither, EGBU_Immutable);
 		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, meshData.indices.size());
 		auto material = materials[meshData.materialName];
@@ -132,12 +132,12 @@ void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 MeshGeometryPtr D3D11ResourceManager::LoadMeshGeometry(const std::string& path, const std::string& inputLayoutName)
 {
 	std::vector<Vertex> vertices = {};
-	std::vector<size_t> indices = {};
+	std::vector<uint32_t> indices = {};
 	Utils::LoadModel(path, vertices, indices);
 
 	auto vertexBuffer = mDevice.CreateGraphicsBuffer(vertices.data(), vertices.size() * sizeof(Vertex), 
 		EBF_VertexBuffer, ECPUAF_Neither, EGBU_Immutable);
-	auto indexBuffer = mDevice.CreateGraphicsBuffer(indices.data(), indices.size() * sizeof(size_t), 
+	auto indexBuffer = mDevice.CreateGraphicsBuffer(indices.data(), indices.size() * sizeof(uint32_t),
 		EBF_IndexBuffer, ECPUAF_Neither, EGBU_Immutable);
 	
 	MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, indices.size());

@@ -276,7 +276,7 @@ bool D3D11GraphicsDevice::CompileShaderFromFile(const char* inFileName, const ch
 	//now copy to vector if we like it...
 	if (pBlobOut)
 	{
-		int compiledCodeSize = pBlobOut->GetBufferSize();
+		size_t compiledCodeSize = pBlobOut->GetBufferSize();
 		outCompiledShaderCode.resize(compiledCodeSize);
 		std::memcpy(outCompiledShaderCode.data(), pBlobOut->GetBufferPointer(), compiledCodeSize);
 
