@@ -50,11 +50,11 @@ void DynamicUploadHeap::FinishFrame(uint64_t frameNum, uint64_t numCompletedFram
 			++numBuffersToDelete;
 		}
 	}
-
+	/* TODO: Properly handle ring buffer descruction
 	if(numBuffersToDelete)
 	{
 		mRingBuffers.erase(mRingBuffers.begin(), mRingBuffers.begin() + numBuffersToDelete);
-	}
+	}*/
 }
 
 #endif

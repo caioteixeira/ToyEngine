@@ -125,6 +125,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX12 Debug|x64'">
     <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX11 Debug|x64'">
+    <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DX11 Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -171,20 +174,31 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>DX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DX11;BUILD_WITH_EASY_PROFILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\External\EasyProfiler\Include;$(SolutionDir)\External\TinyObjLoader;$(SolutionDir)\External\DirectXTK\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)\External\EasyProfiler\x64;$(SolutionDir)\External\DirectXTK\Bin\Desktop_2015\x64\Debug;$(SolutionDir)\External\SDL\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>easy_profiler.lib;dxgi.lib;SDL2.lib;DirectXTK.lib;SDL2main.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)\external\SDL\lib\x64\*.dll" "$(OutDir)" /i /s /y
+xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DX12 Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>DX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DX12;BUILD_WITH_EASY_PROFILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\External\EasyProfiler\Include;$(SolutionDir)\External\TinyObjLoader;$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)\External\EasyProfiler\Bin;$(SolutionDir)\External\DirectXTK12\Bin\Desktop_2015_Win10\x64\Debug;$(SolutionDir)\External\SDL\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\External\EasyProfiler\x64;$(SolutionDir)\External\DirectXTK12\Bin\Desktop_2015_Win10\x64\Debug;$(SolutionDir)\External\SDL\lib\x64</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>DirectXTK12.lib;dxgi.lib;SDL2.lib;SDL2main.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);D3D12.lib;easy_profiler.lib</AdditionalDependencies>
     </Link>

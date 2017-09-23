@@ -39,7 +39,7 @@ void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 		auto vertexBuffer = mDevice->CreateGraphicsBuffer("Vertex Buffer", meshData.vertices.size(), sizeof(Vertex), meshData.vertices.data());
 		auto indexBuffer = mDevice->CreateGraphicsBuffer("Index Buffer", meshData.indices.size(), sizeof(uint32_t), meshData.indices.data());
 
-		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, meshData.indices.size());
+		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, static_cast<int>(meshData.indices.size()));
 		auto& material = materials[meshData.materialName];
 
 		Mesh mesh;
@@ -139,7 +139,10 @@ PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties prope
 		reinterpret_cast<BYTE*>(pixelShader->GetBufferPointer()),
 		pixelShader->GetBufferSize()
 	};
-	opaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+
+	auto rastState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	rastState.CullMode = D3D12_CULL_MODE_NONE;
+	opaquePsoDesc.RasterizerState = rastState;
 	opaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	opaquePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	opaquePsoDesc.SampleMask = UINT_MAX;

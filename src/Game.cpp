@@ -39,6 +39,8 @@ bool Game::Init()
 void Game::RunLoop()
 {
 	EASY_PROFILER_ENABLE
+	EASY_MAIN_THREAD;
+	profiler::startListen();
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	while(!mShouldQuit)
@@ -51,8 +53,12 @@ void Game::RunLoop()
 		//TODO: Run systems
 		mWorld.Update(delta);
 	}
-	EASY_PROFILER_DISABLE
+
 	profiler::dumpBlocksToFile("test_profile.prof");
+
+	auto blocks_count = profiler::dumpBlocksToFile("test.prof");
+
+	std::cout << "Blocks count: " << blocks_count << std::endl;
 }
 
 void Game::StartGame()
@@ -60,6 +66,6 @@ void Game::StartGame()
 	
 
 	mWorld.Init(mRenderer);
-	mWorld.LoadObjLevel("Assets/house.obj");
+	mWorld.LoadObjLevel("Assets/lost_empire.obj");
 
 }

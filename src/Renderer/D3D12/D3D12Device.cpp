@@ -285,14 +285,14 @@ void D3D12GraphicsDevice::InitDevice()
 
 		ComPtr<ID3D12Debug1> debugInterface1;
 		auto r = SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&debugInterface1)));
-		if(r)
+		/* if (r)
 		{
 			debugInterface1->SetEnableGPUBasedValidation(true);
 		}
 		else
 		{
 			SDL_Log("WARNING: Unable to enable D3D12 GPU based validation layer!");
-		}
+		}*/
 	}
 	else
 	{
@@ -373,9 +373,8 @@ void D3D12GraphicsDevice::OnResize()
 	assert(mDevice);
 	assert(mSwapChain);
 
-	//TODO: Flush command queues
+	mCommandListManager->GetGraphicsQueue().Flush();
 
-	//TODO: Get from context pool
 	D3D12CommandContext* commandContext = mCommandListManager->AllocateContext();
 
 	//Release previous resources
@@ -417,7 +416,7 @@ void D3D12GraphicsDevice::OnResize()
 	depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
 	D3D12_CLEAR_VALUE optClear;
-	optClear.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	optClear.Format = mDepthStencilFormat;
 	optClear.DepthStencil.Depth = 1.0f;
 	optClear.DepthStencil.Stencil = 0;
 	

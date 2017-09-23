@@ -54,5 +54,5 @@ PS_INPUT VS(VS_INPUT input)
 //--------------------------------------------------------------------------------------
 float4 PS(PS_INPUT input) : SV_Target
 {
-	return DiffuseTexture.Sample(pointWrapSampler, input.mTex);
+	return DiffuseTexture.Sample(linearWrapSampler, input.mTex);
 }
