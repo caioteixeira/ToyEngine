@@ -25,7 +25,8 @@ D3D12GraphicsDevice::D3D12GraphicsDevice(void *window)
 
 D3D12GraphicsDevice::~D3D12GraphicsDevice()
 {
-
+	auto& graphicsQueue = mCommandListManager->GetGraphicsQueue();
+	graphicsQueue.Flush();
 }
 
 ComPtr<ID3DBlob> D3D12GraphicsDevice::CompileShaderFromFile(const std::wstring & filename, const D3D_SHADER_MACRO * defines, const std::string & entrypoint, const std::string & target)

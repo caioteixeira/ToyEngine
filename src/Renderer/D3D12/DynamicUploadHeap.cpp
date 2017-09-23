@@ -29,7 +29,8 @@ DynamicAllocation DynamicUploadHeap::Allocate(size_t size, size_t alignment)
 		}
 
 		mRingBuffers.emplace_back(newMaxSize, mDevice->GetDevice(), mIsCPUAccessible);
-		allocation = mRingBuffers.back().Allocate(alignedSize);
+		auto& buffer = mRingBuffers.back();
+		allocation = buffer.Allocate(alignedSize);
 	}
 
 	return allocation;

@@ -71,6 +71,7 @@ GPURingBuffer::GPURingBuffer(GPURingBuffer && rhs) noexcept :
 	rhs.mUsedSize = 0;
 	rhs.mHead = 0;
 	rhs.mTail = 0;
+	rhs.mBuffer = nullptr;
 }
 
 GPURingBuffer & GPURingBuffer::operator=(GPURingBuffer && rhs) noexcept
@@ -184,13 +185,14 @@ void GPURingBuffer::Destroy()
 	{
 		mBuffer->Unmap(0, nullptr);
 	}
+	
+	if(mBuffer != nullptr)
+	{
+		mBuffer.Reset();
+	}
 
 	mCPUVirtualAddress = 0;
 	mGPUVirtualAddress = 0;
-	if(mBuffer != nullptr)
-	{
-		mBuffer.ReleaseAndGetAddressOf();
-	}
 }
 
 #endif

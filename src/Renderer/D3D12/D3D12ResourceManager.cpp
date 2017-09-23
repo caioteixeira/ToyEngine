@@ -37,7 +37,7 @@ void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 	for (auto& meshData : meshes)
 	{
 		auto vertexBuffer = mDevice->CreateGraphicsBuffer("Vertex Buffer", meshData.vertices.size(), sizeof(Vertex), meshData.vertices.data());
-		auto indexBuffer = mDevice->CreateGraphicsBuffer("Index Buffer", meshData.indices.size(), sizeof(size_t), meshData.indices.data());
+		auto indexBuffer = mDevice->CreateGraphicsBuffer("Index Buffer", meshData.indices.size(), sizeof(uint32_t), meshData.indices.data());
 
 		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, meshData.indices.size());
 		auto& material = materials[meshData.materialName];

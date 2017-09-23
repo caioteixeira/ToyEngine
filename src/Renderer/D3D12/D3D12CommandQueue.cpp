@@ -88,4 +88,13 @@ void D3D12CommandQueue::StoreAllocator(uint64_t fence, ID3D12CommandAllocator* a
 	mAllocatorPool.StoreAllocator(fence, allocator);
 }
 
+void D3D12CommandQueue::Flush()
+{
+	std::lock_guard<std::mutex> lock(mFenceMutex);
+
+	mCommandQueue->Signal(mFence, mNextFenceValue);
+	WaitForFence(mNextFenceValue);
+	mNextFenceValue++;
+}
+
 #endif

@@ -5,9 +5,9 @@
 
 #include <unordered_map>
 
-void LoadSubMesh(std::vector<Vertex>& vertices, std::vector<size_t>& indices, tinyobj::attrib_t & attrib, const tinyobj::shape_t& shape)
+void LoadSubMesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices, tinyobj::attrib_t & attrib, const tinyobj::shape_t& shape)
 {
-	auto allocSize = shape.mesh.indices.size();
+	const auto allocSize = shape.mesh.indices.size();
 	indices.reserve(allocSize);
 	vertices.reserve(allocSize);
 
@@ -29,7 +29,7 @@ void LoadSubMesh(std::vector<Vertex>& vertices, std::vector<size_t>& indices, ti
 		vertex.texCoord.y = 1.0f - attrib.texcoords[2 * index.texcoord_index + 1];
 
 		//TODO: Avoid duplicated vertices
-		indices.push_back(vertices.size());
+		indices.push_back(static_cast<uint32_t>(vertices.size()));
 		vertices.push_back(vertex);
 	}
 }
@@ -77,7 +77,7 @@ void Utils::LoadObjFile(std::string path, std::vector<SubmeshDesc>& outSubmeshes
 	}
 }
 
-void Utils::LoadModel(const std::string& path, std::vector<Vertex>& vertices, std::vector<size_t>& indices)
+void Utils::LoadModel(const std::string& path, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 {
 	//Init tinyobj loader
 	tinyobj::attrib_t attrib;
