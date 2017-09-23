@@ -3,6 +3,7 @@
 #include "D3D12CommandContextManager.h"
 #include "../ConstantBufferStructs.h"
 #include "../FramePacket.h"
+#include <easy/profiler.h>
 
 D3D12Renderer::D3D12Renderer(): mWindow(nullptr)
 {
@@ -36,6 +37,8 @@ bool D3D12Renderer::Init(int width, int height)
 
 void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 {
+	EASY_BLOCK("RenderFrame");
+
 	Clear();
 
 	GlobalConstants constant;
@@ -54,6 +57,8 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 
 	for (auto& element : framePacket.meshes)
 	{
+		EASY_BLOCK("RenderElement");
+
 		PerObjectConstants objectConstants;
 		objectConstants.worldTransform = element.worldTransform;
 
@@ -92,7 +97,7 @@ D3D12ResourceManager * D3D12Renderer::GetResourceManager() const
 
 void D3D12Renderer::Clear() const
 {
-	mGraphicsDevice->ClearBackBuffer(Vector3(0.5f, 0.5f, 0.5f), 1.0f);
+	mGraphicsDevice->ClearBackBuffer(Vector3(0.0f, 0.0f, 0.0f), 1.0f);
 }
 
 void D3D12Renderer::Present() const

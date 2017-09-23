@@ -2,6 +2,7 @@
 #include "ECS/quick.h"
 #include "GameWorld.h"
 #include <chrono>
+#include <easy/profiler.h>
 
 using namespace Engine;
 
@@ -37,6 +38,8 @@ bool Game::Init()
 
 void Game::RunLoop()
 {
+	EASY_PROFILER_ENABLE
+
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	while(!mShouldQuit)
 	{
@@ -48,10 +51,15 @@ void Game::RunLoop()
 		//TODO: Run systems
 		mWorld.Update(delta);
 	}
+	EASY_PROFILER_DISABLE
+	profiler::dumpBlocksToFile("test_profile.prof");
 }
 
 void Game::StartGame()
 {
+	
+
 	mWorld.Init(mRenderer);
 	mWorld.LoadObjLevel("Assets/house.obj");
+
 }
