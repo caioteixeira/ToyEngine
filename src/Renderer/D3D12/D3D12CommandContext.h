@@ -1,4 +1,5 @@
 #pragma once
+#include "DynamicDescriptorHeap.h"
 #if DX12
 
 #include "../../Math.h"
@@ -31,13 +32,16 @@ public:
 	void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle, Color& clearColor);
 	void ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE& dsvHandle, float depth, UINT8 stencil);
 
-	void SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE& rtv, D3D12_CPU_DESCRIPTOR_HANDLE& dsv);
+	CD3DX12_GPU_DESCRIPTOR_HANDLE CopyDescriptorToDynamicHeap(CD3DX12_CPU_DESCRIPTOR_HANDLE descriptor) const;
+
+	void SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE& rtv, D3D12_CPU_DESCRIPTOR_HANDLE& dsv) const;
 
 	void SetGraphicsRootSignature(ID3D12RootSignature * rootSignature) const;
 	void SetGraphicsRootDescriptorTable(int index, D3D12_GPU_DESCRIPTOR_HANDLE descriptorTable) const;
 	void SetPipelineState(PipelineStatePtr state);
-	void SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap) const;
-	void SetDescriptorHeap(ID3D12DescriptorHeap* heap) const;
+	void SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap);
+	void SetDescriptorHeap(ID3D12DescriptorHeap* heap);
+	void SetDynamicDescriptorHeap();
 
 	void SetIndexBuffer(const GraphicsBufferPtr buffer);
 	void SetVertexBuffer(const GraphicsBufferPtr buffer);
@@ -65,8 +69,10 @@ private:
 	D3D12GraphicsDevice* mDevice;
 
 	PipelineStatePtr mActualPipelineState;
+	ID3D12DescriptorHeap* mActualDescriptorHeap;
 
 	DynamicUploadHeap mUploadHeap;
+	std::unique_ptr<DynamicDescriptorHeap> mDynamicDescriptorHeap;
 };
 #endif
 

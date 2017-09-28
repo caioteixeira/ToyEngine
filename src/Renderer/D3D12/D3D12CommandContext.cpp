@@ -9,6 +9,7 @@ D3D12CommandContext::D3D12CommandContext(D3D12_COMMAND_LIST_TYPE type, D3D12Grap
 {
 	mContextManager = mDevice->GetCommandContextManager();
 	mContextManager->CreateCommandList(type, &mCommandList, &mAllocator);
+	mDynamicDescriptorHeap = std::make_unique<DynamicDescriptorHeap>(mDevice, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1024);
 }
 
 D3D12CommandContext::~D3D12CommandContext()
@@ -63,7 +64,14 @@ void D3D12CommandContext::ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE & ds
 	mCommandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, depth, stencil, 0, nullptr);
 }
 
-void D3D12CommandContext::SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE& rtv, D3D12_CPU_DESCRIPTOR_HANDLE& dsv)
+CD3DX12_GPU_DESCRIPTOR_HANDLE D3D12CommandContext::CopyDescriptorToDynamicHeap(CD3DX12_CPU_DESCRIPTOR_HANDLE descriptor) const
+{
+	const auto alloc = mDynamicDescriptorHeap->AllocateDescriptor();
+	mDevice->GetDevice()->CopyDescriptorsSimple(1, alloc.CPUHandle, descriptor, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	return alloc.GPUHandle;
+}
+
+void D3D12CommandContext::SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE& rtv, D3D12_CPU_DESCRIPTOR_HANDLE& dsv) const
 {
 	mCommandList->OMSetRenderTargets(1, &rtv, true, &dsv);
 }
@@ -89,10 +97,26 @@ void D3D12CommandContext::SetPipelineState(PipelineStatePtr state)
 	mActualPipelineState = state;
 }
 
-void D3D12CommandContext::SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap) const
+void D3D12CommandContext::SetDescriptorHeap(ID3D12DescriptorHeap* heap)
 {
-	ID3D12DescriptorHeap* descriptorHeaps[] = { heap.Get() };
+	if(mActualDescriptorHeap == heap)
+	{
+		return;
+	}
+	mActualDescriptorHeap = heap;
+
+	ID3D12DescriptorHeap* descriptorHeaps[] = { heap };
 	mCommandList->SetDescriptorHeaps(1, descriptorHeaps);
+}
+
+void D3D12CommandContext::SetDynamicDescriptorHeap()
+{
+	SetDescriptorHeap(mDynamicDescriptorHeap->GetDescriptorHeap());
+}
+
+void D3D12CommandContext::SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap)
+{
+	SetDescriptorHeap(heap.Get());
 }
 
 void D3D12CommandContext::SetIndexBuffer(const GraphicsBufferPtr buffer)
@@ -171,8 +195,11 @@ void D3D12CommandContext::Reset()
 	uint64_t currentFence = queue.GetActualFenceValue();
 	uint64_t fenceValue = queue.GetLastCompletedFenceValue();
 	mUploadHeap.FinishFrame(currentFence, fenceValue);
+	mDynamicDescriptorHeap->FinishCurrentFrame(currentFence);
+	mDynamicDescriptorHeap->ReleaseCompletedFrames(fenceValue);
 
 	mActualPipelineState = nullptr;
+	mActualDescriptorHeap = nullptr;
 }
 
 void D3D12CommandContext::SetViewport(const D3D12_VIEWPORT & viewport)

@@ -6,6 +6,7 @@
 #include <memory>
 #include "D3D12Device.h"
 #include "D3D12ResourceManager.h"
+#include "../../EngineCore.h"
 
 class D3D12Renderer : IRenderer
 {
@@ -28,6 +29,9 @@ private:
 	int mHeight = 0;
 
 	Matrix mProj;
+
+	static const int NUM_THREADS = 4;
+	Engine::Core::WorkerPool mThreadPool;
 };
 
 #endif

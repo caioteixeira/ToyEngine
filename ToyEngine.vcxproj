@@ -128,6 +128,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX11 Debug|x64'">
     <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX12 Release|x64'">
+    <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DX11 Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -203,7 +206,8 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
       <AdditionalDependencies>DirectXTK12.lib;dxgi.lib;SDL2.lib;SDL2main.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);D3D12.lib;easy_profiler.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)\external\SDL\lib\x64\*.dll" "$(OutDir)" /i /s /y</Command>
+      <Command>xcopy "$(ProjectDir)\external\SDL\lib\x64\*.dll" "$(OutDir)" /i /s /y
+xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DX11 Release|Win32'">
@@ -267,6 +271,10 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)\external\SDL\lib\x64\*.dll" "$(OutDir)" /i /s /y
+xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DX12 Release|x64'">
     <ClCompile>
@@ -275,14 +283,34 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>DX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DX12;BUILD_WITH_EASY_PROFILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\External\EasyProfiler\Include;$(SolutionDir)\External\TinyObjLoader;$(SolutionDir)\External\DirectXTK12\Inc;$(SolutionDir)\External\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>DirectXTK12.lib;dxgi.lib;SDL2.lib;SDL2main.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies);D3D12.lib;easy_profiler.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\External\EasyProfiler\x64;$(SolutionDir)\External\DirectXTK12\Bin\Desktop_2017_Win10\x64\Release;$(SolutionDir)\External\SDL\lib\x64</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)\external\SDL\lib\x64\*.dll" "$(OutDir)" /i /s /y
+xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\JobSystem\concurrent_queue.h" />
+    <ClInclude Include="src\Core\JobSystem\context.h" />
+    <ClInclude Include="src\Core\JobSystem\delegate.h" />
+    <ClInclude Include="src\Core\JobSystem\job.h" />
+    <ClInclude Include="src\Core\JobSystem\park.h" />
+    <ClInclude Include="src\Core\JobSystem\predicate.h" />
+    <ClInclude Include="src\Core\JobSystem\queue.h" />
+    <ClInclude Include="src\Core\JobSystem\spinlock.h" />
+    <ClInclude Include="src\Core\JobSystem\_detail\job_impl.h" />
+    <ClInclude Include="src\Core\JobSystem\_detail\queue_impl.h" />
+    <ClInclude Include="src\Core\JobSystem\_detail\task.h" />
     <ClInclude Include="src\Core\Utils.h" />
     <ClInclude Include="src\EngineCore.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12CommandContextManager.h" />
@@ -319,6 +347,7 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
     <ClInclude Include="src\Renderer\D3D12\D3D12ResourceManager.h" />
     <ClInclude Include="src\Renderer\D3D12\D3D12Types.h" />
     <ClInclude Include="src\Renderer\D3D12\d3dx12.h" />
+    <ClInclude Include="src\Renderer\D3D12\DynamicDescriptorHeap.h" />
     <ClInclude Include="src\Renderer\D3D12\DynamicUploadHeap.h" />
     <ClInclude Include="src\Renderer\D3D12\GPURingBuffer.h" />
     <ClInclude Include="src\Renderer\D3DCommon\D3DHelpers.h" />
@@ -347,6 +376,11 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
     <ClInclude Include="src\Core\Allocators\VariableSizeMemoryBlockAllocator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\JobSystem\context.cc" />
+    <ClCompile Include="src\Core\JobSystem\job.cc" />
+    <ClCompile Include="src\Core\JobSystem\park.cc" />
+    <ClCompile Include="src\Core\JobSystem\queue.cc" />
+    <ClCompile Include="src\Core\JobSystem\tests.cc" />
     <ClCompile Include="src\Renderer\D3D12\D3D12CommandContextManager.cpp" />
     <ClCompile Include="src\InputManager.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12CommandQueue.cpp" />
@@ -366,6 +400,7 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
     <ClCompile Include="src\Renderer\D3D11\D3D11ResourceManager.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Device.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12ResourceManager.cpp" />
+    <ClCompile Include="src\Renderer\D3D12\DynamicDescriptorHeap.cpp" />
     <ClCompile Include="src\Renderer\D3D12\DynamicUploadHeap.cpp" />
     <ClCompile Include="src\Renderer\D3D12\GPURingBuffer.cpp" />
     <ClCompile Include="src\RotateObjectSystem.cpp" />

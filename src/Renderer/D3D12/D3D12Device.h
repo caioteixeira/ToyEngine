@@ -26,6 +26,9 @@ public:
 		const std::string& entrypoint, const std::string& target);
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateRootSignature(CD3DX12_ROOT_SIGNATURE_DESC& desc);
 	GraphicsBufferPtr CreateGraphicsBuffer(const std::string& name, size_t numElements, SIZE_T elementSize, const void* initialData);
+	Microsoft::WRL::ComPtr<struct ID3D12DescriptorHeap> CreateDescriptorHeap(
+		enum D3D12_DESCRIPTOR_HEAP_TYPE heapType, enum D3D12_DESCRIPTOR_HEAP_FLAGS isShaderVisible,
+		int numDescriptors) const;
 	GraphicsTexturePtr CreateTextureFromFile(const char* inFileName, int& outWidth, int& outHeight) const;
 
 	void ClearBackBuffer(const Vector3& inColor, float inAlpha);
@@ -40,6 +43,7 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView();
 	DXGI_FORMAT GetBackBufferFormat() const { return mBackBufferFormat; }
 	DXGI_FORMAT GetDepthStencilFormat() const { return mDepthStencilFormat; }
+	UINT GetDescriptorSize(D3D12_DESCRIPTOR_HEAP_TYPE type) const;
 
 private:
 	void InitDevice();
@@ -68,7 +72,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Device> mDevice;
 private:
 
-	static const int SwapChainBufferCount = 2;
+	static const int SwapChainBufferCount = 3;
 	int mCurrBackBuffer = 0;
 	uint64_t mPresentFences[SwapChainBufferCount];
 	Microsoft::WRL::ComPtr<ID3D12Resource> mSwapChainBuffer[SwapChainBufferCount];

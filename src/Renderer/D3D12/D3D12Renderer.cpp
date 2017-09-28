@@ -5,7 +5,7 @@
 #include "../FramePacket.h"
 #include <easy/profiler.h>
 
-D3D12Renderer::D3D12Renderer(): mWindow(nullptr)
+D3D12Renderer::D3D12Renderer(): mWindow(nullptr), mThreadPool(NUM_THREADS)
 {
 }
 
@@ -60,6 +60,7 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 	auto globalCB = context->ReserveUploadMemory(sizeof GlobalConstants);
 	memcpy(globalCB.CPUAddress, &constant, sizeof(GlobalConstants));
 
+
 	for (auto& element : framePacket.meshes)
 	{
 		EASY_BLOCK("RenderElement");
@@ -74,15 +75,17 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 		auto& pipelineState = material->pipelineState;
 		context->SetPipelineState(pipelineState);
 		context->SetGraphicsRootSignature(pipelineState->rootSignature.Get());
+		context->SetDynamicDescriptorHeap();
 
 		auto& textureDescriptor = material->diffuseTexture->GetGraphicsTexture()->descriptor;
-		context->SetDescriptorHeap(textureDescriptor);
+		CD3DX12_CPU_DESCRIPTOR_HANDLE CPUDescriptor(textureDescriptor->GetCPUDescriptorHandleForHeapStart());
+		const auto GPUDescriptor = context->CopyDescriptorToDynamicHeap(CPUDescriptor);
 
 		context->SetIndexBuffer(element.mesh->GetIndexBuffer());
 		context->SetVertexBuffer(element.mesh->GetVertexBuffer());
 		context->SetPrimitiveTopology(EPT_TriangleList);
 
-		context->SetGraphicsRootDescriptorTable(0, textureDescriptor->GetGPUDescriptorHandleForHeapStart());
+		context->SetGraphicsRootDescriptorTable(0, GPUDescriptor);
 		context->SetGraphicsRootConstantBufferView(1, globalCB.GPUAddress);
 		context->SetGraphicsRootConstantBufferView(2, objectCB.GPUAddress);
 
@@ -90,8 +93,8 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 	}
 
 	PIXEndEvent(context->GetCommandList());
-
 	context->Finish();
+
 	Present();
 }
 

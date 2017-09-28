@@ -1,4 +1,5 @@
 
+#include <easy/profiler.h>
 #ifdef DX12
 #include "D3D12Device.h"
 #include "d3dx12.h"
@@ -150,6 +151,20 @@ GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string & 
 	return buffer;
 }
 
+ComPtr<ID3D12DescriptorHeap> D3D12GraphicsDevice::CreateDescriptorHeap(enum D3D12_DESCRIPTOR_HEAP_TYPE heapType,
+                                                                       enum D3D12_DESCRIPTOR_HEAP_FLAGS isShaderVisible,
+                                                                       int numDescriptors) const
+{
+	ComPtr<ID3D12DescriptorHeap> descriptorHeap;
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+	srvHeapDesc.NumDescriptors = numDescriptors;
+	srvHeapDesc.Type = heapType;
+	srvHeapDesc.Flags = isShaderVisible;
+	ThrowIfFailed(mDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&descriptorHeap)));
+
+	return std::move(descriptorHeap);
+}
+
 GraphicsTexturePtr D3D12GraphicsDevice::CreateTextureFromFile(const char * inFileName, int & outWidth, int & outHeight) const
 {
 	std::string fileStr(inFileName);
@@ -199,16 +214,10 @@ GraphicsTexturePtr D3D12GraphicsDevice::CreateTextureFromFile(const char * inFil
 
 	context->Finish(true);
 
-	//Create Descriptor Heap
-	ComPtr<ID3D12DescriptorHeap> descriptorHeap;
-	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = 1;
-	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	ThrowIfFailed(mDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&descriptorHeap)));
+	ComPtr<ID3D12DescriptorHeap> descriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, 1);
 
 	//Create SRV
-	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(descriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	const CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(descriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -233,9 +242,11 @@ GraphicsTexturePtr D3D12GraphicsDevice::CreateTextureFromFile(const char * inFil
 
 void D3D12GraphicsDevice::ClearBackBuffer(const Vector3& inColor, float alpha)
 {
+	EASY_BLOCK("Wait to present")
 	auto& graphicsQueue = mCommandListManager->GetGraphicsQueue();
 	graphicsQueue.WaitForFence(mPresentFences[mCurrBackBuffer]);
-	assert(mPresentFences[mCurrBackBuffer] <= graphicsQueue.GetActualFenceValue());
+	assert(mPresentFences[mCurrBackBuffer] <= graphicsQueue.GetLastCompletedFenceValue());
+	EASY_END_BLOCK
 
 	auto context = mCommandListManager->AllocateContext();
 
@@ -266,11 +277,28 @@ void D3D12GraphicsDevice::Present()
 	context->TransitionResource(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 	mPresentFences[mCurrBackBuffer] = context->Finish();
-	const auto fence = mPresentFences[mCurrBackBuffer];
 
 	const auto hr = mSwapChain->Present(0, 0);
 	ThrowIfFailed(hr, "ERROR: Failed to present");
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
+}
+
+UINT D3D12GraphicsDevice::GetDescriptorSize(D3D12_DESCRIPTOR_HEAP_TYPE type) const
+{
+	switch(type)
+	{
+		case D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV: 
+			return mCbvSrvUavDescriptorSize;
+		case D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER: 
+			//TODO: Implement sampler size
+			return -1;
+		case D3D12_DESCRIPTOR_HEAP_TYPE_RTV:
+			return mRtvDescriptorSize;
+		case D3D12_DESCRIPTOR_HEAP_TYPE_DSV:
+			return mDsvDescriptorSize;
+		default: 
+			return -1;
+	}
 }
 
 void D3D12GraphicsDevice::InitDevice()
@@ -285,14 +313,14 @@ void D3D12GraphicsDevice::InitDevice()
 
 		ComPtr<ID3D12Debug1> debugInterface1;
 		auto r = SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&debugInterface1)));
-		/* if (r)
+		if (r)
 		{
-			debugInterface1->SetEnableGPUBasedValidation(true);
+			//debugInterface1->SetEnableGPUBasedValidation(true);
 		}
 		else
 		{
 			SDL_Log("WARNING: Unable to enable D3D12 GPU based validation layer!");
-		}*/
+		}
 	}
 	else
 	{
@@ -332,6 +360,8 @@ void D3D12GraphicsDevice::InitDevice()
 	
 	//TODO: Fallback to WARP device
 	assert(mDevice != nullptr);
+
+	mCbvSrvUavDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	InitCommandObjects();
 	CreateSwapChain();
@@ -398,7 +428,7 @@ void D3D12GraphicsDevice::OnResize()
 
 		mDevice->CreateRenderTargetView(mSwapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
 		rtvHeapHandle.Offset(1, mRtvDescriptorSize);
-		mPresentFences[i] = mCommandListManager->GetGraphicsQueue().GetLastCompletedFenceValue();
+		mPresentFences[i] = mCommandListManager->GetGraphicsQueue().GetActualFenceValue();
 	}
 
 	//Create depth stencil

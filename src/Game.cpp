@@ -42,9 +42,13 @@ void Game::RunLoop()
 	EASY_MAIN_THREAD;
 	profiler::startListen();
 
+	//EASY_BLOCK("Running Game")
+
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	while(!mShouldQuit)
 	{
+		EASY_BLOCK("GameLoop")
+
 		auto now = std::chrono::high_resolution_clock::now();
 		auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - currentTime).count() / 1000.0;
 		currentTime = now;
@@ -52,20 +56,17 @@ void Game::RunLoop()
 		mInput.ProcessInput();
 		//TODO: Run systems
 		mWorld.Update(delta);
+
+		EASY_END_BLOCK;
 	}
 
+	//EASY_END_BLOCK;
+
 	profiler::dumpBlocksToFile("test_profile.prof");
-
-	auto blocks_count = profiler::dumpBlocksToFile("test.prof");
-
-	std::cout << "Blocks count: " << blocks_count << std::endl;
 }
 
 void Game::StartGame()
 {
-	
-
 	mWorld.Init(mRenderer);
-	mWorld.LoadObjLevel("Assets/lost_empire.obj");
-
+	mWorld.LoadObjLevel("Assets/rungholt.obj");
 }
