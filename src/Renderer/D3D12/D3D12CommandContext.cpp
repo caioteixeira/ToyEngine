@@ -22,9 +22,14 @@ uint64_t D3D12CommandContext::Finish(bool waitCompletion)
 
 	auto& queue = mContextManager->GetGraphicsQueue();
 
-	uint64_t fenceValue = queue.ExecuteCommandList(mCommandList);
+	const uint64_t fenceValue = queue.ExecuteCommandList(mCommandList);
 	queue.StoreAllocator(fenceValue, mAllocator);
 	mAllocator = nullptr;
+
+	const uint64_t lastCompletedFence = queue.GetLastCompletedFenceValue();
+	mUploadHeap.FinishFrame(fenceValue, lastCompletedFence);
+	mDynamicDescriptorHeap->FinishCurrentFrame(fenceValue);
+	mDynamicDescriptorHeap->ReleaseCompletedFrames(lastCompletedFence);
 
 	if (waitCompletion)
 	{
@@ -190,13 +195,6 @@ void D3D12CommandContext::Reset()
 	assert(mCommandList != nullptr && mAllocator == nullptr);
 	mAllocator = mContextManager->GetGraphicsQueue().GetAllocator();
 	mCommandList->Reset(mAllocator, nullptr);
-
-	auto& queue = mContextManager->GetGraphicsQueue();
-	uint64_t currentFence = queue.GetActualFenceValue();
-	uint64_t fenceValue = queue.GetLastCompletedFenceValue();
-	mUploadHeap.FinishFrame(currentFence, fenceValue);
-	mDynamicDescriptorHeap->FinishCurrentFrame(currentFence);
-	mDynamicDescriptorHeap->ReleaseCompletedFrames(fenceValue);
 
 	mActualPipelineState = nullptr;
 	mActualDescriptorHeap = nullptr;
