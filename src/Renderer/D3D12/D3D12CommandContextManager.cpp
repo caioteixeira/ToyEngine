@@ -1,3 +1,4 @@
+#include <easy/profiler.h>
 #if DX12
 
 #include "D3D12Device.h"
@@ -45,30 +46,37 @@ void CommandContextManager::CreateCommandList(D3D12_COMMAND_LIST_TYPE type, ID3D
 
 D3D12CommandContext * CommandContextManager::AllocateContext()
 {
-	std::lock_guard<std::mutex> lockGuard(mContextAllocationMutex);
-	
+	EASY_FUNCTION(profiler::colors::Orange);
+
 	D3D12CommandContext* ret = nullptr;
+
+	mContextAllocationMutex.lock();
 
 	if (mAvailableContexts.empty())
 	{
+		EASY_BLOCK("Create new context", profiler::colors::Red);
+		mContextAllocationMutex.unlock();
+
 		ret = new D3D12CommandContext(D3D12_COMMAND_LIST_TYPE_DIRECT, mDevice);
 		mContextPool.emplace_back(ret);
+		EASY_END_BLOCK;
 	}
 	else
 	{
 		ret = mAvailableContexts.front();
 		mAvailableContexts.pop();
+
+		mContextAllocationMutex.unlock();
 		ret->Reset();
 	}
 	
-
 	assert(ret != nullptr);
-
 	return ret;
 }
 
 void CommandContextManager::FreeContext(D3D12CommandContext * context)
 {
+	EASY_FUNCTION(profiler::colors::Orange);
 	assert(context != nullptr);
 
 	std::lock_guard<std::mutex> lockGuard(mContextAllocationMutex);

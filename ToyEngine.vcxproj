@@ -304,6 +304,7 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
     <ClInclude Include="src\Core\JobSystem\context.h" />
     <ClInclude Include="src\Core\JobSystem\delegate.h" />
     <ClInclude Include="src\Core\JobSystem\job.h" />
+    <ClInclude Include="src\Core\JobSystem\WorkerPool.h" />
     <ClInclude Include="src\Core\JobSystem\park.h" />
     <ClInclude Include="src\Core\JobSystem\predicate.h" />
     <ClInclude Include="src\Core\JobSystem\queue.h" />
@@ -378,6 +379,7 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
   <ItemGroup>
     <ClCompile Include="src\Core\JobSystem\context.cc" />
     <ClCompile Include="src\Core\JobSystem\job.cc" />
+    <ClCompile Include="src\Core\JobSystem\WorkerPool.cpp" />
     <ClCompile Include="src\Core\JobSystem\park.cc" />
     <ClCompile Include="src\Core\JobSystem\queue.cc" />
     <ClCompile Include="src\Core\JobSystem\tests.cc" />
