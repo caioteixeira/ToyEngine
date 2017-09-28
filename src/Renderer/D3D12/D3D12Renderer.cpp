@@ -5,7 +5,7 @@
 #include "../FramePacket.h"
 #include <easy/profiler.h>
 
-D3D12Renderer::D3D12Renderer(): mWindow(nullptr), mThreadPool(NUM_THREADS)
+D3D12Renderer::D3D12Renderer(): mWindow(nullptr), mThreadPool(NUM_THREADS - 1)
 {
 }
 
@@ -42,58 +42,84 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 	snprintf(mWindowName, 200, "ToyEngine : %llu FPS", profiler::main_thread::frameTimeLocalAvg());
 	SDL_SetWindowTitle(mWindow, mWindowName);
 
-	EASY_FUNCTION();
+	EASY_FUNCTION(profiler::colors::Blue);
 
 	Clear();
 
-	GlobalConstants constant;
-	constant.projMatrix = framePacket.viewMatrix * mProj;
+	GlobalConstants constantBuffer;
+	constantBuffer.projMatrix = framePacket.viewMatrix * mProj;
 
-	auto contextManager = mGraphicsDevice->GetCommandContextManager();
-	auto context = contextManager->AllocateContext();
-	PIXBeginEvent(context->GetCommandList(), 0, L"Rendering");
+	EASY_BLOCK("Render Elements", profiler::colors::BlueGrey);
 
-	context->SetScissor(mGraphicsDevice->GetScissorRect());
-	context->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
-	context->SetViewport(mGraphicsDevice->GetViewPort());
-
-	auto globalCB = context->ReserveUploadMemory(sizeof GlobalConstants);
-	memcpy(globalCB.CPUAddress, &constant, sizeof(GlobalConstants));
-
-
-	for (auto& element : framePacket.meshes)
+	//Divide work and create parallel tasks
+	auto chunks = Utils::DivideWork(framePacket.meshes.begin(), framePacket.meshes.end(), NUM_THREADS);
+	auto& jobQueue = mThreadPool.GetQueue();
+	auto renderJob = jobQueue.create_job([this, &chunks, &constantBuffer](jobxx::context& ctx)
 	{
-		EASY_BLOCK("RenderElement");
+		for (auto& pair : chunks)
+		{
+			ctx.spawn_task([this, &pair, &constantBuffer]()
+			{
+				EASY_BLOCK("Rendering Job", profiler::colors::Green);
 
-		PerObjectConstants objectConstants;
-		objectConstants.worldTransform = element.worldTransform;
+				auto contextManager = mGraphicsDevice->GetCommandContextManager();
+				auto context = contextManager->AllocateContext();
+				PIXBeginEvent(context->GetCommandList(), 0, L"Rendering Job");
 
-		auto& objectCB = context->ReserveUploadMemory(sizeof(PerObjectConstants));
-		memcpy(objectCB.CPUAddress, &objectConstants, sizeof(PerObjectConstants));
+				context->SetScissor(mGraphicsDevice->GetScissorRect());
+				context->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
+				context->SetViewport(mGraphicsDevice->GetViewPort());
 
-		auto& material = element.material;
-		auto& pipelineState = material->pipelineState;
-		context->SetPipelineState(pipelineState);
-		context->SetGraphicsRootSignature(pipelineState->rootSignature.Get());
-		context->SetDynamicDescriptorHeap();
+				auto globalCB = context->ReserveUploadMemory(sizeof GlobalConstants);
+				memcpy(globalCB.CPUAddress, &constantBuffer, sizeof(GlobalConstants));
 
-		auto& textureDescriptor = material->diffuseTexture->GetGraphicsTexture()->descriptor;
-		CD3DX12_CPU_DESCRIPTOR_HANDLE CPUDescriptor(textureDescriptor->GetCPUDescriptorHandleForHeapStart());
-		const auto GPUDescriptor = context->CopyDescriptorToDynamicHeap(CPUDescriptor);
+				auto element = pair.first;
+				while(element < pair.second)
+				{
+					EASY_BLOCK("RenderElement");
 
-		context->SetIndexBuffer(element.mesh->GetIndexBuffer());
-		context->SetVertexBuffer(element.mesh->GetVertexBuffer());
-		context->SetPrimitiveTopology(EPT_TriangleList);
+					PerObjectConstants objectConstants;
+					objectConstants.worldTransform = element->worldTransform;
 
-		context->SetGraphicsRootDescriptorTable(0, GPUDescriptor);
-		context->SetGraphicsRootConstantBufferView(1, globalCB.GPUAddress);
-		context->SetGraphicsRootConstantBufferView(2, objectCB.GPUAddress);
+					auto& objectCB = context->ReserveUploadMemory(sizeof(PerObjectConstants));
+					memcpy(objectCB.CPUAddress, &objectConstants, sizeof(PerObjectConstants));
 
-		context->DrawIndexed(element.mesh->indexCount, 0);
-	}
+					auto& material = element->material;
+					auto& pipelineState = material->pipelineState;
+					context->SetPipelineState(pipelineState);
+					context->SetGraphicsRootSignature(pipelineState->rootSignature.Get());
+					context->SetDynamicDescriptorHeap();
 
-	PIXEndEvent(context->GetCommandList());
-	context->Finish();
+					auto& textureDescriptor = material->diffuseTexture->GetGraphicsTexture()->descriptor;
+					CD3DX12_CPU_DESCRIPTOR_HANDLE CPUDescriptor(textureDescriptor->GetCPUDescriptorHandleForHeapStart());
+					const auto GPUDescriptor = context->CopyDescriptorToDynamicHeap(CPUDescriptor);
+
+					context->SetIndexBuffer(element->mesh->GetIndexBuffer());
+					context->SetVertexBuffer(element->mesh->GetVertexBuffer());
+					context->SetPrimitiveTopology(EPT_TriangleList);
+
+					context->SetGraphicsRootDescriptorTable(0, GPUDescriptor);
+					context->SetGraphicsRootConstantBufferView(1, globalCB.GPUAddress);
+					context->SetGraphicsRootConstantBufferView(2, objectCB.GPUAddress);
+
+					context->DrawIndexed(element->mesh->indexCount, 0);
+
+					EASY_END_BLOCK
+
+					++element;
+				}
+
+				PIXEndEvent(context->GetCommandList());
+				context->Finish();
+
+				EASY_END_BLOCK
+			});
+		}
+	});
+
+	jobQueue.wait_job_actively(renderJob);
+
+	EASY_END_BLOCK;
 
 	Present();
 }

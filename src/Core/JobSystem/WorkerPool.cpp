@@ -1,4 +1,5 @@
 ﻿#include "WorkerPool.h"
+#include <easy/profiler.h>
 
 Engine::Core::WorkerPool::WorkerPool(int threads)
 {
@@ -6,6 +7,7 @@ Engine::Core::WorkerPool::WorkerPool(int threads)
 	{
 		mThreads.emplace_back([this]()
 		{
+			EASY_THREAD("Worker Thread")
 			mQueue.work_forever();
 		});
 	}

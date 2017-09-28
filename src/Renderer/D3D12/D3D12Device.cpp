@@ -242,12 +242,6 @@ GraphicsTexturePtr D3D12GraphicsDevice::CreateTextureFromFile(const char * inFil
 
 void D3D12GraphicsDevice::ClearBackBuffer(const Vector3& inColor, float alpha)
 {
-	EASY_BLOCK("Wait to present")
-	auto& graphicsQueue = mCommandListManager->GetGraphicsQueue();
-	graphicsQueue.WaitForFence(mPresentFences[mCurrBackBuffer]);
-	assert(mPresentFences[mCurrBackBuffer] <= graphicsQueue.GetLastCompletedFenceValue());
-	EASY_END_BLOCK
-
 	auto context = mCommandListManager->AllocateContext();
 
 	// Set the viewport and scissor rect.  This needs to be reset whenever the command list is reset.
@@ -278,9 +272,16 @@ void D3D12GraphicsDevice::Present()
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 	mPresentFences[mCurrBackBuffer] = context->Finish();
 
+	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
+
+	EASY_BLOCK("Wait to present")
+	auto& graphicsQueue = mCommandListManager->GetGraphicsQueue();
+	graphicsQueue.WaitForFence(mPresentFences[mCurrBackBuffer]);
+	assert(mPresentFences[mCurrBackBuffer] <= graphicsQueue.GetLastCompletedFenceValue());
+	EASY_END_BLOCK
+
 	const auto hr = mSwapChain->Present(0, 0);
 	ThrowIfFailed(hr, "ERROR: Failed to present");
-	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 }
 
 UINT D3D12GraphicsDevice::GetDescriptorSize(D3D12_DESCRIPTOR_HEAP_TYPE type) const
@@ -315,7 +316,7 @@ void D3D12GraphicsDevice::InitDevice()
 		auto r = SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&debugInterface1)));
 		if (r)
 		{
-			//debugInterface1->SetEnableGPUBasedValidation(true);
+			debugInterface1->SetEnableGPUBasedValidation(true);
 		}
 		else
 		{

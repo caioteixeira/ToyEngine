@@ -72,7 +72,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Device> mDevice;
 private:
 
-	static const int SwapChainBufferCount = 3;
+	static const int SwapChainBufferCount = 2;
 	int mCurrBackBuffer = 0;
 	uint64_t mPresentFences[SwapChainBufferCount];
 	Microsoft::WRL::ComPtr<ID3D12Resource> mSwapChainBuffer[SwapChainBufferCount];

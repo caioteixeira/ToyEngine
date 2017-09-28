@@ -1,4 +1,5 @@
 #pragma once
+#include "../ConstantBufferStructs.h"
 #if DX12
 
 #include "../IRenderer.h"

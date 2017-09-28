@@ -26,7 +26,7 @@ bool Game::Init()
 		return false;
 	}
 
-	if(!mRenderer->Init(1024, 768))
+	if(!mRenderer->Init(1440, 900))
 	{
 		SDL_Log("Failed to initialized Renderer.");
 	}
@@ -41,8 +41,6 @@ void Game::RunLoop()
 	EASY_PROFILER_ENABLE
 	EASY_MAIN_THREAD;
 	profiler::startListen();
-
-	//EASY_BLOCK("Running Game")
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	while(!mShouldQuit)
@@ -60,13 +58,11 @@ void Game::RunLoop()
 		EASY_END_BLOCK;
 	}
 
-	//EASY_END_BLOCK;
-
 	profiler::dumpBlocksToFile("test_profile.prof");
 }
 
 void Game::StartGame()
 {
 	mWorld.Init(mRenderer);
-	mWorld.LoadObjLevel("Assets/rungholt.obj");
+	mWorld.LoadObjLevel("Assets/lost_empire.obj");
 }
