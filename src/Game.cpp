@@ -42,14 +42,14 @@ void Game::RunLoop()
 	EASY_MAIN_THREAD;
 	profiler::startListen();
 
-	auto currentTime = std::chrono::high_resolution_clock::now();
+	auto lastFrame = std::chrono::high_resolution_clock::now();
 	while(!mShouldQuit)
 	{
 		EASY_BLOCK("GameLoop")
 
 		auto now = std::chrono::high_resolution_clock::now();
-		auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - currentTime).count() / 1000.0;
-		currentTime = now;
+		auto delta = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(now - lastFrame).count() / 1000.0f;
+		lastFrame = now;
 
 		mInput.ProcessInput();
 		//TODO: Run systems

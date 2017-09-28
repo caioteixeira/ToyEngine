@@ -44,7 +44,7 @@ void GameWorld::LoadObjLevel(const std::string& path)
 		entityx::Entity meshEntity = entities.Create();
 		meshEntity.Assign<Mesh>(mesh);
 		meshEntity.Assign<Transform>();
-		meshEntity.Assign<ConstantRotation>(0.2f, 0.0f, 0.0f);
+		meshEntity.Assign<ConstantRotation>(0.1f, 0.0f, 0.0f);
 	}
 }
 

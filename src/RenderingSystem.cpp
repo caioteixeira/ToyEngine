@@ -65,6 +65,7 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
 		auto buffer = mesh->perObjectBuffer;
 
 		auto quat = Quaternion::CreateFromYawPitchRoll(meshRotation.x, meshRotation.y, meshRotation.z);
+		quat.Normalize();
 
 		element.worldTransform = Matrix::CreateScale(meshScale) * 
 			Matrix::CreateFromQuaternion(quat) * Matrix::CreateTranslation(meshPosition);
