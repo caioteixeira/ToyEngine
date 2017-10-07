@@ -1,4 +1,5 @@
 #include <easy/profiler.h>
+#include "D3D11CommandContext.h"
 #ifdef DX11
 #include "D3D11Renderer.h"
 #include "D3D11ResourceManager.h"
@@ -8,7 +9,7 @@
 #include "../../Core/imgui/imgui_impl_dx11.h"
 
 D3D11Renderer::D3D11Renderer()
-	: mWindow(nullptr)
+	: mWindow(nullptr), mThreadPool(NUM_THREADS - 1)
 {
 	
 }
@@ -50,8 +51,8 @@ bool D3D11Renderer::Init(int width, int height)
 
 void D3D11Renderer::InitFrameBuffer()
 {
-	auto rasterizerState = mGraphicsDevice->CreateRasterizerState(EFM_Solid);
-	mGraphicsDevice->SetRasterizerState(rasterizerState);
+	mRasterizerState = mGraphicsDevice->CreateRasterizerState(EFM_Solid);
+	mGraphicsDevice->SetRasterizerState(mRasterizerState);
 
 	mDepthBuffer = mGraphicsDevice->CreateDepthStencil();
 	mGraphicsDevice->SetDepthStencil(mDepthBuffer);
@@ -85,57 +86,77 @@ void D3D11Renderer::InitShaders()
 	mGraphicsDevice->SetPSSamplerState(mDefaultSampler, 0);
 }
 
-void D3D11Renderer::DrawMeshElement(MeshElement& element) const
+void D3D11Renderer::DrawMeshElement(MeshElement& element, D3D11CommandContext* context) const
 {
+	EASY_FUNCTION();
+
 	PerObjectConstants objectConstants;
 	objectConstants.worldTransform = element.worldTransform;
-	void* buffer = mGraphicsDevice->MapBuffer(element.constantBuffer);
+	void* buffer = context->MapBuffer(element.constantBuffer);
 	memcpy(buffer, &objectConstants, sizeof(PerObjectConstants));
-	mGraphicsDevice->UnmapBuffer(element.constantBuffer);
+	context->UnmapBuffer(element.constantBuffer);
 
-	mGraphicsDevice->SetVSConstantBuffer(element.constantBuffer, 1);
+	context->SetVSConstantBuffer(element.constantBuffer, 1);
 
-	mGraphicsDevice->SetInputLayout(element.material->pipelineState->inputLayout);
-	mGraphicsDevice->SetVertexBuffer(element.mesh->GetVertexBuffer(), sizeof(Vertex));
-	mGraphicsDevice->SetIndexBuffer(element.mesh->GetIndexBuffer());
-	mGraphicsDevice->SetPSTexture(element.material->diffuseTexture->GetGraphicsTexture(), 0);
-	mGraphicsDevice->DrawIndexed(element.mesh->indexCount, 0, 0);
+	context->SetInputLayout(element.material->pipelineState->inputLayout);
+	context->SetVertexBuffer(element.mesh->GetVertexBuffer(), sizeof(Vertex));
+	context->SetIndexBuffer(element.mesh->GetIndexBuffer());
+	context->SetPSTexture(element.material->diffuseTexture->GetGraphicsTexture(), 0);
+	context->DrawIndexed(element.mesh->indexCount, 0, 0);
 }
 
-void D3D11Renderer::UpdateGlobalConstants(FramePacket& packet) const
+void D3D11Renderer::UpdateGlobalConstants(FramePacket& packet, D3D11CommandContext* context) const
 {
 	GlobalConstants constants;
 	constants.projMatrix = packet.viewMatrix *  mProj;
-	void* buffer = mGraphicsDevice->MapBuffer(mCameraBuffer);
+	void* buffer = context->MapBuffer(mCameraBuffer);
 	memcpy(buffer, &constants, sizeof(GlobalConstants));
-	mGraphicsDevice->UnmapBuffer(mCameraBuffer);
+	context->UnmapBuffer(mCameraBuffer);
 }
 
 void D3D11Renderer::RenderFrame(FramePacket& packet)
 {
-	snprintf(mWindowName, 200, "ToyEngine : %llu FPS", profiler::main_thread::frameTimeLocalAvg());
-	SDL_SetWindowTitle(mWindow, mWindowName);
-
 	EASY_FUNCTION();
 
 	Clear();
 
-	mGraphicsDevice->SetDepthStencilState(mMeshDepthState);
-	mGraphicsDevice->SetBlendState(mMeshBlendState);
-
-	mGraphicsDevice->SetVertexShader(mVertexShader);
-	mGraphicsDevice->SetPixelShader(mPixelShader);
-	mGraphicsDevice->SetPSSamplerState(mDefaultSampler, 0);
-
-	UpdateGlobalConstants(packet);
-
-	mGraphicsDevice->SetVSConstantBuffer(mCameraBuffer, 0);
-	mGraphicsDevice->SetPSConstantBuffer(mCameraBuffer, 0);
-
-	for(MeshElement& element : packet.meshes)
+	auto chunks = Utils::DivideWork(packet.meshes.begin(), packet.meshes.end(), NUM_THREADS);
+	auto& jobQueue = mThreadPool.GetQueue();
+	auto renderJob = jobQueue.create_job([this, &chunks, &packet](jobxx::context& ctx)
 	{
-		DrawMeshElement(element);
-	}
+		for (auto& pair : chunks)
+		{
+			ctx.spawn_task([this, &pair, &packet]
+			{
+				D3D11CommandContext* context = mGraphicsDevice->GetContext();
+				UpdateGlobalConstants(packet, context);
+
+				context->SetRenderTarget(mGraphicsDevice->GetBackBufferRenderTarget());
+				context->SetPrimitiveTopology(EPT_TriangleList);
+				context->SetRasterizerState(mRasterizerState);
+				context->SetDepthStencilState(mMeshDepthState);
+				context->SetBlendState(mMeshBlendState);
+
+				context->SetVertexShader(mVertexShader);
+				context->SetPixelShader(mPixelShader);
+				context->SetPSSamplerState(mDefaultSampler, 0);
+
+				context->SetVSConstantBuffer(mCameraBuffer, 0);
+				context->SetPSConstantBuffer(mCameraBuffer, 0);
+
+				auto element = pair.first;
+				while(element < pair.second)
+				{
+					DrawMeshElement(*element, context);
+					++element;
+				}
+
+				context->Finish();
+			});
+		}
+	});
+
+	jobQueue.wait_job_actively(renderJob);
 
 	//ImGui::Render();
 

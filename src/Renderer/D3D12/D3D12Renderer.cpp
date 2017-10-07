@@ -39,9 +39,6 @@ bool D3D12Renderer::Init(int width, int height)
 
 void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 {
-	snprintf(mWindowName, 200, "ToyEngine : %llu FPS", profiler::main_thread::frameTimeLocalAvg());
-	SDL_SetWindowTitle(mWindow, mWindowName);
-
 	EASY_FUNCTION(profiler::colors::Blue);
 
 	Clear();
@@ -58,17 +55,17 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 	{
 		for (auto& pair : chunks)
 		{
-			ctx.spawn_task([this, &pair, &constantBuffer]()
+			auto contextManager = mGraphicsDevice->GetCommandContextManager();
+			auto context = contextManager->AllocateContext();
+			context->SetScissor(mGraphicsDevice->GetScissorRect());
+			context->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
+			context->SetViewport(mGraphicsDevice->GetViewPort());
+
+			ctx.spawn_task([context, &pair, &constantBuffer]()
 			{
 				EASY_BLOCK("Rendering Job", profiler::colors::Green);
-
-				auto contextManager = mGraphicsDevice->GetCommandContextManager();
-				auto context = contextManager->AllocateContext();
+				
 				PIXBeginEvent(context->GetCommandList(), 0, L"Rendering Job");
-
-				context->SetScissor(mGraphicsDevice->GetScissorRect());
-				context->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
-				context->SetViewport(mGraphicsDevice->GetViewPort());
 
 				auto globalCB = context->ReserveUploadMemory(sizeof GlobalConstants);
 				memcpy(globalCB.CPUAddress, &constantBuffer, sizeof(GlobalConstants));

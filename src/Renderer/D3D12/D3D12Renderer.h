@@ -31,7 +31,6 @@ private:
 
 	Matrix mProj;
 
-	static const int NUM_THREADS = 4;
 	Engine::Core::WorkerPool mThreadPool;
 };
 

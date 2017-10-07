@@ -6,6 +6,7 @@
 #include "D3D11GraphicsDevice.h"
 #include "../IRenderer.h"
 #include "D3D11ResourceManager.h"
+#include "../../EngineCore.h"
 
 struct MeshElement;
 
@@ -16,8 +17,8 @@ public:
 	virtual ~D3D11Renderer();
 	void InitFrameBuffer();
 	void InitShaders();
-	void DrawMeshElement(MeshElement& element) const;
-	void UpdateGlobalConstants(FramePacket& packet) const;
+	void DrawMeshElement(MeshElement& element, D3D11CommandContext* context) const;
+	void UpdateGlobalConstants(FramePacket& packet, D3D11CommandContext* context) const;
 	bool Init(int width, int height);
 	void RenderFrame(FramePacket& packet);
 	D3D11ResourceManager* GetResourceManager() { return mResourceManager.get(); }
@@ -34,6 +35,7 @@ private:
 	DepthStencilPtr mDepthBuffer;
 	DepthStencilStatePtr mMeshDepthState;
 	BlendStatePtr mMeshBlendState;
+	RasterizerStatePtr mRasterizerState;
 
 	//TODO: Properly implement multiple shaders
 	PixelShaderPtr mPixelShader;
@@ -46,6 +48,8 @@ private:
 
 	int mWidth = 0;
 	int mHeight = 0;
+
+	Engine::Core::WorkerPool mThreadPool;
 };
 #endif
 

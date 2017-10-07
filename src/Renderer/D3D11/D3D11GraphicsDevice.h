@@ -1,10 +1,13 @@
 #pragma once
 #include <vector>
+#include <queue>
+#include <mutex>
 #ifdef DX11
 #include "D3D11Types.h"
 #include "../../WindowsHeaders.h"
 #include "../../Math.h"
 
+class D3D11CommandContext;
 class D3D11GraphicsDevice
 {
 public:
@@ -14,6 +17,11 @@ public:
 	RenderTargetPtr GetBackBufferRenderTarget() const
 	{
 		return mBackBufferRenderTarget;
+	}
+
+	DepthStencilPtr GetDepthStencilBuffer() const
+	{
+		return mCurrentDepthStencil;
 	}
 
 	ID3D11DeviceContext * GetImmediateContext() const
@@ -66,6 +74,11 @@ public:
 	void Draw(int vertexCount, int startVertexIndex) const;
 	void DrawIndexed(int indexCount, int startIndexLocation, int baseLocation) const;
 	void Present() const;
+
+	D3D11CommandContext* GetContext();
+	void ExecuteDeferredContext(ID3D11DeviceContext* context);
+	void FreeContext(D3D11CommandContext* context);
+
 private:
 	void CreateDevice();
 	HRESULT CreateSwapChain(UINT backBufferWidth, UINT backBufferHeight, HWND window);
@@ -84,5 +97,10 @@ private:
 
 	UINT mWindowWidth;
 	UINT mWindowHeight;
+
+	std::vector<std::unique_ptr<D3D11CommandContext>> mContextPool;
+	std::queue<D3D11CommandContext *> mAvailableContexts;
+	std::mutex mContextAllocationMutex;
+	std::mutex mExecutionMutex;
 };
 #endif

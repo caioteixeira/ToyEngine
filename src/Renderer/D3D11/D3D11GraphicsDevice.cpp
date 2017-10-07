@@ -1,7 +1,9 @@
 #include <iostream>
+#include <easy/profiler.h>
 #ifdef DX11
 #include "D3D11GraphicsDevice.h"
 #include <WICTextureLoader.h>
+#include "D3D11CommandContext.h"
 
 void AutoReleaseD3D(ID3D11DeviceChild* inResource)
 {
@@ -25,9 +27,7 @@ D3D11GraphicsDevice::D3D11GraphicsDevice(void *inWindow)
 	SetViewPort(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
 
 	SetRasterizerState(CreateRasterizerState(EFM_Wireframe));
-
 	SetPrimitiveTopology(EPT_TriangleList);
-
 	SetRenderTarget(GetBackBufferRenderTarget());
 }
 
@@ -607,6 +607,52 @@ void D3D11GraphicsDevice::DrawIndexed(int indexCount, int startIndexLocation, in
 void D3D11GraphicsDevice::Present() const
 {
 	mSwapChain->Present(0, 0);
+}
+
+D3D11CommandContext* D3D11GraphicsDevice::GetContext()
+{
+	EASY_FUNCTION(profiler::colors::Orange);
+
+	D3D11CommandContext* ret = nullptr;
+
+	std::lock_guard<std::mutex> lock(mContextAllocationMutex);
+
+	if (mAvailableContexts.empty())
+	{
+		EASY_BLOCK("Create new context", profiler::colors::Red);
+
+		ret = new D3D11CommandContext(this);
+
+		mContextPool.emplace_back(ret);
+		EASY_END_BLOCK;
+	}
+	else
+	{
+		ret = mAvailableContexts.front();
+		mAvailableContexts.pop();
+	}
+
+	assert(ret != nullptr);
+	return ret;
+}
+
+void D3D11GraphicsDevice::ExecuteDeferredContext(ID3D11DeviceContext* context)
+{
+	std::lock_guard<std::mutex> lockGuard(mExecutionMutex);
+
+	ID3D11CommandList* commandList;
+	context->FinishCommandList(false, &commandList);
+
+	mImmediateContext->ExecuteCommandList(commandList, true);
+}
+
+void D3D11GraphicsDevice::FreeContext(D3D11CommandContext* context)
+{
+	EASY_FUNCTION(profiler::colors::Orange);
+	assert(context != nullptr);
+
+	std::lock_guard<std::mutex> lockGuard(mContextAllocationMutex);
+	mAvailableContexts.push(context);
 }
 
 #endif
