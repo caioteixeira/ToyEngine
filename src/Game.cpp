@@ -38,16 +38,13 @@ bool Game::Init()
 
 void Game::RunLoop()
 {
-	int numFrames = 0;
-	float executionTime = 10.0f;
-	float remainingTime = executionTime;
 
 	EASY_PROFILER_ENABLE
 	EASY_MAIN_THREAD;
 	profiler::startListen();
 
 	auto lastFrame = std::chrono::high_resolution_clock::now();
-	while(!mShouldQuit && remainingTime > 0.0f)
+	while(!mShouldQuit)
 	{
 		EASY_BLOCK("GameLoop")
 
@@ -55,17 +52,12 @@ void Game::RunLoop()
 		auto delta = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(now - lastFrame).count() / 1000.0f;
 		lastFrame = now;
 
-		remainingTime -= delta;
-		numFrames++;
-
 		mInput.ProcessInput();
 		//TODO: Run systems
 		mWorld.Update(delta);
 
 		EASY_END_BLOCK;
 	}
-
-	SDL_Log("%f FPS", numFrames / executionTime);
 
 	profiler::dumpBlocksToFile("test_profile.prof");
 }
