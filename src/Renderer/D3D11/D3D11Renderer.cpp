@@ -101,8 +101,11 @@ void D3D11Renderer::DrawMeshElement(MeshElement& element, D3D11CommandContext* c
 	context->SetInputLayout(element.material->pipelineState->inputLayout);
 	context->SetVertexBuffer(element.mesh->GetVertexBuffer(), sizeof(Vertex));
 	context->SetIndexBuffer(element.mesh->GetIndexBuffer());
-	context->SetPSTexture(element.material->diffuseTexture->GetGraphicsTexture(), 0);
-	context->DrawIndexed(element.mesh->indexCount, 0, 0);
+	if(element.material != nullptr && element.material->diffuseTexture != nullptr)
+	{
+		context->SetPSTexture(element.material->diffuseTexture->GetGraphicsTexture(), 0);
+		context->DrawIndexed(element.mesh->indexCount, 0, 0);
+	}
 }
 
 void D3D11Renderer::UpdateGlobalConstants(FramePacket& packet, D3D11CommandContext* context) const

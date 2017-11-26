@@ -361,7 +361,12 @@ GraphicsTexturePtr D3D11GraphicsDevice::CreateTextureFromFile(const char* path, 
 		//TODO: Use logger class
 		std::cerr << "GraphicsDriver can only load images of type DDS, PNG, or BMP." << std::endl;
 	}
-	ThrowIfFailed(hr, "Problem Creating Texture From File");
+
+	if(hr != S_OK)
+	{
+		SDL_Log("Problem Creating Texture From File");
+		return nullptr;
+	}
 
 	CD3D11_TEXTURE2D_DESC textureDesc;
 	((ID3D11Texture2D*)texture)->GetDesc(&textureDesc);

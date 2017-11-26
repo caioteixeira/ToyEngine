@@ -190,7 +190,12 @@ GraphicsTexturePtr D3D12GraphicsDevice::CreateTextureFromFile(const char * inFil
 		//TODO: Use logger class
 		SDL_Log("ERROR: GraphicsDriver can only load images of type DDS, PNG, or BMP.");
 	}
-	ThrowIfFailed(hr, "Problem Creating Texture From File");
+
+	if (hr != S_OK)
+	{
+		SDL_Log("Problem Creating Texture From File");
+		return nullptr;
+	}
 
 	const UINT64 uploadBufferSize = GetRequiredIntermediateSize(buffer.Get(), 0, 1);
 

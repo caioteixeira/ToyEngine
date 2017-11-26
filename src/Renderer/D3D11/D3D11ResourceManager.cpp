@@ -38,7 +38,11 @@ TexturePtr D3D11ResourceManager::GetTexture(const std::string& path)
 	}
 
 	auto texture = LoadTexture(path);
-	mTextureCache.emplace(path, texture);
+
+	if(texture != nullptr)
+	{
+		mTextureCache.emplace(path, texture);
+	}
 	return texture;
 }
 
@@ -61,6 +65,11 @@ TexturePtr D3D11ResourceManager::LoadTexture(const std::string& path) const
 	finalPath = finalPath + path;
 	auto graphicsTexture = mDevice.CreateTextureFromFile(finalPath.c_str(), width, height);
 
+	if(graphicsTexture == nullptr)
+	{
+		return nullptr;
+	}
+
 	return std::make_shared<Texture>(graphicsTexture, width, height);
 }
 
@@ -79,6 +88,12 @@ MaterialPtr D3D11ResourceManager::CreateMaterial(Utils::MaterialDesc& desc)
 	if(!desc.diffuseTexName.empty())
 	{
 		material->diffuseTexture = GetTexture(desc.diffuseTexName);
+
+		if(material->diffuseTexture == nullptr)
+		{
+			return nullptr;
+		}
+
 		material->SetProperty(DiffuseTexture);
 	}
 
@@ -103,9 +118,12 @@ void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 	for(auto& desc : materialMap)
 	{
 		auto material = CreateMaterial(desc.second);
-		materials[desc.first] = material;
 
-		SDL_Log("Renderer: Succesfully loaded a material");
+		if(material != nullptr)
+		{
+			materials[desc.first] = material;
+			SDL_Log("Renderer: Succesfully loaded a material");
+		}
 	}
 
 	for(auto& meshData : meshes)
@@ -115,15 +133,20 @@ void D3D11ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 		auto indexBuffer = mDevice.CreateGraphicsBuffer(meshData.indices.data(), meshData.indices.size() * sizeof(uint32_t),
 			EBF_IndexBuffer, ECPUAF_Neither, EGBU_Immutable);
 		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, meshData.indices.size());
-		auto material = materials[meshData.materialName];
 
-		Mesh mesh;
-		mesh.geometry = geo;
-		mesh.material = material;
-		mesh.perObjectBuffer = mDevice.CreateGraphicsBuffer(nullptr, sizeof(PerObjectConstants), EBF_ConstantBuffer, ECPUAF_CanWrite, EGBU_Dynamic);;
-		outMeshes.push_back(mesh);
+		const auto it = materials.find(meshData.materialName);
+		if(it != materials.end())
+		{
+			auto material = materials[meshData.materialName];
 
-		SDL_Log("Renderer: Succesfully loaded a mesh element");
+			Mesh mesh;
+			mesh.geometry = geo;
+			mesh.material = material;
+			mesh.perObjectBuffer = mDevice.CreateGraphicsBuffer(nullptr, sizeof(PerObjectConstants), EBF_ConstantBuffer, ECPUAF_CanWrite, EGBU_Dynamic);;
+			outMeshes.push_back(mesh);
+
+			SDL_Log("Renderer: Succesfully loaded a mesh element");
+		}
 	}
 
 	SDL_Log("Renderer: Succesfully loaded OBJ File");

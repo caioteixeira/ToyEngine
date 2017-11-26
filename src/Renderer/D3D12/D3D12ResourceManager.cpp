@@ -29,9 +29,12 @@ void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 	for (auto& desc : materialMap)
 	{
 		auto& material = CreateMaterial(desc.second);
-		materials[desc.first] = material;
 
-		SDL_Log("Renderer: Succesfully loaded a material");
+		if(material != nullptr)
+		{
+			materials[desc.first] = material;
+			SDL_Log("Renderer: Succesfully loaded a material");
+		}
 	}
 
 	for (auto& meshData : meshes)
@@ -40,14 +43,18 @@ void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 		auto indexBuffer = mDevice->CreateGraphicsBuffer("Index Buffer", meshData.indices.size(), sizeof(uint32_t), meshData.indices.data());
 
 		MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer, static_cast<int>(meshData.indices.size()));
-		auto& material = materials[meshData.materialName];
 
-		Mesh mesh;
-		mesh.geometry = geo;
-		mesh.material = material;
-		outMeshes.push_back(mesh);
+		if(materials.find(meshData.materialName) != materials.end())
+		{
+			auto& material = materials[meshData.materialName];
 
-		SDL_Log("Renderer: Succesfully loaded a mesh element");
+			Mesh mesh;
+			mesh.geometry = geo;
+			mesh.material = material;
+			outMeshes.push_back(mesh);
+
+			SDL_Log("Renderer: Succesfully loaded a mesh element");
+		}
 	}
 
 	SDL_Log("Renderer: Succesfully loaded OBJ File");
@@ -68,7 +75,10 @@ TexturePtr D3D12ResourceManager::GetTexture(const std::string& path)
 	}
 
 	auto texture = LoadTexture(path);
-	mTextureCache.emplace(path, texture);
+	if(texture != nullptr)
+	{
+		mTextureCache.emplace(path, texture);
+	}
 	return texture;
 }
 
@@ -85,6 +95,10 @@ MaterialPtr D3D12ResourceManager::CreateMaterial(Utils::MaterialDesc& desc)
 	material->pipelineState = mDefaultPipeline;
 
 	material->diffuseTexture = GetTexture(desc.diffuseTexName);
+	if(material->diffuseTexture == nullptr)
+	{
+		return nullptr;
+	}
 
 	return material;
 }
@@ -214,12 +228,22 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> D3D12ResourceManager::GetStatic
 
 TexturePtr D3D12ResourceManager::LoadTexture(const std::string & path) const
 {
+	if(path.size() == 0)
+	{
+		return nullptr;
+	}
+
 	//TODO: Remove width and height from Texture class
 	int width = -1;
 	int height = -1;
 	std::string finalPath("Assets/");
 	finalPath = finalPath + path;
 	auto graphicsTexture = mDevice->CreateTextureFromFile(finalPath.c_str(), width, height);
+
+	if(graphicsTexture == nullptr)
+	{
+		return nullptr;
+	}
 
 	return std::make_shared<Texture>(graphicsTexture, width, height);
 }
