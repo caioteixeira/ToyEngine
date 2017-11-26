@@ -1,6 +1,5 @@
-
 #include <easy/profiler.h>
-#ifdef DX12
+
 #include "D3D12Device.h"
 #include "d3dx12.h"
 #include "D3D12CommandContext.h"
@@ -541,7 +540,3 @@ void D3D12GraphicsDevice::CreateRtvAndDsvDescriptorHeaps()
 	ThrowIfFailed(mDevice->CreateDescriptorHeap(
 		&dsvHeapDesc, IID_PPV_ARGS(mDsvHeap.GetAddressOf())));
 }
-
-
-#endif
-

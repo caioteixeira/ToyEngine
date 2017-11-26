@@ -1,5 +1,5 @@
 ﻿#pragma once
-#if DX12
+
 #include <deque>
 #include "d3dx12.h"
 #include "../../WindowsHeaders.h"
@@ -50,5 +50,3 @@ private:
 
 	UINT mDescriptorSize = 0;
 };
-
-#endif

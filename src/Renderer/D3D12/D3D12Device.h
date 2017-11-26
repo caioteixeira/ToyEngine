@@ -1,5 +1,4 @@
 #pragma once
-#ifdef DX12
 
 #include <memory>
 
@@ -89,5 +88,3 @@ private:
 	const DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	const DXGI_FORMAT mBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 };
-
-#endif

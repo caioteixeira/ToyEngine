@@ -1,4 +1,3 @@
-#if DX12
 #include "GPURingBuffer.h"
 
 
@@ -194,5 +193,3 @@ void GPURingBuffer::Destroy()
 	mCPUVirtualAddress = 0;
 	mGPUVirtualAddress = 0;
 }
-
-#endif

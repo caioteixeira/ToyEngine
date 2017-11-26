@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "d3dx12.h"
 
-#if DX12
 #include <memory>
 #include "../../WindowsHeaders.h"
 
@@ -109,5 +108,3 @@ struct PipelineState
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
 };
 typedef std::shared_ptr<PipelineState> PipelineStatePtr;
-
-#endif

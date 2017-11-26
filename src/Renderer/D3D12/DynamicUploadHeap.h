@@ -1,5 +1,4 @@
 ﻿#pragma once
-#if DX12
 
 #include <vector>
 #include "GPURingBuffer.h"
@@ -25,5 +24,3 @@ private:
 	std::vector<GPURingBuffer> mRingBuffers;
 	D3D12GraphicsDevice * mDevice = nullptr;
 };
-
-#endif

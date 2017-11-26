@@ -1,6 +1,4 @@
-﻿#if DX12
-
-#include "DynamicDescriptorHeap.h"
+﻿#include "DynamicDescriptorHeap.h"
 #include "D3D12Device.h"
 
 DynamicDescriptorHeap::DynamicDescriptorHeap(D3D12GraphicsDevice* device, D3D12_DESCRIPTOR_HEAP_TYPE type, size_t maxSize)
@@ -93,5 +91,3 @@ inline size_t DynamicDescriptorHeap::GetAllocationOffset(size_t size = 1)
 
 	return mInvalidOffset;
 }
-
-#endif

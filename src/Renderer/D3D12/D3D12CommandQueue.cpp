@@ -1,4 +1,3 @@
-#if DX12
 #include "D3D12CommandQueue.h"
 #include <algorithm>
 #include <thread>
@@ -96,5 +95,3 @@ void D3D12CommandQueue::Flush()
 	WaitForFence(mNextFenceValue);
 	mNextFenceValue++;
 }
-
-#endif

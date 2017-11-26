@@ -1,5 +1,4 @@
-﻿#if DX12
-#include <unordered_map>
+﻿#include <unordered_map>
 #include "D3D12ResourceManager.h"
 #include "D3D12Device.h"
 #include "../Utils.h"
@@ -247,5 +246,3 @@ TexturePtr D3D12ResourceManager::LoadTexture(const std::string & path) const
 
 	return std::make_shared<Texture>(graphicsTexture, width, height);
 }
-
-#endif

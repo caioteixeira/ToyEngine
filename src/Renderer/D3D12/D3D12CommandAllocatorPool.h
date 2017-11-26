@@ -1,5 +1,4 @@
 #pragma once
-#if DX12
 
 #include "D3D12CommandContext.h"
 #include <vector>
@@ -24,5 +23,3 @@ private:
 	std::queue<std::pair<uint64_t, ID3D12CommandAllocator *>> mFreeQueue;
 	std::mutex mAllocatorMutex;
 };
-
-#endif;

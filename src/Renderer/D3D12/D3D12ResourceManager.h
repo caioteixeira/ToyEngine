@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#if DX12
 #include <array>
 #include "../IResourceManager.h"
 #include "../Utils.h"
@@ -29,4 +28,3 @@ private:
 
 	std::unordered_map<std::string, TexturePtr> mTextureCache;
 };
-#endif

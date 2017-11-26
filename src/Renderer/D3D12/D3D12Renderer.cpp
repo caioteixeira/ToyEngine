@@ -1,4 +1,3 @@
-#ifdef DX12
 #include "D3D12Renderer.h"
 #include "D3D12CommandContextManager.h"
 #include "../ConstantBufferStructs.h"
@@ -137,4 +136,3 @@ void D3D12Renderer::Present() const
 	EASY_FUNCTION();
 	mGraphicsDevice->Present();
 }
-#endif

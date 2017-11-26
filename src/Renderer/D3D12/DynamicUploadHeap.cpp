@@ -1,5 +1,4 @@
-﻿#if DX12
-#include "DynamicUploadHeap.h"
+﻿#include "DynamicUploadHeap.h"
 #include "D3D12Device.h"
 #include "GPURingBuffer.h"
 
@@ -56,5 +55,3 @@ void DynamicUploadHeap::FinishFrame(uint64_t frameNum, uint64_t numCompletedFram
 		mRingBuffers.erase(mRingBuffers.begin(), mRingBuffers.begin() + numBuffersToDelete);
 	}*/
 }
-
-#endif

@@ -1,4 +1,3 @@
-#if DX12
 #include "D3D12Device.h"
 #include "D3D12CommandContext.h"
 #include "D3D12CommandContextManager.h"
@@ -210,7 +209,3 @@ void D3D12CommandContext::SetScissor(const D3D12_RECT & rect)
 	assert(rect.left < rect.right && rect.top < rect.bottom);
 	mCommandList->RSSetScissorRects(1, &rect);
 }
-
-
-#endif
-

@@ -1,5 +1,4 @@
 #pragma once
-#if DX12
 
 #include <utility>
 #include <cstdint>
@@ -58,5 +57,3 @@ private:
 	size_t mMaxSize = 0;
 	size_t mUsedSize = 0;
 };
-
-#endif

@@ -1,6 +1,4 @@
 #pragma once
-#if DX12
-
 #include "D3D12Device.h"
 #include "D3D12CommandAllocatorPool.h"
 
@@ -40,5 +38,3 @@ private:
 	uint64_t mLastCompletedFenceValue;
 	HANDLE mFenceEventHandle;
 };
-
-#endif

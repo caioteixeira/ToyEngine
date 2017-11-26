@@ -1,6 +1,5 @@
 #pragma once
 #include "DynamicDescriptorHeap.h"
-#if DX12
 
 #include "../../Math.h"
 #include "D3D12Types.h"
@@ -74,5 +73,3 @@ private:
 	DynamicUploadHeap mUploadHeap;
 	std::unique_ptr<DynamicDescriptorHeap> mDynamicDescriptorHeap;
 };
-#endif
-
