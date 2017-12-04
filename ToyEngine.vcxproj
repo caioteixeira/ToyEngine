@@ -222,7 +222,7 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
     <ClInclude Include="src\Renderer\IResourceManager.h" />
     <ClInclude Include="src\Renderer\Texture.h" />
     <ClInclude Include="src\Renderer\Types.h" />
-    <ClInclude Include="src\Renderer\Utils.h" />
+    <ClInclude Include="src\Renderer\OBJModelLoader.h" />
     <ClInclude Include="src\Renderer\Vertex.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Math.h" />
@@ -269,7 +269,7 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
     <ClCompile Include="src\Renderer\MeshGeometry.cpp" />
     <ClCompile Include="src\Renderer\IResourceManager.cpp" />
     <ClCompile Include="src\Renderer\Texture.cpp" />
-    <ClCompile Include="src\Renderer\Utils.cpp" />
+    <ClCompile Include="src\Renderer\OBJModelLoader.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Renderer\D3D12\D3D12Renderer.cpp" />
     <ClCompile Include="src\Game.cpp" />

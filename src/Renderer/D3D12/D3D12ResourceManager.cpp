@@ -1,7 +1,7 @@
 ﻿#include <unordered_map>
 #include "D3D12ResourceManager.h"
 #include "D3D12Device.h"
-#include "../Utils.h"
+#include "../OBJModelLoader.h"
 #include "../Mesh.h"
 #include "../Vertex.h"
 #include "d3dx12.h"
@@ -9,7 +9,6 @@
 D3D12ResourceManager::D3D12ResourceManager(D3D12GraphicsDevice * device)
 	: mDevice(device)
 {
-	mDefaultPipeline = GetPipelineState(Diffuse);
 }
 
 D3D12ResourceManager::~D3D12ResourceManager()
@@ -19,10 +18,10 @@ D3D12ResourceManager::~D3D12ResourceManager()
 void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh>& outMeshes)
 {
 	std::vector<Vertex> vertices = {};
-	std::vector<Utils::SubmeshDesc> meshes = {};
-	std::unordered_map<std::string, Utils::MaterialDesc> materialMap = {};
+	std::vector<OBJModelLoader::SubmeshDesc> meshes = {};
+	std::unordered_map<std::string, OBJModelLoader::MaterialDesc> materialMap = {};
 
-	Utils::LoadObjFile(path, meshes, materialMap);
+	OBJModelLoader::LoadObjFile(path, meshes, materialMap);
 
 	std::unordered_map<std::string, MaterialPtr> materials = {};
 	for (auto& desc : materialMap)
@@ -81,7 +80,7 @@ TexturePtr D3D12ResourceManager::GetTexture(const std::string& path)
 	return texture;
 }
 
-MaterialPtr D3D12ResourceManager::CreateMaterial(Utils::MaterialDesc& desc)
+MaterialPtr D3D12ResourceManager::CreateMaterial(OBJModelLoader::MaterialDesc& desc)
 {
 	auto material = std::make_shared<Material>();
 	material->ambientColor = desc.ambient;
@@ -91,7 +90,7 @@ MaterialPtr D3D12ResourceManager::CreateMaterial(Utils::MaterialDesc& desc)
 
 	//TODO: Properly set illumination properties
 	material->SetProperty(Diffuse);
-	material->pipelineState = mDefaultPipeline;
+	material->pipelineState = GetPipelineState(material->properties);
 
 	material->diffuseTexture = GetTexture(desc.diffuseTexName);
 	if(material->diffuseTexture == nullptr)
@@ -110,13 +109,14 @@ PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties prope
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
 	// Create root signature
-	CD3DX12_ROOT_PARAMETER slotRootParameter[3];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[4];
 	slotRootParameter[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
 	slotRootParameter[1].InitAsConstantBufferView(0);
 	slotRootParameter[2].InitAsConstantBufferView(1);
+	slotRootParameter[3].InitAsConstantBufferView(2);
 
 	auto samplers = GetStaticSamplers();
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(3, slotRootParameter,
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter,
 		(UINT)samplers.size(), samplers.data(),
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 

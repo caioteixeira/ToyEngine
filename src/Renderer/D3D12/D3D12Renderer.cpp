@@ -48,7 +48,7 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 	EASY_BLOCK("Render Elements", profiler::colors::BlueGrey);
 
 	//Divide work and create parallel tasks
-	auto chunks = Utils::DivideWork(framePacket.meshes.begin(), framePacket.meshes.end(), NUM_THREADS);
+	auto chunks = DivideWork(framePacket.meshes.begin(), framePacket.meshes.end(), NUM_THREADS);
 	auto& jobQueue = mThreadPool.GetQueue();
 	auto renderJob = jobQueue.create_job([this, &chunks, &constantBuffer](jobxx::context& ctx)
 	{
@@ -90,6 +90,15 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 					CD3DX12_CPU_DESCRIPTOR_HANDLE CPUDescriptor(textureDescriptor->GetCPUDescriptorHandleForHeapStart());
 					const auto GPUDescriptor = context->CopyDescriptorToDynamicHeap(CPUDescriptor);
 
+					auto& materialCB = context->ReserveUploadMemory(sizeof(MaterialConstants));
+					MaterialConstants materialConstants;
+					materialConstants.kd = material->diffuseColor;
+					materialConstants.ks = material->specularColor;
+					materialConstants.ka = material->ambientColor;
+					materialConstants.ns = material->shininess;
+
+					memcpy(materialCB.CPUAddress, &materialConstants, sizeof(MaterialConstants));
+
 					context->SetIndexBuffer(element->mesh->GetIndexBuffer());
 					context->SetVertexBuffer(element->mesh->GetVertexBuffer());
 					context->SetPrimitiveTopology(EPT_TriangleList);
@@ -97,6 +106,7 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 					context->SetGraphicsRootDescriptorTable(0, GPUDescriptor);
 					context->SetGraphicsRootConstantBufferView(1, globalCB.GPUAddress);
 					context->SetGraphicsRootConstantBufferView(2, objectCB.GPUAddress);
+					context->SetGraphicsRootConstantBufferView(3, materialCB.GPUAddress);
 
 					context->DrawIndexed(element->mesh->indexCount, 0);
 

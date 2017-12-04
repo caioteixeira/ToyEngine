@@ -35,8 +35,6 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
 {
 	EASY_FUNCTION();
 
-	//ImGui_ImplDX11_NewFrame();
-
 	assert(mRenderer != nullptr);
 
 	//ShowImGUISample();

@@ -10,6 +10,16 @@ cbuffer PER_OBJECT : register(b1)
 	float4x4 worldMatrix;
 }
 
+cbuffer PER_MATERIAL : register(b2)
+{
+	float4 kd;
+	float4 ks;
+	float4 ka;
+	float ns;
+	float d;
+	float tr;
+}
+
 SamplerState pointWrapSampler : register(s0);
 SamplerState pointClampSampler : register(s1);
 SamplerState linearWrapSampler : register(s2);
