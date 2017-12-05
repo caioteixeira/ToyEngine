@@ -44,6 +44,21 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 
 	GlobalConstants constantBuffer;
 	constantBuffer.projMatrix = framePacket.viewMatrix * mProj;
+	constantBuffer.cameraPos = framePacket.cameraPos;
+	constantBuffer.ambientColor = Color(0.5f, 0.5f, 0.5f);
+
+	for(int i = 0; i < 8; i++)
+	{
+		constantBuffer.pointLights[i].mEnabled = false;
+	}
+
+	constantBuffer.pointLights[0].mEnabled = true;
+	constantBuffer.pointLights[0].mDiffuse = Color(0.5f, 0.7f, 0.2f);
+	constantBuffer.pointLights[0].mSpecular = Color(1.0f, 1.0f, 1.0f);
+	constantBuffer.pointLights[0].mInnerRadius = 80.0f;
+	constantBuffer.pointLights[0].mOuterRadius = 80.0f;
+	constantBuffer.pointLights[0].mPosition = Vector3(0.0f, 0.0f, 50.0f);
+	constantBuffer.pointLights[0].mSpecularPower = 1.0f;
 
 	EASY_BLOCK("Render Elements", profiler::colors::BlueGrey);
 
