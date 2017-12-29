@@ -1,6 +1,5 @@
 #pragma once
 
-#if DX12
 #include "../../Math.h"
 
 class D3D12GraphicsDevice;
@@ -32,6 +31,4 @@ private:
 	std::queue<D3D12CommandContext *> mAvailableContexts;
 	std::mutex mContextAllocationMutex;
 };
-
-#endif
 

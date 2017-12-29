@@ -11,14 +11,8 @@
 #include <DirectXHelpers.h>
 #include "Renderer/D3DCommon/D3DHelpers.h"
 
-#ifdef DX11
-#include <d3d11_1.h>
-#endif
-
-#ifdef DX12
 #include <d3d12.h>
 #include <dxgi1_4.h>
-#endif
 
 //SDL
 #define SDL_MAIN_HANDLED
