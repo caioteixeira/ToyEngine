@@ -19,7 +19,7 @@ void GameWorld::Init(std::shared_ptr<Renderer> renderer)
 {
 	entityx::Entity cameraEntity = entities.Create();
 
-	Vector3 cameraPos(30.0 , 30.0, 60.0);
+	const Vector3 cameraPos(30.0 , 30.0, 100.0);
 	cameraEntity.Assign<Transform>()->position = cameraPos;
 	cameraEntity.Assign<Camera>();
 	//TODO: Temporarilly look at 0,0 every frame

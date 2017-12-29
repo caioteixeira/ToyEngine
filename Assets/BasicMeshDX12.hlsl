@@ -1,11 +1,10 @@
 #pragma pack_matrix(row_major)
 
-struct PointLightData {
-	float4 diffuseColor;
-	float4 specularColor;
-	float3 position;
-    float specularPower;
-	float innerRadius;
+struct PointLightData 
+{
+	float3 diffuseColor;
+    float innerRadius;
+    float3 position;
 	float outerRadius;
 	bool enabled;
 };
@@ -26,11 +25,11 @@ cbuffer PER_OBJECT : register(b1)
 
 cbuffer PER_MATERIAL : register(b2)
 {
-	float4 kd;
-	float4 ks;
-	float4 ka;
-	float ns;
-	float d;
+	float3 kd;
+    float d;
+	float3 ks;
+    float ns;
+	float3 ka;
 	float tr;
 }
 
@@ -58,24 +57,61 @@ struct PS_INPUT
 	float2 mTex: TEXCOORD;
 };
 
+//
+// Lighting Utils
+//  (from Frank D.Luna DX12 Samples)
+//
+float CalcAttenuation(float d, float falloffStart, float falloffEnd)
+{
+    // Linear falloff.
+    return saturate((falloffEnd - d) / (falloffEnd - falloffStart));
+}
+
+// Schlick gives an approximation to Fresnel reflectance (see pg. 233 "Real-Time Rendering 3rd Ed.").
+// R0 = ( (n-1)/(n+1) )^2, where n is the index of refraction.
+float3 SchlickFresnel(float3 R0, float3 normal, float3 lightVec)
+{
+    float cosIncidentAngle = saturate(dot(normal, lightVec));
+
+    float f0 = 1.0f - cosIncidentAngle;
+    float3 reflectPercent = R0 + (1.0f - R0) * (f0 * f0 * f0 * f0 * f0);
+
+    return reflectPercent;
+}
+
+float3 BlinnPhong(float3 lightStrength, float3 lightVec, float3 normal, float3 toEye)
+{
+    const float m = ns * 256.0f;
+    float3 halfVec = normalize(toEye + lightVec);
+
+    float roughnessFactor = (m + 8.0f) * pow(max(dot(halfVec, normal), 0.0f), m) / 8.0f;
+
+    float3 fresnelFactor = SchlickFresnel(ks, halfVec, lightVec);
+
+    float3 specAlbedo = fresnelFactor * roughnessFactor;
+
+    // Our spec formula goes outside [0,1] range, but we are 
+    // doing LDR rendering.  So scale it down a bit.
+    specAlbedo = specAlbedo / (specAlbedo + 1.0f);
+
+    return (kd.rgb + specAlbedo) * lightStrength;
+}
+
 //--------------------------------------------------------------------------------------
 // Vertex Shader
 //--------------------------------------------------------------------------------------
 PS_INPUT VS(VS_INPUT input)
 {
-	PS_INPUT output;
+    PS_INPUT output;
 
-	float4  temp = float4(input.mPos, 1);
-	temp = mul(temp, worldMatrix);
-	output.mPos = mul(temp, projMatrix);
-	output.mTex = input.mTex;
+    float4 temp = float4(input.mPos, 1);
+    temp = mul(temp, worldMatrix);
+    output.mPos = mul(temp, projMatrix);
+    output.mTex = input.mTex;
+    output.mNormal = mul(input.mNormal, (float3x3) worldMatrix);
+    output.mWorldPosition = temp.xyz;
 
-	float4 tempNormal = float4(input.mNormal, 0);
-    tempNormal = mul(tempNormal, worldMatrix);
-	output.mNormal = tempNormal.xyz;
-	output.mWorldPosition = temp.xyz;
-
-	return output;
+    return output;
 }
 
 
@@ -86,40 +122,45 @@ float4 PS(PS_INPUT input) : SV_Target
 {
 	float4 color = DiffuseTexture.Sample(linearWrapSampler, input.mTex);
 
-	//ambient
-	float3 phong = ambientLight;
+	//ambient light
+    float3 phong = ambientLight;
 
-	//point
-	float3 N = normalize(input.mNormal);
-	float3 V = worldCameraPos - input.mWorldPosition;
-	V = normalize(V);
+	// Point light
+    float3 N = normalize(input.mNormal);
+    float3 V = worldCameraPos - input.mWorldPosition;
+    V = normalize(V);
 
-	for (int i = 0; i < 8; i++)
-	{
-		if (!pointLights[i].enabled)
-		{
-			continue;
-		}
+    for (int i = 0; i < 8; i++)
+    {
+        PointLightData lightData = pointLights[i];
+        if (!lightData.enabled)
+        {
+            continue;
+        }
 
-		float3 L = pointLights[i].position - input.mWorldPosition;
-		L = normalize(L);
-		float NdotL = dot(N, L);
+        // The vector from the surface to the light.
+        float3 lightVec = lightData.position - input.mWorldPosition;
 
-		float3 R = reflect(-L, N);
+        // The distance from surface to light.
+        float d = length(lightVec);
 
-		if (NdotL > 0) {
-			/*Diffuse color*/
-			float dist = distance(input.mWorldPosition, pointLights[i].position);
-			float sstep = smoothstep(pointLights[i].innerRadius, pointLights[i].outerRadius, dist);
+        // Range test.
+        if (d > lightData.outerRadius)
+            continue;
 
-			float4 diffuseColor = lerp(pointLights[i].diffuseColor, float4(0.0f, 0.0f, 0.0f, 0.0f), sstep);
-			phong += (diffuseColor.xyz * NdotL);
+        // Normalize the light vector.
+        lightVec /= d;
 
-			/*Specular color*/
-			float RdotV = dot(R, V);
-			phong += pointLights[i].specularColor.xyz * pow(max(0.0f, RdotV), pointLights[i].specularPower);
-		}
-	}
+        // Scale light down by Lambert's cosine law.
+        float ndotl = max(dot(lightVec, N), 0.0f);
+        float3 lightStrength = lightData.diffuseColor * ndotl;
+
+        // Attenuate light by distance.
+        float att = CalcAttenuation(d, lightData.innerRadius, lightData.outerRadius);
+        lightStrength *= att;
+        
+        phong += BlinnPhong(lightStrength, lightVec, N, V);
+    }
 
 	//saturate phong
     float4 finalPhong = float4(phong, 0.0f);

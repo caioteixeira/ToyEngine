@@ -28,7 +28,7 @@ bool D3D12Renderer::Init(int width, int height)
 	}
 
 	mProj = Matrix::CreatePerspectiveFieldOfView(DirectX::XMConvertToRadians(90.0f),
-		static_cast<float>(mWidth) / static_cast<float>(mHeight), 0.5f, 500.0f);
+		static_cast<float>(mWidth) / static_cast<float>(mHeight), 0.5f, 5000.0f);
 
 	mGraphicsDevice = std::make_unique<D3D12GraphicsDevice>(GetActiveWindow());
 	mResourceManager = std::make_unique<D3D12ResourceManager>(mGraphicsDevice.get());
@@ -45,20 +45,24 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 	GlobalConstants constantBuffer;
 	constantBuffer.projMatrix = framePacket.viewMatrix * mProj;
 	constantBuffer.cameraPos = framePacket.cameraPos;
-	constantBuffer.ambientColor = Color(0.5f, 0.5f, 0.5f);
+	constantBuffer.ambientColor = Vector3(0.5f, 0.5f, 0.5f);
 
 	for(int i = 0; i < 8; i++)
 	{
 		constantBuffer.pointLights[i].mEnabled = false;
 	}
 
+	constantBuffer.pointLights[0].mPosition = Vector3(400.0f, 100.0f, 0.0f);
+	constantBuffer.pointLights[0].mDiffuse = DirectX::XMFLOAT3(1.0f, 0.1f, 1.0f);
+	constantBuffer.pointLights[0].mInnerRadius = 100.0f;
+	constantBuffer.pointLights[0].mOuterRadius = 600.0f;
 	constantBuffer.pointLights[0].mEnabled = true;
-	constantBuffer.pointLights[0].mDiffuse = Color(0.5f, 0.7f, 0.2f);
-	constantBuffer.pointLights[0].mSpecular = Color(1.0f, 1.0f, 1.0f);
-	constantBuffer.pointLights[0].mInnerRadius = 80.0f;
-	constantBuffer.pointLights[0].mOuterRadius = 80.0f;
-	constantBuffer.pointLights[0].mPosition = Vector3(0.0f, 0.0f, 50.0f);
-	constantBuffer.pointLights[0].mSpecularPower = 1.0f;
+
+	constantBuffer.pointLights[1].mPosition = Vector3(100.0f, 100.0f, 0.0f);
+	constantBuffer.pointLights[1].mDiffuse = DirectX::XMFLOAT3(0.01f, 1.0f, 1.0f);
+	constantBuffer.pointLights[1].mInnerRadius = 100.0f;
+	constantBuffer.pointLights[1].mOuterRadius = 600.0f;
+	constantBuffer.pointLights[1].mEnabled = true;
 
 	EASY_BLOCK("Render Elements", profiler::colors::BlueGrey);
 
@@ -107,9 +111,9 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 
 					auto& materialCB = context->ReserveUploadMemory(sizeof(MaterialConstants));
 					MaterialConstants materialConstants;
-					materialConstants.kd = material->diffuseColor;
-					materialConstants.ks = material->specularColor;
-					materialConstants.ka = material->ambientColor;
+					materialConstants.kd = material->diffuseColor.ToVector3();
+					materialConstants.ks = material->specularColor.ToVector3();
+					materialConstants.ka = material->ambientColor.ToVector3();
 					materialConstants.ns = material->shininess;
 
 					memcpy(materialCB.CPUAddress, &materialConstants, sizeof(MaterialConstants));

@@ -65,5 +65,5 @@ void Game::RunLoop()
 void Game::StartGame()
 {
 	mWorld.Init(mRenderer);
-	mWorld.LoadObjLevel("Assets/lost_empire.obj");
+	mWorld.LoadObjLevel("Assets/sponza.obj");
 }

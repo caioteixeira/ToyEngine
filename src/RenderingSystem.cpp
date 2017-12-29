@@ -46,7 +46,7 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
 	{
 		const auto viewMatrix = Matrix::CreateLookAt(transform->position, Vector3::Zero, Vector3::Up);
 		packet.viewMatrix = viewMatrix;
-		packet.cameraPos = transform->position;
+		packet.cameraPos = viewMatrix.Translation();
 
 		//TODO: Add support to multiple cameras
 		break;
