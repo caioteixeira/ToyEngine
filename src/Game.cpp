@@ -38,7 +38,6 @@ bool Game::Init()
 
 void Game::RunLoop()
 {
-
 	EASY_PROFILER_ENABLE
 	EASY_MAIN_THREAD;
 	profiler::startListen();

@@ -14,15 +14,22 @@ class D3D12Renderer : IRenderer
 public:
 	D3D12Renderer();
 	~D3D12Renderer();
+	
 	bool Init(int width, int height);
 	void RenderFrame(FramePacket & framePacket);
 	D3D12ResourceManager* GetResourceManager() const;
+	void SetupImguiNewFrame();
 private:
 	void Clear() const;
-	void Present() const;
+	void Present();
+
+	void InitImgui();
 
 	std::unique_ptr<class D3D12GraphicsDevice> mGraphicsDevice;
 	std::unique_ptr<D3D12ResourceManager> mResourceManager;
+
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mImguiDescriptorHeap;
+	D3D12CommandContext* mImguiContext;
 
 	char * mWindowName;
 	SDL_Window* mWindow;

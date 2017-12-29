@@ -44,6 +44,8 @@ public:
 	DXGI_FORMAT GetDepthStencilFormat() const { return mDepthStencilFormat; }
 	UINT GetDescriptorSize(D3D12_DESCRIPTOR_HEAP_TYPE type) const;
 
+	static const int SwapChainBufferCount = 2;
+
 private:
 	void InitDevice();
 	void InitCommandObjects();
@@ -69,9 +71,7 @@ private:
 	Microsoft::WRL::ComPtr<IDXGIFactory4> mdxgiFactory;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;
 	Microsoft::WRL::ComPtr<ID3D12Device> mDevice;
-private:
-
-	static const int SwapChainBufferCount = 2;
+	
 	int mCurrBackBuffer = 0;
 	uint64_t mPresentFences[SwapChainBufferCount];
 	Microsoft::WRL::ComPtr<ID3D12Resource> mSwapChainBuffer[SwapChainBufferCount];

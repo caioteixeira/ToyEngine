@@ -162,6 +162,7 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\imgui\imgui_impl_dx12.h" />
     <ClInclude Include="src\Core\JobSystem\concurrent_queue.h" />
     <ClInclude Include="src\Core\JobSystem\context.h" />
     <ClInclude Include="src\Core\JobSystem\delegate.h" />
@@ -184,7 +185,6 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
     <ClInclude Include="src\ConstantRotation.h" />
     <ClInclude Include="src\Core\imgui\imconfig.h" />
     <ClInclude Include="src\Core\imgui\imgui.h" />
-    <ClInclude Include="src\Core\imgui\imgui_impl_dx11.h" />
     <ClInclude Include="src\Core\imgui\imgui_internal.h" />
     <ClInclude Include="src\Core\imgui\stb_rect_pack.h" />
     <ClInclude Include="src\Core\imgui\stb_textedit.h" />
@@ -235,6 +235,7 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
     <ClInclude Include="src\Core\Allocators\VariableSizeMemoryBlockAllocator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\imgui\imgui_impl_dx12.cpp" />
     <ClCompile Include="src\Core\JobSystem\context.cc" />
     <ClCompile Include="src\Core\JobSystem\job.cc" />
     <ClCompile Include="src\Core\JobSystem\WorkerPool.cpp" />
@@ -251,7 +252,6 @@ xcopy "$(ProjectDir)\external\EasyProfiler\x64\*.dll" "$(OutDir)" /i /s /y</Comm
     <ClCompile Include="src\Core\imgui\imgui.cpp" />
     <ClCompile Include="src\Core\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\Core\imgui\imgui_draw.cpp" />
-    <ClCompile Include="src\Core\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\ECS\Entity.cc" />
     <ClCompile Include="src\ECS\Event.cc" />
     <ClCompile Include="src\ECS\help\Pool.cc" />

@@ -3,6 +3,8 @@
 #include "../ConstantBufferStructs.h"
 #include "../FramePacket.h"
 #include <easy/profiler.h>
+#include "../../Core/imgui/imgui_impl_dx12.h"
+#include <SDL_syswm.h>
 
 D3D12Renderer::D3D12Renderer(): mWindow(nullptr), mThreadPool(NUM_THREADS - 1)
 {
@@ -11,6 +13,7 @@ D3D12Renderer::D3D12Renderer(): mWindow(nullptr), mThreadPool(NUM_THREADS - 1)
 
 D3D12Renderer::~D3D12Renderer()
 {
+	ImGui_ImplDX12_Shutdown();
 	delete[] mWindowName;
 }
 
@@ -33,7 +36,26 @@ bool D3D12Renderer::Init(int width, int height)
 	mGraphicsDevice = std::make_unique<D3D12GraphicsDevice>(GetActiveWindow());
 	mResourceManager = std::make_unique<D3D12ResourceManager>(mGraphicsDevice.get());
 
+	InitImgui();
+
 	return true;
+}
+
+void D3D12Renderer::InitImgui()
+{
+	mImguiDescriptorHeap = mGraphicsDevice->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+		D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
+
+	struct SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+
+	SDL_GetWindowWMInfo(mWindow, &wmInfo);
+
+	ImGui_ImplDX12_Init(wmInfo.info.win.window, mGraphicsDevice->SwapChainBufferCount, mGraphicsDevice->GetDevice(),
+		DXGI_FORMAT_R8G8B8A8_UNORM, mImguiDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+		mImguiDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+
+	SetupImguiNewFrame();
 }
 
 void D3D12Renderer::RenderFrame(FramePacket & framePacket)
@@ -144,6 +166,16 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 
 	jobQueue.wait_job_actively(renderJob);
 
+	//Render ImGuiFrame
+	PIXBeginEvent(mImguiContext->GetCommandList(), 0, L"Imgui Rendering");
+	mImguiContext->SetScissor(mGraphicsDevice->GetScissorRect());
+	mImguiContext->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
+	mImguiContext->SetViewport(mGraphicsDevice->GetViewPort());
+	ImGui::Render();
+
+	PIXEndEvent(mImguiContext->GetCommandList());
+	mImguiContext->Finish();
+
 	EASY_END_BLOCK;
 
 	Present();
@@ -160,8 +192,18 @@ void D3D12Renderer::Clear() const
 	mGraphicsDevice->ClearBackBuffer(Vector3(0.0f, 0.0f, 0.0f), 1.0f);
 }
 
-void D3D12Renderer::Present() const
+void D3D12Renderer::SetupImguiNewFrame()
+{
+	auto contextManager = mGraphicsDevice->GetCommandContextManager();
+	mImguiContext = contextManager->AllocateContext();
+	mImguiContext->SetDescriptorHeap(mImguiDescriptorHeap);
+	ImGui_ImplDX12_NewFrame(mImguiContext->GetCommandList());
+}
+
+void D3D12Renderer::Present()
 {
 	EASY_FUNCTION();
 	mGraphicsDevice->Present();
+
+	SetupImguiNewFrame();
 }

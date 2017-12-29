@@ -4,7 +4,6 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "Core/imgui/imgui.h"
-#include "Core/imgui/imgui_impl_dx11.h"
 #include <easy/profiler.h>
 
 RenderingSystem::RenderingSystem()
@@ -37,7 +36,7 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
 
 	assert(mRenderer != nullptr);
 
-	//ShowImGUISample();
+	ShowImGUISample();
 
 	FramePacket packet;
 	entityx::ComponentHandle<Transform> transform;
