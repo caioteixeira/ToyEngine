@@ -20,13 +20,21 @@ void RenderingSystem::SetRenderer(std::shared_ptr<Renderer> renderer)
 	mRenderer = renderer;
 }
 
-void ShowImGUISample()
+void ShowImGUISample(entityx::EntityManager& es)
 {
 	// 1. Show a simple window
 	// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
 	{
-		ImGui::Text("Hello, world!");;
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	}
+
+	entityx::ComponentHandle<Transform> transform;
+	entityx::ComponentHandle<Camera> camera;
+	for (auto entity : es.entities_with_components(transform, camera))
+	{
+		ImGui::Begin("Camera Position");
+		ImGui::InputFloat3("", static_cast<float *>(&transform->position.x));
+		ImGui::End();
 	}
 }
 
@@ -36,13 +44,14 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
 
 	assert(mRenderer != nullptr);
 
-	ShowImGUISample();
+	ShowImGUISample(es);
 
 	FramePacket packet;
 	entityx::ComponentHandle<Transform> transform;
 	entityx::ComponentHandle<Camera> camera;
 	for(auto entity : es.entities_with_components(transform, camera))
 	{
+		//TODO: Implement FPS camera
 		const auto viewMatrix = Matrix::CreateLookAt(transform->position, Vector3::Zero, Vector3::Up);
 		packet.viewMatrix = viewMatrix;
 		packet.cameraPos = viewMatrix.Translation();
