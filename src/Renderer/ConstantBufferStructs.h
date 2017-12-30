@@ -1,6 +1,7 @@
 #pragma once
 #include "../Math.h"
-#include "FramePacket.h"
+
+static const int MAX_POINT_LIGHTS = 8;
 
 struct PointLightData
 {
@@ -19,7 +20,7 @@ struct GlobalConstants
 	float p; //padding;
 	Vector3 ambientColor;
 	float p2; //padding
-	PointLightData pointLights[8];
+	PointLightData pointLights[MAX_POINT_LIGHTS];
 };
 
 struct PerObjectConstants

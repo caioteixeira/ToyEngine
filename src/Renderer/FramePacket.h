@@ -2,6 +2,7 @@
 #include "../Math.h"
 #include "Mesh.h"
 #include <vector>
+#include "ConstantBufferStructs.h"
 
 struct MeshElement
 {
@@ -17,5 +18,6 @@ struct FramePacket
 	Vector3 cameraPos;
 	std::vector<MeshElement> meshes;
 
-	Color ambientLightColor;
+	Vector3 ambientLightColor;
+	PointLightData pointLights[MAX_POINT_LIGHTS];
 };

@@ -1,10 +1,11 @@
 #include "RenderingSystem.h"
 #include <iostream>
-#include "Renderer/FramePacket.h"
-#include "Transform.h"
-#include "Camera.h"
-#include "Core/imgui/imgui.h"
+#include "FramePacket.h"
+#include "../Transform.h"
+#include "../Camera.h"
+#include "../Core/imgui/imgui.h"
 #include <easy/profiler.h>
+#include "PointLight.h"
 
 RenderingSystem::RenderingSystem()
 {
@@ -20,22 +21,43 @@ void RenderingSystem::SetRenderer(std::shared_ptr<Renderer> renderer)
 	mRenderer = renderer;
 }
 
-void ShowImGUISample(entityx::EntityManager& es)
+void RenderingSystem::ShowDebugUI(entityx::EntityManager& es)
 {
-	// 1. Show a simple window
-	// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
+	// FPS
 	{
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}
 
+	//Camera position
 	entityx::ComponentHandle<Transform> transform;
 	entityx::ComponentHandle<Camera> camera;
 	for (auto entity : es.entities_with_components(transform, camera))
 	{
 		ImGui::Begin("Camera Position");
-		ImGui::InputFloat3("", static_cast<float *>(&transform->position.x));
+		ImGui::InputFloat3("CameraPos", reinterpret_cast<float*>(&transform->position));
 		ImGui::End();
 	}
+
+	// Light Data
+	ImGui::Begin("LightData");
+
+	ImGui::Text("Ambient Light");
+	ImGui::InputFloat3("Ambient", reinterpret_cast<float*>(&mAmbientLight));
+	entityx::ComponentHandle<PointLight> pointLight;
+	for (auto entity : es.entities_with_components(transform, pointLight))
+	{
+		ImGui::BeginGroup();
+		ImGui::Text("PointLight");
+		ImGui::PushID(&pointLight->diffuse);
+		ImGui::InputFloat3("## Position", reinterpret_cast<float*>(&transform->position));	
+		ImGui::InputFloat3("## Color", reinterpret_cast<float *>(&pointLight->diffuse));
+		ImGui::InputFloat("## InnerRadius", &pointLight->innerRadius);
+		ImGui::InputFloat("## OuterRadius", &pointLight->outerRadius);
+		ImGui::PopID();
+		ImGui::EndGroup();
+	}
+
+	ImGui::End();
 }
 
 void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& events, entityx::TimeDelta dt)
@@ -44,7 +66,7 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
 
 	assert(mRenderer != nullptr);
 
-	ShowImGUISample(es);
+	ShowDebugUI(es);
 
 	FramePacket packet;
 	entityx::ComponentHandle<Transform> transform;
@@ -80,6 +102,22 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
 		element.material = material;
 		element.constantBuffer = buffer;
 		packet.meshes.push_back(element);
+	}
+
+	packet.ambientLightColor = mAmbientLight;
+	memset(&packet.pointLights, 0, sizeof PointLightData * MAX_POINT_LIGHTS);
+	entityx::ComponentHandle<PointLight> pointLight;
+	int i = 0;
+	for(auto entity : es.entities_with_components(pointLight, transform))
+	{
+		assert(i < MAX_POINT_LIGHTS);
+
+		packet.pointLights[i].mEnabled = true;
+		packet.pointLights[i].mDiffuse = pointLight->diffuse;
+		packet.pointLights[i].mInnerRadius = pointLight->innerRadius;
+		packet.pointLights[i].mOuterRadius = pointLight->outerRadius;
+		packet.pointLights[i].mPosition = transform->position;
+		i++;
 	}
 
 	mRenderer->RenderFrame(packet);

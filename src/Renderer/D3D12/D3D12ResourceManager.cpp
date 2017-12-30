@@ -123,8 +123,8 @@ PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties prope
 	state->rootSignature = mDevice->CreateRootSignature(rootSigDesc);
 
 	//Compile Shaders
-	auto vertexShader = mDevice->CompileShaderFromFile(L"Assets/BasicMeshDX12.hlsl", nullptr, "VS", "vs_5_0");
-	auto pixelShader = mDevice->CompileShaderFromFile(L"Assets/BasicMeshDX12.hlsl", nullptr, "PS", "ps_5_0");
+	auto vertexShader = mDevice->CompileShaderFromFile(L"Shaders/Phong.hlsl", nullptr, "VS", "vs_5_0");
+	auto pixelShader = mDevice->CompileShaderFromFile(L"Shaders/Phong.hlsl", nullptr, "PS", "ps_5_0");
 
 	std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout =
 	{

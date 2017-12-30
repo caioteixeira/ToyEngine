@@ -36,9 +36,6 @@
     <ClInclude Include="src\Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderingSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Renderer\D3D12\D3D12Device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -231,6 +228,12 @@
     <ClInclude Include="src\Core\imgui\imgui_impl_dx12.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer\PointLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\RenderingSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game.cpp">
@@ -241,9 +244,6 @@
     </ClCompile>
     <ClCompile Include="src\Renderer\D3D12\D3D12Renderer.cpp">
       <Filter>Source Files\Renderer\D3D12</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderingSystem.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\D3D12\D3D12Device.cpp">
       <Filter>Source Files</Filter>
@@ -351,6 +351,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\imgui\imgui_impl_dx12.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\PointLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\RenderingSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

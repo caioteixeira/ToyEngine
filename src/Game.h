@@ -1,7 +1,6 @@
 #pragma once
 #include "WindowsHeaders.h"
 #include "Renderer/Renderer.h"
-#include "RenderingSystem.h"
 #include "GameWorld.h"
 #include "InputManager.h"
 

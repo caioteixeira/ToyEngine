@@ -79,7 +79,7 @@ ComPtr<ID3D12RootSignature> D3D12GraphicsDevice::CreateRootSignature(CD3DX12_ROO
 	return rootSignature;
 }
 
-GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string & name, size_t numElements, size_t elementSize, const void * initialData)
+GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string & name, size_t numElements, size_t elementSize, const void * initialData) const
 {
 	auto buffer = std::make_shared<GraphicsBuffer>();
 	buffer->elementSize = elementSize;
@@ -320,7 +320,7 @@ void D3D12GraphicsDevice::InitDevice()
 		auto r = SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&debugInterface1)));
 		if (r)
 		{
-			debugInterface1->SetEnableGPUBasedValidation(true);
+			debugInterface1->SetEnableGPUBasedValidation(false);
 		}
 		else
 		{
