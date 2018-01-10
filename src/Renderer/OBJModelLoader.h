@@ -32,12 +32,4 @@ namespace OBJModelLoader
 	MaterialDesc LoadMaterial(tinyobj::material_t material);
 
 	void LoadObjFile(std::string path,  std::vector<SubmeshDesc>& outSubmeshes, std::unordered_map<std::string, MaterialDesc>& outMaterials);
-
-	/**
-	 * \brief Loads an obj file and merges its vertices on a unique geometry
-	 * \param path 
-	 * \param vertices 
-	 * \param indices 
-	 */
-	void LoadModel(const std::string& path, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
 }
