@@ -1,0 +1,3 @@
+[submodule "External/px_sched"]
+	path = External/px_sched
+	url = https://github.com/caioteixeira/px_sched.git
