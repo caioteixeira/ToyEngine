@@ -13,7 +13,7 @@ InputManager::~InputManager()
 }
 
 void InputManager::ProcessInput()
-{
+{/*
 	ImGuiIO& io = ImGui::GetIO();
 
 	// Poll events from SDL
@@ -106,6 +106,7 @@ void InputManager::ProcessInput()
 			break;
 		}
 	}
+	*/
 }
 
 void InputManager::Initialize()

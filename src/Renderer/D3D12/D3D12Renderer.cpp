@@ -4,7 +4,7 @@
 #include "../FramePacket.h"
 #include <easy/profiler.h>
 #include "../../Core/imgui/imgui_impl_dx12.h"
-#include <SDL_syswm.h>
+#include "../../Core/Logger.h"
 
 D3D12Renderer::D3D12Renderer(): mWindow(nullptr), mThreadPool(NUM_THREADS - 1)
 {
@@ -20,13 +20,13 @@ D3D12Renderer::~D3D12Renderer()
 bool D3D12Renderer::Init(int width, int height)
 {
 	mWindowName = new char[200];
-	mWindow = SDL_CreateWindow("Toy Engine", 100, 100, width, height, 0);
+	mWindow = GetActiveWindow();
 	mWidth = width;
 	mHeight = height;
 
 	if (!mWindow)
 	{
-		SDL_Log("Could not create window.");
+		Logger::Log("Could not create window.");
 		return false;
 	}
 
@@ -46,12 +46,8 @@ void D3D12Renderer::InitImgui()
 	mImguiDescriptorHeap = mGraphicsDevice->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
 		D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
 
-	struct SDL_SysWMinfo wmInfo;
-	SDL_VERSION(&wmInfo.version);
 
-	SDL_GetWindowWMInfo(mWindow, &wmInfo);
-
-	ImGui_ImplDX12_Init(wmInfo.info.win.window, mGraphicsDevice->SwapChainBufferCount, mGraphicsDevice->GetDevice(),
+	ImGui_ImplDX12_Init(mWindow, mGraphicsDevice->SwapChainBufferCount, mGraphicsDevice->GetDevice(),
 		DXGI_FORMAT_R8G8B8A8_UNORM, mImguiDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
 		mImguiDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
@@ -156,6 +152,7 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 	mImguiContext->SetScissor(mGraphicsDevice->GetScissorRect());
 	mImguiContext->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
 	mImguiContext->SetViewport(mGraphicsDevice->GetViewPort());
+	mImguiContext->SetDescriptorHeap(mImguiDescriptorHeap);
 	ImGui::Render();
 
 	PIXEndEvent(mImguiContext->GetCommandList());

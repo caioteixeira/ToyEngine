@@ -13,7 +13,3 @@
 
 #include <d3d12.h>
 #include <dxgi1_4.h>
-
-//SDL
-#define SDL_MAIN_HANDLED
-#include "SDL.h"

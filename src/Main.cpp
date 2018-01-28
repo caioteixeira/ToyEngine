@@ -1,8 +1,8 @@
 #include "Game.h"
 
-int main(int argc, char * argv[])
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
 {
-	Game game;
+	Game game(hInstance);
 
 	if(game.Init())
 	{

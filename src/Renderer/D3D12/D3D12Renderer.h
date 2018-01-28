@@ -32,7 +32,7 @@ private:
 	D3D12CommandContext* mImguiContext;
 
 	char * mWindowName;
-	SDL_Window* mWindow;
+	HWND mWindow;
 	int mWidth = 0;
 	int mHeight = 0;
 
