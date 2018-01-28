@@ -89,18 +89,18 @@ void OBJModelLoader::LoadObjFile(std::string path, std::vector<SubmeshDesc>& out
 	std::vector<tinyobj::material_t> materials;
 	std::string err;
 
-	SDL_Log("Started to load Obj File");
+	Logger::Log("Started to load Obj File");
 	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str(), "Assets/"))
 	{
 		throw std::runtime_error(err);
 	}
-	SDL_Log("Succesfully loaded obj file");
+	Logger::Log("Succesfully loaded obj file");
 
 	for (const auto& shape : shapes)
 	{
 		EASY_BLOCK("Submesh");
 		LoadShape(outSubmeshes, attrib, shape, materials);
-		SDL_Log("Succesfully loaded a shape");
+		Logger::Log("Succesfully loaded a shape");
 		EASY_END_BLOCK;
 	}
 
@@ -108,6 +108,6 @@ void OBJModelLoader::LoadObjFile(std::string path, std::vector<SubmeshDesc>& out
 	{
 		const auto data = LoadMaterial(material);
 		outMaterials[data.name] = data;
-		SDL_Log("Succesfully loaded a material");
+		Logger::Log("Succesfully loaded a material");
 	}
 }

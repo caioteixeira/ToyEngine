@@ -1,5 +1,6 @@
 ﻿#include "DynamicDescriptorHeap.h"
 #include "D3D12Device.h"
+#include "../../Core/Logger.h"
 
 DynamicDescriptorHeap::DynamicDescriptorHeap(D3D12GraphicsDevice* device, D3D12_DESCRIPTOR_HEAP_TYPE type, size_t maxSize)
 	: mMaxSize(maxSize)
@@ -16,7 +17,7 @@ DescriptorAllocation DynamicDescriptorHeap::AllocateDescriptor()
 
 	if(offset == mInvalidOffset)
 	{
-		SDL_Log("Dynamic descriptor Heap is full!", SDL_LOG_CATEGORY_ERROR);
+		Logger::Log("ERROR: Dynamic descriptor Heap is full!");
 		return alloc;
 	}
 	

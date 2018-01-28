@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <SDL.h>
+#include "../../Core/Logger.h"
 
 inline void ThrowIfFailed(HRESULT hr, char* str = nullptr)
 {
@@ -8,7 +8,7 @@ inline void ThrowIfFailed(HRESULT hr, char* str = nullptr)
 	{
 		if(str != nullptr)
 		{
-			SDL_Log(str, SDL_LOG_CATEGORY_ERROR);
+			Logger::Log(str);
 		}
 
 		//TODO: Create DXException

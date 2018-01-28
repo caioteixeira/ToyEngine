@@ -5,6 +5,7 @@
 #include "../Mesh.h"
 #include "../Vertex.h"
 #include "d3dx12.h"
+#include "../../Core/Logger.h"
 
 D3D12ResourceManager::D3D12ResourceManager(D3D12GraphicsDevice * device)
 	: mDevice(device)
@@ -31,7 +32,7 @@ void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 		if(material != nullptr)
 		{
 			materials[desc.first] = material;
-			SDL_Log("Renderer: Succesfully loaded a material");
+			Logger::Log("Renderer: Succesfully loaded a material");
 		}
 	}
 
@@ -51,11 +52,11 @@ void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 			mesh.material = material;
 			outMeshes.push_back(mesh);
 
-			SDL_Log("Renderer: Succesfully loaded a mesh element");
+			Logger::Log("Renderer: Succesfully loaded a mesh element");
 		}
 	}
 
-	SDL_Log("Renderer: Succesfully loaded OBJ File");
+	Logger::Log("Renderer: Succesfully loaded OBJ File");
 }
 
 MeshGeometryPtr D3D12ResourceManager::GetMeshGeometry(const std::string& path, const std::string& inputLayoutName)
