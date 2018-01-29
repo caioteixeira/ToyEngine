@@ -67,7 +67,6 @@ void Game::RunLoop()
 		auto delta = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(now - lastFrame).count() / 1000.0f;
 		lastFrame = now;
 
-		mInput.ProcessInput();
 		//TODO: Run systems
 		mWorld.Update(delta);
 
@@ -86,13 +85,30 @@ void Game::StartGame()
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	// Forward hwnd on because we can get messages (e.g., WM_CREATE)
-	// before CreateWindow returns, and thus before mhMainWnd is valid.
 	return Game::GetInstance()->MsgProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT Game::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) const
+LRESULT Game::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if(mInput.ProcessInput(hwnd, msg, wParam, lParam))
+	{
+		return true;
+	}
+
+	switch (msg)
+	{
+	case WM_SIZE:
+		//TODO: Resize
+		return 0;
+	case WM_SYSCOMMAND:
+		if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
+			return 0;
+		break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+	}
+
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 

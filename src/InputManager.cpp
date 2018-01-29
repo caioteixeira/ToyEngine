@@ -2,6 +2,7 @@
 #include "WindowsHeaders.h"
 #include "Game.h"
 #include "Core/imgui/imgui.h"
+#include "Core/imgui/imgui_impl_dx12.h"
 
 InputManager::InputManager(Game& game)
 	: mGame(game)
@@ -12,8 +13,17 @@ InputManager::~InputManager()
 {
 }
 
+LRESULT InputManager::ProcessInput(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if(ImGui_ImplDX12_WndProcHandler(hwnd, msg, wParam, lParam))
+	{
+		return true;
+	}
+}
+
+/*
 void InputManager::ProcessInput()
-{/*
+{
 	ImGuiIO& io = ImGui::GetIO();
 
 	// Poll events from SDL
@@ -106,8 +116,9 @@ void InputManager::ProcessInput()
 			break;
 		}
 	}
-	*/
+	
 }
+*/
 
 void InputManager::Initialize()
 {

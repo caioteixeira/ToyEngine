@@ -16,7 +16,7 @@ public:
 
 	//TODO: I don't really like singletons, should find a better solution :/
 	static Game* GetInstance();
-	LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) const;
+	LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:
 	void StartGame();
