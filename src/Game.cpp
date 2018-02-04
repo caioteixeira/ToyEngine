@@ -41,6 +41,8 @@ bool Game::Init()
 		return false;
 	}
 
+	mInput.SetMainWindow(mMainWnd);
+
 	if(!mRenderer->Init(1440, 900))
 	{
 		Logger::Log("Failed to initialized Renderer.");
@@ -67,6 +69,8 @@ void Game::RunLoop()
 		auto delta = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(now - lastFrame).count() / 1000.0f;
 		lastFrame = now;
 
+		mInput.ProcessInput();
+
 		//TODO: Run systems
 		mWorld.Update(delta);
 
@@ -90,7 +94,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 LRESULT Game::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if(mInput.ProcessInput(hwnd, msg, wParam, lParam))
+	if(mInput.MsgProc(hwnd, msg, wParam, lParam))
 	{
 		return true;
 	}
@@ -112,7 +116,7 @@ LRESULT Game::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-bool Game::InitMainWindow(int width, int height)
+bool Game::InitMainWindow(int clientWidth, int clientHeight)
 {
 	WNDCLASS wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
@@ -133,10 +137,10 @@ bool Game::InitMainWindow(int width, int height)
 	}
 
 	// Compute window rectangle dimensions based on requested client area dimensions.
-	RECT R = { 0, 0, width, height };
+	RECT R = { 0, 0, clientWidth, clientHeight };
 	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
-	width = R.right - R.left;
-	height = R.bottom - R.top;
+	int width = R.right - R.left;
+	int height = R.bottom - R.top;
 
 	mMainWnd = CreateWindow("MainWnd", "ToyEngine",
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, mAppInst, 0);

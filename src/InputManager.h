@@ -8,9 +8,12 @@ class InputManager
 public:
 	InputManager(Game& game);
 	~InputManager();
-	LRESULT ProcessInput(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	void ProcessInput();
+	void SetMainWindow(HWND hwnd);
+	LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void Initialize();
 private:
 	Game& mGame;
+	HWND mMainWindow;
 };
 
