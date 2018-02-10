@@ -1,3 +1,6 @@
 [submodule "External/px_sched"]
 	path = External/px_sched
 	url = https://github.com/caioteixeira/px_sched.git
+[submodule "External/SDL2"]
+	path = External/SDL2
+	url = https://github.com/caioteixeira/SDL-mirror.git
