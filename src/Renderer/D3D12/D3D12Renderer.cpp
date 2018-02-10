@@ -90,8 +90,6 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 			{
 				EASY_BLOCK("Rendering Job", profiler::colors::Green);
 				
-				PIXBeginEvent(context->GetCommandList(), 0, L"Rendering Job");
-
 				auto globalCB = context->ReserveUploadMemory(sizeof GlobalConstants);
 				memcpy(globalCB.CPUAddress, &constantBuffer, sizeof(GlobalConstants));
 
@@ -141,7 +139,6 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 					++element;
 				}
 
-				PIXEndEvent(context->GetCommandList());
 				context->Finish();
 
 				EASY_END_BLOCK
@@ -152,13 +149,11 @@ void D3D12Renderer::RenderFrame(FramePacket & framePacket)
 	jobQueue.wait_job_actively(renderJob);
 
 	//Render ImGuiFrame
-	PIXBeginEvent(mImguiContext->GetCommandList(), 0, L"Imgui Rendering");
 	mImguiContext->SetScissor(mGraphicsDevice->GetScissorRect());
 	mImguiContext->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
 	mImguiContext->SetViewport(mGraphicsDevice->GetViewPort());
 	ImGui::Render();
 
-	PIXEndEvent(mImguiContext->GetCommandList());
 	mImguiContext->Finish();
 
 	EASY_END_BLOCK;

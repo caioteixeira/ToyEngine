@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------
-// File: WICTextureLoader.cpp
+// File: WICTextureLoader12.cpp
 //
-// Function for loading a WIC image and creating a Direct3D runtime texture for it
+// Function for loading a WIC image and creating a Direct3D 12 runtime texture for it
 // (auto-generating mipmaps if possible)
 //
 // Note: Assumes application has already called CoInitializeEx
@@ -18,25 +18,23 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //
+// http://go.microsoft.com/fwlink/?LinkId=248926
 // http://go.microsoft.com/fwlink/?LinkID=615561
 //--------------------------------------------------------------------------------------
 
 // We could load multi-frame images (TIFF/GIF) into a texture array.
 // For now, we just load the first frame (note: DirectXTex supports multi-frame images)
 
-#include "pch.h"
+#include "WICTextureLoader12.h"
 
-#include "WICTextureLoader.h"
+#include <assert.h>
+#include <algorithm>
 
-#include "DirectXHelpers.h"
-#include "PlatformHelpers.h"
-#include "LoaderHelpers.h"
-#include "ResourceUploadBatch.h"
+#include <wincodec.h>
 
-namespace DirectX
-{
-    uint32_t CountMips(uint32_t width, uint32_t height);
-}
+#include <wrl\client.h>
+
+#include "d3dx12.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -148,11 +146,7 @@ namespace
 
         // We don't support n-channel formats
     };
-}
 
-//--------------------------------------------------------------------------------------
-namespace DirectX
-{
     IWICImagingFactory2* _GetWIC()
     {
         static INIT_ONCE s_initOnce = INIT_ONCE_STATIC_INIT;
@@ -171,11 +165,65 @@ namespace DirectX
 
         return factory;
     }
-} // namespace DirectX
 
+    //---------------------------------------------------------------------------------
+    template<UINT TNameLength>
+    inline void SetDebugObjectName(_In_ ID3D12DeviceChild* resource, _In_z_ const wchar_t(&name)[TNameLength])
+    {
+        #if !defined(NO_D3D12_DEBUG_NAME) && ( defined(_DEBUG) || defined(PROFILE) )
+            resource->SetName(name);
+        #else
+            UNREFERENCED_PARAMETER(resource);
+            UNREFERENCED_PARAMETER(name);
+        #endif
+    }
 
-namespace
-{
+    inline uint32_t CountMips(uint32_t width, uint32_t height)
+    {
+        if (width == 0 || height == 0)
+            return 0;
+
+        uint32_t count = 1;
+        while (width > 1 || height > 1)
+        {
+            width >>= 1;
+            height >>= 1;
+            count++;
+        }
+        return count;
+    }
+
+    //--------------------------------------------------------------------------------------
+    DXGI_FORMAT MakeSRGB(_In_ DXGI_FORMAT format)
+    {
+        switch (format)
+        {
+        case DXGI_FORMAT_R8G8B8A8_UNORM:
+            return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+
+        case DXGI_FORMAT_BC1_UNORM:
+            return DXGI_FORMAT_BC1_UNORM_SRGB;
+
+        case DXGI_FORMAT_BC2_UNORM:
+            return DXGI_FORMAT_BC2_UNORM_SRGB;
+
+        case DXGI_FORMAT_BC3_UNORM:
+            return DXGI_FORMAT_BC3_UNORM_SRGB;
+
+        case DXGI_FORMAT_B8G8R8A8_UNORM:
+            return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+
+        case DXGI_FORMAT_B8G8R8X8_UNORM:
+            return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+
+        case DXGI_FORMAT_BC7_UNORM:
+            return DXGI_FORMAT_BC7_UNORM_SRGB;
+
+        default:
+            return format;
+        }
+    }
+
     //---------------------------------------------------------------------------------
     DXGI_FORMAT _WICToDXGI(const GUID& guid)
     {
@@ -304,7 +352,7 @@ namespace
         // Handle sRGB formats
         if (loadFlags & WIC_LOADER_FORCE_SRGB)
         {
-            format = LoaderHelpers::MakeSRGB(format);
+            format = MakeSRGB(format);
         }
         else if (!(loadFlags & WIC_LOADER_IGNORE_SRGB))
         {
@@ -328,32 +376,15 @@ namespace
                             sRGB = true;
                         }
                     }
-#if defined(_XBOX_ONE) && defined(_TITLE)
-                    else if (memcmp(&containerFormat, &GUID_ContainerFormatJpeg, sizeof(GUID)) == 0)
-                    {
-                        if (SUCCEEDED(metareader->GetMetadataByName(L"/app1/ifd/exif/{ushort=40961}", &value)) && value.vt == VT_UI2 && value.uiVal == 1)
-                        {
-                            sRGB = true;
-                        }
-                    }
-                    else if (memcmp(&containerFormat, &GUID_ContainerFormatTiff, sizeof(GUID)) == 0)
-                    {
-                        if (SUCCEEDED(metareader->GetMetadataByName(L"/ifd/exif/{ushort=40961}", &value)) && value.vt == VT_UI2 && value.uiVal == 1)
-                        {
-                            sRGB = true;
-                        }
-                    }
-#else
                     else if (SUCCEEDED(metareader->GetMetadataByName(L"System.Image.ColorSpace", &value)) && value.vt == VT_UI2 && value.uiVal == 1)
                     {
                         sRGB = true;
                     }
-#endif
 
                     (void)PropVariantClear(&value);
 
                     if (sRGB)
-                        format = LoaderHelpers::MakeSRGB(format);
+                        format = MakeSRGB(format);
                 }
             }
         }
@@ -418,7 +449,7 @@ namespace
                     return E_UNEXPECTED;
                 }
 
-                hr = FC->Initialize(scaler.Get(), convertGUID, WICBitmapDitherTypeErrorDiffusion, 0, 0, WICBitmapPaletteTypeCustom);
+                hr = FC->Initialize(scaler.Get(), convertGUID, WICBitmapDitherTypeErrorDiffusion, nullptr, 0, WICBitmapPaletteTypeMedianCut);
                 if (FAILED(hr))
                     return hr;
 
@@ -446,7 +477,7 @@ namespace
                 return E_UNEXPECTED;
             }
 
-            hr = FC->Initialize(frame, convertGUID, WICBitmapDitherTypeErrorDiffusion, 0, 0, WICBitmapPaletteTypeCustom);
+            hr = FC->Initialize(frame, convertGUID, WICBitmapDitherTypeErrorDiffusion, nullptr, 0, WICBitmapPaletteTypeMedianCut);
             if (FAILED(hr))
                 return hr;
 
@@ -479,7 +510,7 @@ namespace
             &desc,
             D3D12_RESOURCE_STATE_COPY_DEST,
             nullptr,
-            IID_GRAPHICS_PPV_ARGS(&tex));
+            IID_PPV_ARGS(&tex));
 
         if (FAILED(hr))
         {
@@ -519,27 +550,6 @@ HRESULT DirectX::LoadWICTextureFromMemory(
         texture,
         decodedData,
         subresource);
-}
-
-_Use_decl_annotations_
-HRESULT DirectX::CreateWICTextureFromMemory(
-    ID3D12Device* d3dDevice,
-    ResourceUploadBatch& resourceUpload,
-    const uint8_t* wicData,
-    size_t wicDataSize,
-    ID3D12Resource** texture,
-    bool generateMips,
-    size_t maxsize )
-{
-    return CreateWICTextureFromMemoryEx(
-        d3dDevice,
-        resourceUpload,
-        wicData,
-        wicDataSize,
-        maxsize,
-        D3D12_RESOURCE_FLAG_NONE,
-        (generateMips) ? WIC_LOADER_MIP_AUTOGEN : WIC_LOADER_DEFAULT,
-        texture );
 }
 
 
@@ -608,53 +618,6 @@ HRESULT DirectX::LoadWICTextureFromMemoryEx(
     return hr;
 }
 
-_Use_decl_annotations_
-HRESULT DirectX::CreateWICTextureFromMemoryEx(
-    ID3D12Device* d3dDevice,
-    ResourceUploadBatch& resourceUpload,
-    const uint8_t* wicData,
-    size_t wicDataSize,
-    size_t maxsize,
-    D3D12_RESOURCE_FLAGS resFlags,
-    unsigned int loadFlags,
-    ID3D12Resource** texture)
-{
-    std::unique_ptr<uint8_t[]> decodedData;
-    D3D12_SUBRESOURCE_DATA initData;
-    HRESULT hr = LoadWICTextureFromMemoryEx(
-        d3dDevice,
-        wicData,
-        wicDataSize,
-        maxsize,
-        resFlags,
-        loadFlags,
-        texture,
-        decodedData,
-        initData);
-
-    if (SUCCEEDED(hr))
-    {
-        resourceUpload.Upload(
-            *texture,
-            0,
-            &initData,
-            1);
-
-        resourceUpload.Transition(
-            *texture,
-            D3D12_RESOURCE_STATE_COPY_DEST,
-            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-
-        // Generate mips?
-        if (loadFlags & WIC_LOADER_MIP_AUTOGEN)
-        {
-            resourceUpload.GenerateMips(*texture);
-        }
-    }
-
-    return hr;
-}
-
 
 //--------------------------------------------------------------------------------------
 _Use_decl_annotations_
@@ -675,25 +638,6 @@ HRESULT DirectX::LoadWICTextureFromFile(
         texture,
         wicData,
         subresource);
-}
-
-_Use_decl_annotations_
-HRESULT DirectX::CreateWICTextureFromFile(
-    ID3D12Device* d3dDevice,
-    ResourceUploadBatch& resourceUpload,
-    const wchar_t* fileName,
-    ID3D12Resource** texture,
-    bool generateMips,
-    size_t maxsize )
-{
-    return CreateWICTextureFromFileEx(
-        d3dDevice,
-        resourceUpload,
-        fileName,
-        maxsize,
-        D3D12_RESOURCE_FLAG_NONE,
-        generateMips ? WIC_LOADER_MIP_AUTOGEN : WIC_LOADER_DEFAULT,
-        texture );
 }
 
 
@@ -755,51 +699,6 @@ HRESULT DirectX::LoadWICTextureFromFileEx(
         }
     }
 #endif
-
-    return hr;
-}
-
-_Use_decl_annotations_
-HRESULT DirectX::CreateWICTextureFromFileEx(
-    ID3D12Device* d3dDevice,
-    ResourceUploadBatch& resourceUpload,
-    const wchar_t* fileName,
-    size_t maxsize,
-    D3D12_RESOURCE_FLAGS resFlags,
-    unsigned int loadFlags,
-    ID3D12Resource** texture)
-{
-    std::unique_ptr<uint8_t[]> decodedData;
-    D3D12_SUBRESOURCE_DATA initData;
-    HRESULT hr = LoadWICTextureFromFileEx(
-        d3dDevice,
-        fileName,
-        maxsize,
-        resFlags,
-        loadFlags,
-        texture,
-        decodedData,
-        initData);
-
-    if (SUCCEEDED(hr))
-    {
-        resourceUpload.Upload(
-            *texture,
-            0,
-            &initData,
-            1);
-
-        resourceUpload.Transition(
-            *texture,
-            D3D12_RESOURCE_STATE_COPY_DEST,
-            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-
-        // Generate mips?
-        if (loadFlags & WIC_LOADER_MIP_AUTOGEN)
-        {
-            resourceUpload.GenerateMips(*texture);
-        }
-    }
 
     return hr;
 }
