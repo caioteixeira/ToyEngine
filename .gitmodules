@@ -4,3 +4,6 @@
 [submodule "External/SDL2"]
 	path = External/SDL2
 	url = https://github.com/caioteixeira/SDL-mirror.git
+[submodule "External/EasyProfiler"]
+	path = External/EasyProfiler
+	url = https://github.com/caioteixeira/easy_profiler.git
