@@ -7,3 +7,6 @@
 [submodule "External/EasyProfiler"]
 	path = External/EasyProfiler
 	url = https://github.com/caioteixeira/easy_profiler.git
+[submodule "External/TinyObjLoader"]
+	path = External/TinyObjLoader
+	url = https://github.com/caioteixeira/tinyobjloader.git
