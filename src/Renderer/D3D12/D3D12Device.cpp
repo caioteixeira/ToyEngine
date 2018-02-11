@@ -4,7 +4,7 @@
 #include "d3dx12.h"
 #include "D3D12CommandContext.h"
 #include "D3D12CommandContextManager.h"
-#include <WICTextureLoader.h>
+#include "WICTextureLoader12.h"
 
 
 using Microsoft::WRL::ComPtr;
