@@ -6,10 +6,13 @@
 #include "D3D12CommandContextManager.h"
 #include "WICTextureLoader12.h"
 
+#include "../../EngineCore.h"
+
 
 using Microsoft::WRL::ComPtr;
 using namespace std;
 using namespace DirectX;
+using namespace Engine;
 
 D3D12GraphicsDevice::D3D12GraphicsDevice(void *window)
 {
@@ -47,7 +50,7 @@ ComPtr<ID3DBlob> D3D12GraphicsDevice::CompileShaderFromFile(const std::wstring &
 
 	if (errors != nullptr)
 	{
-		SDL_Log((char*)errors->GetBufferPointer());
+		Logger::DebugLogError((char*)errors->GetBufferPointer());
 	}
 
 	ThrowIfFailed(hr, "ERROR! Failed to compile shader from file!");
@@ -65,7 +68,7 @@ ComPtr<ID3D12RootSignature> D3D12GraphicsDevice::CreateRootSignature(CD3DX12_ROO
 
 	if (errorBlob != nullptr)
 	{
-		SDL_Log((char*)errorBlob->GetBufferPointer());
+		Logger::DebugLogError((char*)errorBlob->GetBufferPointer());
 	}
 	ThrowIfFailed(hr);
 
@@ -187,12 +190,12 @@ GraphicsTexturePtr D3D12GraphicsDevice::CreateTextureFromFile(const char * inFil
 	else
 	{
 		//TODO: Use logger class
-		SDL_Log("ERROR: GraphicsDriver can only load images of type DDS, PNG, or BMP.");
+		Logger::DebugLogError("ERROR: GraphicsDriver can only load images of type DDS, PNG, or BMP.");
 	}
 
 	if (hr != S_OK)
 	{
-		SDL_Log("Problem Creating Texture From File");
+		Logger::DebugLogError("Problem Creating Texture From File");
 		return nullptr;
 	}
 
@@ -324,12 +327,12 @@ void D3D12GraphicsDevice::InitDevice()
 		}
 		else
 		{
-			SDL_Log("WARNING: Unable to enable D3D12 GPU based validation layer!");
+			Logger::DebugLogError("WARNING: Unable to enable D3D12 GPU based validation layer!");
 		}
 	}
 	else
 	{
-		SDL_Log("WARNING: Unable to enable D3D12 debug validation layer!");
+		Logger::DebugLogError("WARNING: Unable to enable D3D12 debug validation layer!");
 	}
 #endif
 
@@ -353,7 +356,7 @@ void D3D12GraphicsDevice::InitDevice()
 		if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device))))
 		{
 			adapter->GetDesc1(&desc);
-			SDL_Log("D3D12-capable hardware found:  %s (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
+			Logger::DebugLog("D3D12-capable hardware found:  %s (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
 			maxSize = desc.DedicatedVideoMemory;
 		}
 	}

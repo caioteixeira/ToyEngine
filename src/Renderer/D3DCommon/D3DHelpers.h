@@ -1,14 +1,15 @@
 #pragma once
 #include <string>
-#include <SDL.h>
+#include "../../EngineCore.h"
 
+using namespace Engine;
 inline void ThrowIfFailed(HRESULT hr, char* str = nullptr)
 {
 	if(hr != S_OK)
 	{
 		if(str != nullptr)
 		{
-			SDL_Log(str, SDL_LOG_CATEGORY_ERROR);
+			Logger::DebugLogError(str);
 		}
 
 		//TODO: Create DXException
