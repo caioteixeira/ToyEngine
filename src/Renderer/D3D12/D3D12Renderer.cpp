@@ -4,7 +4,10 @@
 #include "../FramePacket.h"
 #include <easy/profiler.h>
 #include "../../Core/imgui/imgui_impl_dx12.h"
+#include "../../WindowsHeaders.h"
 #include <SDL_syswm.h>
+
+using namespace Engine;
 
 D3D12Renderer::D3D12Renderer(): mWindow(nullptr), mThreadPool(NUM_THREADS - 1)
 {
@@ -26,7 +29,7 @@ bool D3D12Renderer::Init(int width, int height)
 
 	if (!mWindow)
 	{
-		SDL_Log("Could not create window.");
+		Logger::DebugLog("Could not create window.");
 		return false;
 	}
 

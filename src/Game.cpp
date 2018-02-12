@@ -3,13 +3,14 @@
 #include "GameWorld.h"
 #include <chrono>
 #include <easy/profiler.h>
+#include "EngineCore.h"
 
 using namespace Engine;
 
 Game::Game(): 
 	mWorld()
-	,mShouldQuit(false)
 	,mInput(*this)
+	,mShouldQuit(false)
 {
 	mRenderer = std::make_shared<Renderer>();
 }
@@ -22,13 +23,13 @@ bool Game::Init()
 {
 	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
 	{
-		SDL_Log("Failed to initialize SDL.");
+		Logger::DebugLog("Failed to initialize SDL.");
 		return false;
 	}
 
 	if(!mRenderer->Init(1440, 900))
 	{
-		SDL_Log("Failed to initialized Renderer.");
+		Logger::DebugLog("Failed to initialized Renderer.");
 	}
 
 	StartGame();

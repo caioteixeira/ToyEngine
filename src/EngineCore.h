@@ -4,4 +4,6 @@
 #include "Core/JobSystem/job.h"
 #include "Core/JobSystem/context.h"
 
+#include "Core/Logger.h"
+
 static const int NUM_THREADS = 4;
