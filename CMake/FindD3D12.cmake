@@ -17,6 +17,7 @@ if (IS_DIRECTORY "${WIN10_SDK_PATH}/Include/${WIN10_SDK_VERSION}.0")
 endif (IS_DIRECTORY "${WIN10_SDK_PATH}/Include/${WIN10_SDK_VERSION}.0")
 
 message(STATUS "WIN10_SDK_VERSION ${WIN10_SDK_VERSION}")
+message(STATUS "WIN10_SDK_PATH ${WIN10_SDK_PATH}")
 
 
 # Find the d3d12 and dxgi include path, it will typically look something like this.
@@ -36,29 +37,20 @@ find_path(DXGI_INCLUDE_DIR    # Set variable DXGI_INCLUDE_DIR
           HINTS
           )
 
-if (CMAKE_GENERATOR MATCHES "Visual Studio.*Win64" )
-  find_library(D3D12_LIBRARY NAMES d3d12.lib
-               HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x64 )
-elseif (CMAKE_GENERATOR MATCHES "Visual Studio.*Win32" )
-  find_library(D3D12_LIBRARY NAMES d3d12.lib
-               HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x86 )
-endif (CMAKE_GENERATOR MATCHES "Visual Studio.*Win64" )
+if (CMAKE_GENERATOR MATCHES "Visual Studio.*Win64") 
+	message("Finding x64 D3D12 headers")
+	set(CPU_ARCH "x64")
+elseif (CMAKE_GENERATOR MATCHES "Visual Studio.*Win32") 
+	message("Finding x86 D3D12 headers")
+	set(CPU_ARCH "x86")
+endif (CMAKE_GENERATOR MATCHES "Visual Studio.*Win64")
 
-if (CMAKE_GENERATOR MATCHES "Visual Studio.*Win64" )
-  find_library(DXGI_LIBRARY NAMES dxgi.lib
-               HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x64 )
-elseif (CMAKE_GENERATOR MATCHES "Visual Studio.*Win32" )
-  find_library(DXGI_LIBRARY NAMES dxgi.lib
-               HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x86 )
-endif (CMAKE_GENERATOR MATCHES "Visual Studio.*Win64" )
-
-if (CMAKE_GENERATOR MATCHES "Visual Studio.*Win64" )
-  find_library(D3DCOMPILER_LIBRARY NAMES d3dcompiler.lib
-               HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x64 )
-elseif (CMAKE_GENERATOR MATCHES "Visual Studio.*Win32" )
-  find_library(D3DCOMPILER_LIBRARY NAMES d3dcompiler.lib
-               HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x86 )
-endif (CMAKE_GENERATOR MATCHES "Visual Studio.*Win64" )
+find_library(DXGI_LIBRARY NAMES dxgi.lib
+            HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/${CPU_ARCH} )
+find_library(D3D12_LIBRARY NAMES d3d12.lib
+            HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/${CPU_ARCH} )
+find_library(D3DCOMPILER_LIBRARY NAMES d3dcompiler.lib
+            HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/${CPU_ARCH} )
 
 set(D3D12_LIBRARIES ${D3D12_LIBRARY} ${DXGI_LIBRARY} ${D3DCOMPILER_LIBRARY})
 set(D3D12_INCLUDE_DIRS ${D3D12_INCLUDE_DIR} ${DXGI_INCLUDE_DIR})
