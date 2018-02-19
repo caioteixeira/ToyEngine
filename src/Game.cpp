@@ -13,6 +13,8 @@ Game::Game():
 	,mShouldQuit(false)
 {
 	mRenderer = std::make_shared<Renderer>();
+
+	ConfigSystem::Init();
 }
 
 Game::~Game()
