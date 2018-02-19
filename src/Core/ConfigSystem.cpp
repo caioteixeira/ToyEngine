@@ -4,6 +4,8 @@ using namespace Engine;
 
 std::unordered_map<std::string, std::string> ConfigSystem::mStringMap = {};
 std::unordered_map<std::string, int> ConfigSystem::mIntMap = {};
+std::unordered_map<std::string, double> ConfigSystem::mDoubleMap = {};
+
 
 void ConfigSystem::Init()
 {
