@@ -29,3 +29,13 @@ int ConfigSystem::GetIntValue(std::string key)
 
 	return 0;
 }
+
+double ConfigSystem::GetDoubleValue(std::string key)
+{
+	if (mDoubleMap.find(key) != mDoubleMap.end())
+	{
+		return mDoubleMap[key];
+	}
+
+	return 0;
+}
