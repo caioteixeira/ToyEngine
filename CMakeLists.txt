@@ -37,7 +37,10 @@ set(SDL_LIBS
 	SDL2main
 )
 
+#--- Easy Profiler ---
 add_subdirectory(External/EasyProfiler)
+
+add_subdirectory(External/rapidjson)
 
 #---- DX 12 -----
 find_package(D3D12 REQUIRED)
@@ -46,6 +49,7 @@ set(IMPORT_INCLUDES
 	External/TinyObjLoader
 	External/px_sched
 	External/EasyProfiler/easy_profiler_core/include
+	External/rapidjson/include/rapidjson
 	${SDL2_BINARY_DIR}/include
 	${SDL2_SOURCE_DIR}/include
 	${D3D12_INCLUDE_DIRS}
