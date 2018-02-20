@@ -2,9 +2,7 @@
 
 using namespace Engine;
 
-std::unordered_map<std::string, std::string> ConfigSystem::mStringMap = {};
-std::unordered_map<std::string, int> ConfigSystem::mIntMap = {};
-std::unordered_map<std::string, double> ConfigSystem::mDoubleMap = {};
+std::unordered_map<std::string, CVar> ConfigSystem::mCVarMap = {};
 
 
 void ConfigSystem::Init()
@@ -12,32 +10,21 @@ void ConfigSystem::Init()
 	//TODO: Load configVars.json
 }
 
-std::string ConfigSystem::GetStringValue(std::string key)
+CVar* ConfigSystem::GetCVar(std::string key)
 {
-	if (mStringMap.find(key) != mStringMap.end())
+	if(mCVarMap.find(key) != mCVarMap.end())
 	{
-		return mStringMap[key];
+		return &mCVarMap[key];
 	}
 
-	return "";
+	return nullptr;
 }
 
-int ConfigSystem::GetIntValue(std::string key)
+CVar* CVar::Get(std::string key)
 {
-	if (mIntMap.find(key) != mIntMap.end())
-	{
-		return mIntMap[key];
-	}
-
-	return 0;
+	return ConfigSystem::GetCVar(key);
 }
 
-double ConfigSystem::GetDoubleValue(std::string key)
-{
-	if (mDoubleMap.find(key) != mDoubleMap.end())
-	{
-		return mDoubleMap[key];
-	}
 
-	return 0;
-}
+
+

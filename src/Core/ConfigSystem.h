@@ -10,32 +10,30 @@ namespace Engine
 		friend class CVar;
 	public:
 		static void Init();
+		static CVar* GetCVar(std::string);
 	private:
-		static std::string GetStringValue(std::string);
-		static int GetIntValue(std::string);
-		static double GetDoubleValue(std::string);
 
-		static std::unordered_map<std::string, std::string> mStringMap;
-		static std::unordered_map<std::string, int> mIntMap;
-		static std::unordered_map<std::string, double> mDoubleMap;
+		static std::unordered_map<std::string, CVar> mCVarMap;
+	};
+
+	enum CVarType
+	{
+		String,
+		Integer,
+		Double
 	};
 
 	class CVar
 	{
 	public:
-		static std::string GetString(std::string key)
-		{
-			return ConfigSystem::GetStringValue(key);
-		}
+		static CVar* Get(std::string key);
 
-		static int GetInt(std::string key)
+		CVarType type;
+		union
 		{
-			return ConfigSystem::GetIntValue(key);
-		}
-
-		static double GetDouble(std::string key)
-		{
-			return ConfigSystem::GetDoubleValue(key);
-		}
+			char stringValue[64];
+			int intValue;
+			double doubleValue;
+		};
 	};
 }
