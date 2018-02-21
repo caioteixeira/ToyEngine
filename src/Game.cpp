@@ -67,5 +67,8 @@ void Game::RunLoop()
 void Game::StartGame()
 {
 	mWorld.Init(mRenderer);
-	mWorld.LoadObjLevel("Assets/sponza.obj");
+
+	const auto scene = CVar::Get("initialScene");
+	assert(scene != nullptr);
+	mWorld.LoadObjLevel(scene->stringValue);
 }
