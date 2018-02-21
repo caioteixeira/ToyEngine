@@ -11,6 +11,7 @@ namespace Engine
 	public:
 		static void Init();
 		static CVar* GetCVar(std::string);
+		static void DrawDebugWindow();
 	private:
 
 		static std::unordered_map<std::string, CVar> mCVarMap;
@@ -20,7 +21,7 @@ namespace Engine
 	{
 		String,
 		Integer,
-		Double
+		Float
 	};
 
 	class CVar
@@ -33,7 +34,7 @@ namespace Engine
 		{
 			char stringValue[64];
 			int intValue;
-			double doubleValue;
+			float floatValue;
 		};
 	};
 }

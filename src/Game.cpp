@@ -55,6 +55,9 @@ void Game::RunLoop()
 		lastFrame = now;
 
 		mInput.ProcessInput();
+
+		ConfigSystem::DrawDebugWindow();
+
 		//TODO: Run systems
 		mWorld.Update(delta);
 

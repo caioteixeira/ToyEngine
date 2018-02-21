@@ -3,6 +3,7 @@
 #include <fstream>
 #include <document.h>
 #include "Logger.h"
+#include "imgui/imgui.h"
 
 using namespace Engine;
 
@@ -46,11 +47,11 @@ void ConfigSystem::Init()
 			var.intValue = itr->value.GetInt();
 			mCVarMap.emplace(itr->name.GetString(), var);
 		}
-		else if(itr->value.IsDouble())
+		else if(itr->value.IsFloat())
 		{
 			CVar var;
-			var.type = CVarType::Double;
-			var.doubleValue = itr->value.GetDouble();
+			var.type = CVarType::Float;
+			var.floatValue = itr->value.GetFloat();
 			mCVarMap.emplace(itr->name.GetString(), var);
 		}
 	}
@@ -63,7 +64,41 @@ CVar* ConfigSystem::GetCVar(std::string key)
 		return &mCVarMap[key];
 	}
 
+	Logger::DebugLogError("No CVar for key %c", key.c_str());
 	return nullptr;
+}
+
+void ConfigSystem::DrawDebugWindow()
+{
+	ImGui::Begin("CVars");
+
+	for (auto pair : mCVarMap)
+	{
+		ImGui::PushID(pair.first.c_str());
+		
+		auto var = &pair.second; 
+		switch(var->type)
+		{
+			case String:
+			{
+				ImGui::InputText(pair.first.c_str(), var->stringValue, 64);
+				break;
+			}
+			case Integer:
+			{
+				ImGui::InputInt(pair.first.c_str(), &var->intValue);
+				break;
+			}
+			case Float:
+			{
+				ImGui::InputFloat(pair.first.c_str(), &var->floatValue);
+				break;
+			}
+		}
+
+		ImGui::PopID();
+	}
+	ImGui::End();
 }
 
 CVar* CVar::Get(std::string key)
