@@ -30,28 +30,28 @@ void ConfigSystem::Init()
 		Logger::DebugLogError("Failed to parse config.json!");
 	}
 
-	for (auto itr = document.Begin(); itr != document.End(); ++itr)
+	for (auto itr = document.MemberBegin(); itr != document.MemberEnd(); ++itr)
 	{
-		if(itr->IsString())
+		if(itr->value.IsString())
 		{
 			CVar var;
 			var.type = CVarType::String;
-			strcpy(var.stringValue, itr->GetString());
-			mCVarMap.emplace("string", var);
+			strcpy(var.stringValue, itr->value.GetString());
+			mCVarMap.emplace(itr->name.GetString(), var);
 		}
-		else if(itr->IsInt())
+		else if(itr->value.IsInt())
 		{
 			CVar var;
 			var.type = CVarType::Integer;
-			var.intValue = itr->GetInt();
-			mCVarMap.emplace("int", var);
+			var.intValue = itr->value.GetInt();
+			mCVarMap.emplace(itr->name.GetString(), var);
 		}
-		else if(itr->IsDouble())
+		else if(itr->value.IsDouble())
 		{
 			CVar var;
 			var.type = CVarType::Double;
-			var.doubleValue = itr->GetDouble();
-			mCVarMap.emplace("double", var);
+			var.doubleValue = itr->value.GetDouble();
+			mCVarMap.emplace(itr->name.GetString(), var);
 		}
 	}
 }

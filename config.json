@@ -1,0 +1,5 @@
+{
+    "sceneFile": "Assets/sponza.obj",
+    "numThreads": 4,
+    "targetFramerate": 60.0
+}
