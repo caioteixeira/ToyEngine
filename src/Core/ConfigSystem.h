@@ -14,7 +14,10 @@ namespace Engine
 		static void DrawDebugWindow();
 	private:
 
-		static std::unordered_map<std::string, CVar> mCVarMap;
+		static int mLastCVarIndex;
+		static constexpr int CVAR_REGISTRY_SIZE = 256;
+		static std::array<CVar, CVAR_REGISTRY_SIZE> mCVars;
+		static std::unordered_map<std::string, int> mCVarMap;
 	};
 
 	enum CVarType

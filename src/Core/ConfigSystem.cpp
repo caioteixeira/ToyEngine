@@ -4,13 +4,18 @@
 #include <document.h>
 #include "Logger.h"
 #include "imgui/imgui.h"
+#include <array>
 
 using namespace Engine;
 
-std::unordered_map<std::string, CVar> ConfigSystem::mCVarMap = {};
+std::unordered_map<std::string, int> ConfigSystem::mCVarMap = {};
+std::array<CVar, ConfigSystem::CVAR_REGISTRY_SIZE> ConfigSystem::mCVars = {};
+int ConfigSystem::mLastCVarIndex = 0;
 
 void ConfigSystem::Init()
 {
+	memset(mCVars.data(), 0, sizeof(CVar) * mCVars.size());
+
 	//TODO: Load config.json
 	std::ifstream configFile("config.json");
 	if(!configFile.is_open())
@@ -33,27 +38,27 @@ void ConfigSystem::Init()
 
 	for (auto itr = document.MemberBegin(); itr != document.MemberEnd(); ++itr)
 	{
+		CVar var;
 		if(itr->value.IsString())
 		{
-			CVar var;
-			var.type = CVarType::String;
+			var.type = String;
 			strcpy(var.stringValue, itr->value.GetString());
-			mCVarMap.emplace(itr->name.GetString(), var);
+			
 		}
 		else if(itr->value.IsInt())
 		{
-			CVar var;
-			var.type = CVarType::Integer;
+			var.type = Integer;
 			var.intValue = itr->value.GetInt();
-			mCVarMap.emplace(itr->name.GetString(), var);
 		}
 		else if(itr->value.IsFloat())
 		{
-			CVar var;
-			var.type = CVarType::Float;
+			var.type = Float;
 			var.floatValue = itr->value.GetFloat();
-			mCVarMap.emplace(itr->name.GetString(), var);
 		}
+
+		mCVars[mLastCVarIndex] = var;
+		mCVarMap.emplace(itr->name.GetString(), mLastCVarIndex);
+		mLastCVarIndex++;
 	}
 }
 
@@ -61,7 +66,8 @@ CVar* ConfigSystem::GetCVar(std::string key)
 {
 	if(mCVarMap.find(key) != mCVarMap.end())
 	{
-		return &mCVarMap[key];
+		auto index = mCVarMap[key];
+		return &mCVars[index];
 	}
 
 	Logger::DebugLogError("No CVar for key %c", key.c_str());
@@ -75,8 +81,9 @@ void ConfigSystem::DrawDebugWindow()
 	for (auto pair : mCVarMap)
 	{
 		ImGui::PushID(pair.first.c_str());
-		
-		auto var = &pair.second; 
+
+		const auto index = pair.second; 
+		auto var = &mCVars[index];
 		switch(var->type)
 		{
 			case String:
