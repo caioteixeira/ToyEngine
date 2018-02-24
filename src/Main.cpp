@@ -1,13 +1,13 @@
 #include "Game.h"
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
-	Game game;
+    Game game;
 
-	if(game.Init())
-	{
-		game.RunLoop();
-	}
+    if (game.Init())
+    {
+        game.RunLoop();
+    }
 
-	return 0;
+    return 0;
 }

@@ -36,13 +36,13 @@
 
 namespace jobxx
 {
-
     class predicate
     {
     public:
         predicate() = default;
 
-        template <typename FunctionT, typename = std::enable_if_t<!std::is_same_v<std::remove_const_t<std::remove_reference_t<FunctionT>>, predicate>>>
+        template <typename FunctionT, typename = std::enable_if_t<!std::is_same_v<
+                      std::remove_const_t<std::remove_reference_t<FunctionT>>, predicate>>>
         /*implicit*/ predicate(FunctionT&& func) { _assign(std::forward<FunctionT>(func)); }
 
         explicit operator bool() const { return _thunk != nullptr; }
@@ -50,9 +50,10 @@ namespace jobxx
         bool operator()() { return _thunk(_view); }
 
     private:
-        template <typename FunctionT> inline void _assign(FunctionT&& func);
+        template <typename FunctionT>
+        inline void _assign(FunctionT&& func);
 
-        bool(*_thunk)(void*) = nullptr;
+        bool (*_thunk)(void*) = nullptr;
         void* _view = nullptr;
     };
 
@@ -60,10 +61,9 @@ namespace jobxx
     void predicate::_assign(FunctionT&& func)
     {
         using func_type = std::remove_reference_t<FunctionT>;
-        _thunk = [](void* view){ return (*static_cast<func_type*>(view))(); };
+        _thunk = [](void* view) { return (*static_cast<func_type*>(view))(); };
         _view = &func;
     }
-
 }
 
 #endif // defined(_guard_JOBXX_PREDICATE_H)

@@ -3,19 +3,19 @@
 
 namespace Engine
 {
-	class Asset : public std::enable_shared_from_this<Asset>
-	{
-	public:
-		Asset(class Game& game);
-		virtual ~Asset();
+    class Asset : public std::enable_shared_from_this<Asset>
+    {
+    public:
+        Asset(class Game& game);
+        virtual ~Asset();
 
-	protected:
-		using enable_shared_from_this<Asset>::shared_from_this;
-		virtual bool Load(const char* fileName, class AssetCache* cache) = 0;
-		class Game& mGame;
-	};
+    protected:
+        using enable_shared_from_this<Asset>::shared_from_this;
+        virtual bool Load(const char* fileName, class AssetCache* cache) = 0;
+        class Game& mGame;
+    };
 
-	typedef std::shared_ptr<Asset> AssetPtr;
+    typedef std::shared_ptr<Asset> AssetPtr;
 }
 
 //TODO: Move to a macro definition file
@@ -32,5 +32,4 @@ namespace Engine
 		if (!ptr->Load(file, cache)) { return nullptr; } \
 		return ptr; \
 	} \
-	private: \
-
+	private:

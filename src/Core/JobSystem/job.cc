@@ -1,4 +1,3 @@
-
 // jobxx - C++ lightweight task library.
 //
 // This is free and unencumbered software released into the public domain.

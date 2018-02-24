@@ -17,19 +17,19 @@
 
 namespace entityx
 {
-	/**
-	 * A convenience class for instantiating an EventManager, EntityManager and
-	 * SystemManager.
-	 */
-	class EntityX
-	{
-	public:
-		EntityX() : entities(events), systems(entities, events)
-		{
-		}
+    /**
+     * A convenience class for instantiating an EventManager, EntityManager and
+     * SystemManager.
+     */
+    class EntityX
+    {
+    public:
+        EntityX() : entities(events), systems(entities, events)
+        {
+        }
 
-		EventManager events;
-		EntityManager entities;
-		SystemManager systems;
-	};
+        EventManager events;
+        EntityManager entities;
+        SystemManager systems;
+    };
 } // namespace entityx

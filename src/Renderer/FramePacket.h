@@ -6,18 +6,18 @@
 
 struct MeshElement
 {
-	MeshGeometryPtr mesh;
-	MaterialPtr material;
-	Matrix worldTransform;
-	GraphicsBufferPtr constantBuffer;
+    MeshGeometryPtr mesh;
+    MaterialPtr material;
+    Matrix worldTransform;
+    GraphicsBufferPtr constantBuffer;
 };
 
 struct FramePacket
 {
-	Matrix viewMatrix;
-	Vector3 cameraPos;
-	std::vector<MeshElement> meshes;
+    Matrix viewMatrix;
+    Vector3 cameraPos;
+    std::vector<MeshElement> meshes;
 
-	Vector3 ambientLightColor;
-	PointLightData pointLights[MAX_POINT_LIGHTS];
+    Vector3 ambientLightColor;
+    PointLightData pointLights[MAX_POINT_LIGHTS];
 };

@@ -37,14 +37,14 @@
 
 namespace jobxx
 {
-
     template <typename Value>
     class concurrent_queue
     {
     public:
         using value_type = Value;
 
-        template <typename InsertValue> inline void push_back(InsertValue&& task);
+        template <typename InsertValue>
+        inline void push_back(InsertValue&& task);
         inline bool pop_front(value_type& out);
         inline bool maybe_empty() const;
 
@@ -85,7 +85,6 @@ namespace jobxx
         std::lock_guard<std::mutex> _(_lock);
         return _queue.empty();
     }
-    
 }
 
 #endif // defined(_guard_JOBXX_CONCURRENT_QUEUE_H)

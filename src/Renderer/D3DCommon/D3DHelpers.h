@@ -3,16 +3,17 @@
 #include "../../EngineCore.h"
 
 using namespace Engine;
+
 inline void ThrowIfFailed(HRESULT hr, char* str = nullptr)
 {
-	if(hr != S_OK)
-	{
-		if(str != nullptr)
-		{
-			Logger::DebugLogError(str);
-		}
+    if (hr != S_OK)
+    {
+        if (str != nullptr)
+        {
+            Logger::DebugLogError(str);
+        }
 
-		//TODO: Create DXException
-		throw 1;
-	}
+        //TODO: Create DXException
+        throw 1;
+    }
 }

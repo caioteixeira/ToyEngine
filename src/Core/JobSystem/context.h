@@ -36,7 +36,6 @@
 
 namespace jobxx
 {
-
     namespace _detail
     {
         struct job_impl;
@@ -48,7 +47,9 @@ namespace jobxx
     class context
     {
     public:
-        explicit context(_detail::queue_impl& queue, _detail::job_impl* parent) : _queue(queue), _job(parent) {}
+        explicit context(_detail::queue_impl& queue, _detail::job_impl* parent) : _queue(queue), _job(parent)
+        {
+        }
 
         context(context const&) = delete;
         context& operator=(context const&) = delete;
@@ -59,7 +60,6 @@ namespace jobxx
         _detail::queue_impl& _queue;
         _detail::job_impl* _job = nullptr;
     };
-
 }
 
 #endif // defined(_guard_JOBXX_CONTEXT_H)

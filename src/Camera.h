@@ -2,5 +2,5 @@
 
 struct Camera
 {
-	Matrix viewMatrix;
+    Matrix viewMatrix;
 };

@@ -4,7 +4,7 @@
 
 struct Mesh
 {
-	MeshGeometryPtr geometry;
-	MaterialPtr material;
-	GraphicsBufferPtr perObjectBuffer;
+    MeshGeometryPtr geometry;
+    MaterialPtr material;
+    GraphicsBufferPtr perObjectBuffer;
 };

@@ -36,7 +36,6 @@
 
 namespace jobxx
 {
-
     class spinlock
     {
     public:
@@ -81,7 +80,6 @@ namespace jobxx
     {
         _flag.store(false, std::memory_order_release);
     }
-
 }
 
 #endif // defined(_guard_JOBXX_SPINLOCK_H)

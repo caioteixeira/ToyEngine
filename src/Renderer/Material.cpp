@@ -2,5 +2,5 @@
 
 void Material::SetProperty(MaterialProperties property)
 {
-	properties = static_cast<MaterialProperties>(property | properties);
+    properties = static_cast<MaterialProperties>(property | properties);
 }
