@@ -1,14 +1,20 @@
 #pragma once
-class Game;
 
-class InputManager
+
+namespace Engine
 {
-public:
-	InputManager(Game& game);
-	~InputManager();
-	void ProcessInput();
-	void Initialize();
-private:
-	Game& mGame;
-};
+	class Game;
+
+	class InputManager
+	{
+	public:
+		InputManager(Game& game);
+		~InputManager();
+		void ProcessInput();
+		void Initialize();
+	private:
+		Game & mGame;
+	};
+}
+
 

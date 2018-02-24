@@ -10,3 +10,6 @@
 [submodule "External/TinyObjLoader"]
 	path = External/TinyObjLoader
 	url = https://github.com/caioteixeira/tinyobjloader.git
+[submodule "External/rapidjson"]
+	path = External/rapidjson
+	url = https://github.com/caioteixeira/rapidjson.git

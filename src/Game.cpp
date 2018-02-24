@@ -13,6 +13,8 @@ Game::Game():
 	,mShouldQuit(false)
 {
 	mRenderer = std::make_shared<Renderer>();
+
+	ConfigSystem::Init();
 }
 
 Game::~Game()
@@ -53,6 +55,9 @@ void Game::RunLoop()
 		lastFrame = now;
 
 		mInput.ProcessInput();
+
+		ConfigSystem::DrawDebugWindow();
+
 		//TODO: Run systems
 		mWorld.Update(delta);
 
@@ -65,5 +70,8 @@ void Game::RunLoop()
 void Game::StartGame()
 {
 	mWorld.Init(mRenderer);
-	mWorld.LoadObjLevel("Assets/sponza.obj");
+
+	const auto scene = CVar::Get("initialScene");
+	assert(scene != nullptr);
+	mWorld.LoadObjLevel(scene->stringValue);
 }

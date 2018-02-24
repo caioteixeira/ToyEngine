@@ -1,14 +1,14 @@
 #include "Logger.h"
 #include "../WindowsHeaders.h"
 
-void Logger::DebugLog(char* format, ...)
+void Logger::DebugLog(const char* format, ...)
 {
 	va_list arglist;
 	va_start(arglist, format);
 	SDL_Log(format, arglist);
 }
 
-void Logger::DebugLogError(char* format, ...)
+void Logger::DebugLogError(const char* format, ...)
 {
 	va_list arglist;
 	va_start(arglist, format);
