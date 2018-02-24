@@ -39,8 +39,10 @@
 
 namespace jobxx
 {
-
-    namespace _detail { struct queue_impl; }
+    namespace _detail
+    {
+        struct queue_impl;
+    }
 
     enum class spawn_result
     {
@@ -59,7 +61,8 @@ namespace jobxx
         queue(queue const&) = delete;
         queue& operator=(queue const&) = delete;
 
-        template <typename InitFunctionT> job create_job(InitFunctionT&& initializer);
+        template <typename InitFunctionT>
+        job create_job(InitFunctionT&& initializer);
         spawn_result spawn_task(delegate&& work);
 
         void wait_job_actively(job const& awaited);
@@ -84,7 +87,6 @@ namespace jobxx
         initializer(ctx);
         return job(job_impl);
     }
-
 }
 
 #endif // defined(_guard_JOBXX_QUEUE_H)

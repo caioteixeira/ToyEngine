@@ -39,15 +39,13 @@ namespace jobxx
 {
     namespace _detail
     {
-
         struct job_impl
         {
             std::atomic<int> refs = 1;
             std::atomic<int> tasks = 0;
             park waiting;
         };
-
-    }    
+    }
 }
 
 #endif // defined(_guard_JOBXX_DETAIL_JOB_H)

@@ -16,177 +16,179 @@ D3D12Renderer::D3D12Renderer(): mWindow(nullptr), mThreadPool(NUM_THREADS - 1)
 
 D3D12Renderer::~D3D12Renderer()
 {
-	ImGui_ImplDX12_Shutdown();
-	delete[] mWindowName;
+    ImGui_ImplDX12_Shutdown();
+    delete[] mWindowName;
 }
 
 bool D3D12Renderer::Init(int width, int height)
 {
-	mWindowName = new char[200];
-	mWindow = SDL_CreateWindow("Toy Engine", 100, 100, width, height, 0);
-	mWidth = width;
-	mHeight = height;
+    mWindowName = new char[200];
+    mWindow = SDL_CreateWindow("Toy Engine", 100, 100, width, height, 0);
+    mWidth = width;
+    mHeight = height;
 
-	if (!mWindow)
-	{
-		Logger::DebugLog("Could not create window.");
-		return false;
-	}
+    if (!mWindow)
+    {
+        Logger::DebugLog("Could not create window.");
+        return false;
+    }
 
-	mProj = Matrix::CreatePerspectiveFieldOfView(DirectX::XMConvertToRadians(90.0f),
-		static_cast<float>(mWidth) / static_cast<float>(mHeight), 0.5f, 5000.0f);
+    mProj = Matrix::CreatePerspectiveFieldOfView(DirectX::XMConvertToRadians(90.0f),
+                                                 static_cast<float>(mWidth) / static_cast<float>(mHeight), 0.5f,
+                                                 5000.0f);
 
-	mGraphicsDevice = std::make_unique<D3D12GraphicsDevice>(GetActiveWindow());
-	mResourceManager = std::make_unique<D3D12ResourceManager>(mGraphicsDevice.get());
+    mGraphicsDevice = std::make_unique<D3D12GraphicsDevice>(GetActiveWindow());
+    mResourceManager = std::make_unique<D3D12ResourceManager>(mGraphicsDevice.get());
 
-	InitImgui();
+    InitImgui();
 
-	return true;
+    return true;
 }
 
 void D3D12Renderer::InitImgui()
 {
-	mImguiDescriptorHeap = mGraphicsDevice->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-		D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
+    mImguiDescriptorHeap = mGraphicsDevice->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+                                                                 D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
 
-	struct SDL_SysWMinfo wmInfo;
-	SDL_VERSION(&wmInfo.version);
+    struct SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);
 
-	SDL_GetWindowWMInfo(mWindow, &wmInfo);
+    SDL_GetWindowWMInfo(mWindow, &wmInfo);
 
-	ImGui_ImplDX12_Init(wmInfo.info.win.window, mGraphicsDevice->SwapChainBufferCount, mGraphicsDevice->GetDevice(),
-		DXGI_FORMAT_R8G8B8A8_UNORM, mImguiDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-		mImguiDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+    ImGui_ImplDX12_Init(wmInfo.info.win.window, mGraphicsDevice->SwapChainBufferCount, mGraphicsDevice->GetDevice(),
+                        DXGI_FORMAT_R8G8B8A8_UNORM, mImguiDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+                        mImguiDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
-	SetupImguiNewFrame();
+    SetupImguiNewFrame();
 }
 
-void D3D12Renderer::RenderFrame(FramePacket & framePacket)
+void D3D12Renderer::RenderFrame(FramePacket& framePacket)
 {
-	EASY_FUNCTION(profiler::colors::Blue);
+    EASY_FUNCTION(profiler::colors::Blue);
 
-	Clear();
+    Clear();
 
-	GlobalConstants constantBuffer;
-	memset(&constantBuffer, 0, sizeof GlobalConstants);
-	constantBuffer.projMatrix = framePacket.viewMatrix * mProj;
-	constantBuffer.cameraPos = framePacket.cameraPos;
-	constantBuffer.ambientColor = framePacket.ambientLightColor;
-	memcpy(&constantBuffer.pointLights, &framePacket.pointLights, sizeof PointLightData * MAX_POINT_LIGHTS);
+    GlobalConstants constantBuffer;
+    memset(&constantBuffer, 0, sizeof GlobalConstants);
+    constantBuffer.projMatrix = framePacket.viewMatrix * mProj;
+    constantBuffer.cameraPos = framePacket.cameraPos;
+    constantBuffer.ambientColor = framePacket.ambientLightColor;
+    memcpy(&constantBuffer.pointLights, &framePacket.pointLights, sizeof PointLightData * MAX_POINT_LIGHTS);
 
-	EASY_BLOCK("Render Elements", profiler::colors::BlueGrey);
+    EASY_BLOCK("Render Elements", profiler::colors::BlueGrey);
 
-	//Divide work and create parallel tasks
-	auto chunks = DivideWork(framePacket.meshes.begin(), framePacket.meshes.end(), NUM_THREADS);
-	auto& jobQueue = mThreadPool.GetQueue();
-	auto renderJob = jobQueue.create_job([this, &chunks, &constantBuffer](jobxx::context& ctx)
-	{
-		for (auto& pair : chunks)
-		{
-			auto contextManager = mGraphicsDevice->GetCommandContextManager();
-			auto context = contextManager->AllocateContext();
-			context->SetScissor(mGraphicsDevice->GetScissorRect());
-			context->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
-			context->SetViewport(mGraphicsDevice->GetViewPort());
+    //Divide work and create parallel tasks
+    auto chunks = DivideWork(framePacket.meshes.begin(), framePacket.meshes.end(), NUM_THREADS);
+    auto& jobQueue = mThreadPool.GetQueue();
+    auto renderJob = jobQueue.create_job([this, &chunks, &constantBuffer](jobxx::context& ctx)
+    {
+        for (auto& pair : chunks)
+        {
+            auto contextManager = mGraphicsDevice->GetCommandContextManager();
+            auto context = contextManager->AllocateContext();
+            context->SetScissor(mGraphicsDevice->GetScissorRect());
+            context->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
+            context->SetViewport(mGraphicsDevice->GetViewPort());
 
-			ctx.spawn_task([context, &pair, &constantBuffer]()
-			{
-				EASY_BLOCK("Rendering Job", profiler::colors::Green);
-				
-				auto globalCB = context->ReserveUploadMemory(sizeof GlobalConstants);
-				memcpy(globalCB.CPUAddress, &constantBuffer, sizeof(GlobalConstants));
+            ctx.spawn_task([context, &pair, &constantBuffer]()
+            {
+                EASY_BLOCK("Rendering Job", profiler::colors::Green);
 
-				auto element = pair.first;
-				while(element < pair.second)
-				{
-					EASY_BLOCK("RenderElement");
+                auto globalCB = context->ReserveUploadMemory(sizeof GlobalConstants);
+                memcpy(globalCB.CPUAddress, &constantBuffer, sizeof(GlobalConstants));
 
-					PerObjectConstants objectConstants;
-					objectConstants.worldTransform = element->worldTransform;
+                auto element = pair.first;
+                while (element < pair.second)
+                {
+                    EASY_BLOCK("RenderElement");
 
-					auto& objectCB = context->ReserveUploadMemory(sizeof(PerObjectConstants));
-					memcpy(objectCB.CPUAddress, &objectConstants, sizeof(PerObjectConstants));
+                    PerObjectConstants objectConstants;
+                    objectConstants.worldTransform = element->worldTransform;
 
-					auto& material = element->material;
-					auto& pipelineState = material->pipelineState;
-					context->SetPipelineState(pipelineState);
-					context->SetGraphicsRootSignature(pipelineState->rootSignature.Get());
-					context->SetDynamicDescriptorHeap();
+                    auto& objectCB = context->ReserveUploadMemory(sizeof(PerObjectConstants));
+                    memcpy(objectCB.CPUAddress, &objectConstants, sizeof(PerObjectConstants));
 
-					auto& textureDescriptor = material->diffuseTexture->GetGraphicsTexture()->descriptor;
-					CD3DX12_CPU_DESCRIPTOR_HANDLE CPUDescriptor(textureDescriptor->GetCPUDescriptorHandleForHeapStart());
-					const auto GPUDescriptor = context->CopyDescriptorToDynamicHeap(CPUDescriptor);
+                    auto& material = element->material;
+                    auto& pipelineState = material->pipelineState;
+                    context->SetPipelineState(pipelineState);
+                    context->SetGraphicsRootSignature(pipelineState->rootSignature.Get());
+                    context->SetDynamicDescriptorHeap();
 
-					auto& materialCB = context->ReserveUploadMemory(sizeof(MaterialConstants));
-					MaterialConstants materialConstants;
-					materialConstants.kd = material->diffuseColor.ToVector3();
-					materialConstants.ks = material->specularColor.ToVector3();
-					materialConstants.ka = material->ambientColor.ToVector3();
-					materialConstants.ns = material->shininess;
+                    auto& textureDescriptor = material->diffuseTexture->GetGraphicsTexture()->descriptor;
+                    CD3DX12_CPU_DESCRIPTOR_HANDLE
+                        CPUDescriptor(textureDescriptor->GetCPUDescriptorHandleForHeapStart());
+                    const auto GPUDescriptor = context->CopyDescriptorToDynamicHeap(CPUDescriptor);
 
-					memcpy(materialCB.CPUAddress, &materialConstants, sizeof(MaterialConstants));
+                    auto& materialCB = context->ReserveUploadMemory(sizeof(MaterialConstants));
+                    MaterialConstants materialConstants;
+                    materialConstants.kd = material->diffuseColor.ToVector3();
+                    materialConstants.ks = material->specularColor.ToVector3();
+                    materialConstants.ka = material->ambientColor.ToVector3();
+                    materialConstants.ns = material->shininess;
 
-					context->SetIndexBuffer(element->mesh->GetIndexBuffer());
-					context->SetVertexBuffer(element->mesh->GetVertexBuffer());
-					context->SetPrimitiveTopology(EPT_TriangleList);
+                    memcpy(materialCB.CPUAddress, &materialConstants, sizeof(MaterialConstants));
 
-					context->SetGraphicsRootDescriptorTable(0, GPUDescriptor);
-					context->SetGraphicsRootConstantBufferView(1, globalCB.GPUAddress);
-					context->SetGraphicsRootConstantBufferView(2, objectCB.GPUAddress);
-					context->SetGraphicsRootConstantBufferView(3, materialCB.GPUAddress);
+                    context->SetIndexBuffer(element->mesh->GetIndexBuffer());
+                    context->SetVertexBuffer(element->mesh->GetVertexBuffer());
+                    context->SetPrimitiveTopology(EPT_TriangleList);
 
-					context->DrawIndexed(element->mesh->indexCount, 0);
+                    context->SetGraphicsRootDescriptorTable(0, GPUDescriptor);
+                    context->SetGraphicsRootConstantBufferView(1, globalCB.GPUAddress);
+                    context->SetGraphicsRootConstantBufferView(2, objectCB.GPUAddress);
+                    context->SetGraphicsRootConstantBufferView(3, materialCB.GPUAddress);
 
-					EASY_END_BLOCK
+                    context->DrawIndexed(element->mesh->indexCount, 0);
 
-					++element;
-				}
+                    EASY_END_BLOCK
 
-				context->Finish();
+                    ++element;
+                }
 
-				EASY_END_BLOCK
-			});
-		}
-	});
+                context->Finish();
 
-	jobQueue.wait_job_actively(renderJob);
+                EASY_END_BLOCK
+            });
+        }
+    });
 
-	//Render ImGuiFrame
-	mImguiContext->SetScissor(mGraphicsDevice->GetScissorRect());
-	mImguiContext->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
-	mImguiContext->SetViewport(mGraphicsDevice->GetViewPort());
-	ImGui::Render();
+    jobQueue.wait_job_actively(renderJob);
 
-	mImguiContext->Finish();
+    //Render ImGuiFrame
+    mImguiContext->SetScissor(mGraphicsDevice->GetScissorRect());
+    mImguiContext->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
+    mImguiContext->SetViewport(mGraphicsDevice->GetViewPort());
+    ImGui::Render();
 
-	EASY_END_BLOCK;
+    mImguiContext->Finish();
 
-	Present();
+    EASY_END_BLOCK;
+
+    Present();
 }
 
-D3D12ResourceManager * D3D12Renderer::GetResourceManager() const
+D3D12ResourceManager* D3D12Renderer::GetResourceManager() const
 {
-	return mResourceManager.get();
+    return mResourceManager.get();
 }
 
 void D3D12Renderer::Clear() const
 {
-	EASY_FUNCTION();
-	mGraphicsDevice->ClearBackBuffer(Vector3(0.0f, 0.0f, 0.0f), 1.0f);
+    EASY_FUNCTION();
+    mGraphicsDevice->ClearBackBuffer(Vector3(0.0f, 0.0f, 0.0f), 1.0f);
 }
 
 void D3D12Renderer::SetupImguiNewFrame()
 {
-	auto contextManager = mGraphicsDevice->GetCommandContextManager();
-	mImguiContext = contextManager->AllocateContext();
-	mImguiContext->SetDescriptorHeap(mImguiDescriptorHeap);
-	ImGui_ImplDX12_NewFrame(mImguiContext->GetCommandList());
+    auto contextManager = mGraphicsDevice->GetCommandContextManager();
+    mImguiContext = contextManager->AllocateContext();
+    mImguiContext->SetDescriptorHeap(mImguiDescriptorHeap);
+    ImGui_ImplDX12_NewFrame(mImguiContext->GetCommandList());
 }
 
 void D3D12Renderer::Present()
 {
-	EASY_FUNCTION();
-	mGraphicsDevice->Present();
+    EASY_FUNCTION();
+    mGraphicsDevice->Present();
 
-	SetupImguiNewFrame();
+    SetupImguiNewFrame();
 }

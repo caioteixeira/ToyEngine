@@ -37,7 +37,6 @@
 
 namespace jobxx
 {
-
     enum class park_result
     {
         failure = -1,
@@ -55,13 +54,18 @@ namespace jobxx
         park& operator=(park const&) = delete;
 
         park_result park_until(predicate pred) { return _park(this, pred); }
-        static park_result park_until(park& first, predicate first_pred, park& second, predicate second_pred) { return _park(&first, first_pred, &second, second_pred); }
+
+        static park_result park_until(park& first, predicate first_pred, park& second, predicate second_pred)
+        {
+            return _park(&first, first_pred, &second, second_pred);
+        }
 
         bool unpark_one();
         void unpark_all();
 
     private:
         struct thread_state;
+
         struct parked_node
         {
             thread_state* _thread = nullptr;
@@ -70,16 +74,16 @@ namespace jobxx
             int _id = 0;
         };
 
-        static park_result _park(park* first, predicate first_pred, park* second = nullptr, predicate second_pred = predicate());
+        static park_result _park(park* first, predicate first_pred, park* second = nullptr,
+                                 predicate second_pred = predicate());
 
         bool _unpark(thread_state& thread);
         void _link(parked_node& node);
         void _unlink(parked_node& node);
-        
+
         spinlock _lock;
         parked_node _parked;
     };
-
 }
 
 #endif // defined(_guard_JOBXX_PARK_H)

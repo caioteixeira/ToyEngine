@@ -6,24 +6,22 @@
 
 namespace Engine
 {
-	class Game
-	{
-	public:
-		Game();
-		~Game();
-		bool Init();
-		void RunLoop();
-		void QuitGame() { mShouldQuit = true; }
+    class Game
+    {
+    public:
+        Game();
+        ~Game();
+        bool Init();
+        void RunLoop();
+        void QuitGame() { mShouldQuit = true; }
 
-	private:
-		void StartGame();
+    private:
+        void StartGame();
 
-		ECS::GameWorld mWorld;
-		std::shared_ptr<Renderer> mRenderer;
-		InputManager mInput;
+        ECS::GameWorld mWorld;
+        std::shared_ptr<Renderer> mRenderer;
+        InputManager mInput;
 
-		bool mShouldQuit;
-	};
+        bool mShouldQuit;
+    };
 }
-
-

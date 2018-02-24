@@ -7,7 +7,7 @@
 class IResourceManager
 {
 public:
-	void LoadObjFile(const std::string& path, std::vector<Mesh>& outMeshes);
-	MeshGeometryPtr GetMeshGeometry(const std::string& path, const std::string& inputLayoutName);
-	TexturePtr GetTexture(const std::string& path);
+    void LoadObjFile(const std::string& path, std::vector<Mesh>& outMeshes);
+    MeshGeometryPtr GetMeshGeometry(const std::string& path, const std::string& inputLayoutName);
+    TexturePtr GetTexture(const std::string& path);
 };

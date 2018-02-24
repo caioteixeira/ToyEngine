@@ -39,12 +39,10 @@
 
 namespace jobxx
 {
-
     enum class spawn_result;
 
     namespace _detail
     {
-
         struct job_impl;
         struct task;
 
@@ -58,9 +56,7 @@ namespace jobxx
             park waiting;
             std::atomic<bool> closed = false;
         };
-
     }
-
 }
 
 #endif // defined(_guard_JOBXX_DETAIL_QUEUE_H)

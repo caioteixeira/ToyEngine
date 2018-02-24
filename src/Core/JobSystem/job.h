@@ -34,8 +34,11 @@
 
 namespace jobxx
 {
+    namespace _detail
+    {
+        struct job_impl;
+    }
 
-    namespace _detail { struct job_impl; }
     class queue;
 
     class job
@@ -45,7 +48,9 @@ namespace jobxx
         ~job();
 
         // note this does not increment refs!
-        explicit job(_detail::job_impl* impl) : _impl(impl) {}
+        explicit job(_detail::job_impl* impl) : _impl(impl)
+        {
+        }
 
         job(job&& rhs) : _impl(rhs._impl) { rhs._impl = nullptr; }
         job& operator=(job&& rhs);
@@ -58,7 +63,6 @@ namespace jobxx
 
         friend queue;
     };
-    
 }
 
 #endif // defined(_guard_JOBXX_JOB_H)

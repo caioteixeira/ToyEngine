@@ -36,10 +36,8 @@
 
 namespace jobxx
 {
-
     namespace _detail
     {
-    
         struct job_impl;
 
         struct task
@@ -47,8 +45,7 @@ namespace jobxx
             delegate work;
             _detail::job_impl* parent = nullptr;
         };
-
-    }    
+    }
 }
 
 #endif // defined(_guard_JOBXX_DETAIL_TASK_H)

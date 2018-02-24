@@ -3,7 +3,7 @@
 
 struct PointLight
 {
-	Vector3 diffuse;
-	float innerRadius;
-	float outerRadius;
+    Vector3 diffuse;
+    float innerRadius;
+    float outerRadius;
 };

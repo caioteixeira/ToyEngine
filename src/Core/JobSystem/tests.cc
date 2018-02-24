@@ -1,4 +1,3 @@
-
 // jobxx - C++ lightweight task library.
 //
 // This is free and unencumbered software released into the public domain.
@@ -40,7 +39,6 @@
 // test utilities and helpers
 namespace
 {
-
     class worker_pool
     {
     public:
@@ -48,7 +46,7 @@ namespace
         {
             for (int i = 0; i < threads; ++i)
             {
-                _threads.emplace_back([this](){ _queue.work_forever(); });
+                _threads.emplace_back([this]() { _queue.work_forever(); });
             }
         }
 
@@ -68,7 +66,7 @@ namespace
         std::vector<std::thread> _threads;
     };
 
-    static bool execute(bool(*test)(), int times = 1)
+    static bool execute(bool (*test)(), int times = 1)
     {
         for (int i = 0; i < times; ++i)
         {
@@ -88,13 +86,11 @@ namespace
             context.spawn_task(func);
         }
     }
-
 }
 
 // our tests
 namespace
 {
-
     // test the general queue/task/job system _without_ threads
     static bool basic_test()
     {
@@ -106,14 +102,14 @@ namespace
         jobxx::job job = queue.create_job([&num, &num2](jobxx::context& ctx)
         {
             // spawn a task in the job (with no task context)
-            ctx.spawn_task([&num](){ num = 0xdeadbeef; });
+            ctx.spawn_task([&num]() { num = 0xdeadbeef; });
 
             // spawn a task in the job (with task context)
             ctx.spawn_task([&num2](jobxx::context& ctx)
             {
                 num2 = 0xdeadbeee;
 
-                ctx.spawn_task([&num2](){ ++num2; });
+                ctx.spawn_task([&num2]() { ++num2; });
             });
         });
         queue.wait_job_actively(job);
@@ -134,7 +130,7 @@ namespace
         std::atomic<int> counter = 0;
         for (int inc = 1; inc != 5; ++inc)
         {
-            spawn_n(pool.queue(), 1000, [&counter, inc](){ counter += inc; });
+            spawn_n(pool.queue(), 1000, [&counter, inc]() { counter += inc; });
         }
 
         while (counter != (1000 + 2000 + 3000 + 4000))
@@ -189,7 +185,6 @@ namespace
 
         return true;
     }
-
 }
 
 /*int main()

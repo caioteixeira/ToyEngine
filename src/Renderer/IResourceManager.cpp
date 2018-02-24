@@ -6,10 +6,10 @@ void IResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh>& o
 
 MeshGeometryPtr IResourceManager::GetMeshGeometry(const std::string& path, const std::string& inputLayoutName)
 {
-	return nullptr;
+    return nullptr;
 }
 
 TexturePtr IResourceManager::GetTexture(const std::string& path)
 {
-	return nullptr;
+    return nullptr;
 }

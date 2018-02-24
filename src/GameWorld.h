@@ -5,16 +5,16 @@
 
 namespace Engine::ECS
 {
-	class GameWorld : public entityx::EntityX
-	{
-	public:
-		GameWorld();
-		~GameWorld();
+    class GameWorld : public entityx::EntityX
+    {
+    public:
+        GameWorld();
+        ~GameWorld();
 
-		void Init(std::shared_ptr<Renderer> renderer);
-		void LoadObjLevel(const std::string& path);
-		void Update(double deltaTime);
-	private:
-		std::shared_ptr<Renderer> mRenderer;
-	};
+        void Init(std::shared_ptr<Renderer> renderer);
+        void LoadObjLevel(const std::string& path);
+        void Update(double deltaTime);
+    private:
+        std::shared_ptr<Renderer> mRenderer;
+    };
 }

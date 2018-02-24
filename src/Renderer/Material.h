@@ -6,29 +6,29 @@
 
 enum MaterialProperties
 {
-	None = 0,
-	ConstantColor = 1,
-	Diffuse = 2,
-	SpecularDiffuse = 4,
-	DiffuseTexture = 8,
-	ReflectionTexture = 16
+    None = 0,
+    ConstantColor = 1,
+    Diffuse = 2,
+    SpecularDiffuse = 4,
+    DiffuseTexture = 8,
+    ReflectionTexture = 16
 };
 
 struct Material
 {
-	MaterialProperties properties = None;
+    MaterialProperties properties = None;
 
-	Color ambientColor; 
-	Color diffuseColor;
-	Color specularColor;
-	float shininess;
+    Color ambientColor;
+    Color diffuseColor;
+    Color specularColor;
+    float shininess;
 
-	TexturePtr diffuseTexture;
-	TexturePtr specularTexture;
+    TexturePtr diffuseTexture;
+    TexturePtr specularTexture;
 
-	PipelineStatePtr pipelineState = nullptr;
+    PipelineStatePtr pipelineState = nullptr;
 
-	void SetProperty(MaterialProperties property);
+    void SetProperty(MaterialProperties property);
 };
 
 typedef std::shared_ptr<Material> MaterialPtr;

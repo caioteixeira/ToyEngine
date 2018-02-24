@@ -1,4 +1,3 @@
-
 // jobxx - C++ lightweight task library.
 //
 // This is free and unencumbered software released into the public domain.
@@ -35,7 +34,9 @@
 #include "_detail/queue_impl.h"
 #include "_detail/task.h"
 
-jobxx::queue::queue() : _impl(new _detail::queue_impl) {}
+jobxx::queue::queue() : _impl(new _detail::queue_impl)
+{
+}
 
 jobxx::queue::~queue()
 {
@@ -56,8 +57,8 @@ void jobxx::queue::wait_job_actively(job const& awaited)
 
         _detail::task* item = nullptr;
         park_result const result = park::park_until(
-            _impl->waiting, [&awaited]{ return awaited.complete(); },
-            awaited._impl->waiting, [this, &item]{ return (item = _impl->pull_task()) != nullptr; });
+            _impl->waiting, [&awaited] { return awaited.complete(); },
+            awaited._impl->waiting, [this, &item] { return (item = _impl->pull_task()) != nullptr; });
 
         // if we were unparked by the task queue, that means that there is work
         // available. we will only have acquired the task already if it was ready

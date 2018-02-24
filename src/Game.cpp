@@ -7,14 +7,14 @@
 
 using namespace Engine;
 
-Game::Game(): 
-	mWorld()
-	,mInput(*this)
-	,mShouldQuit(false)
+Game::Game():
+    mWorld()
+    , mInput(*this)
+    , mShouldQuit(false)
 {
-	mRenderer = std::make_shared<Renderer>();
+    mRenderer = std::make_shared<Renderer>();
 
-	ConfigSystem::Init();
+    ConfigSystem::Init();
 }
 
 Game::~Game()
@@ -23,55 +23,56 @@ Game::~Game()
 
 bool Game::Init()
 {
-	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
-	{
-		Logger::DebugLog("Failed to initialize SDL.");
-		return false;
-	}
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
+    {
+        Logger::DebugLog("Failed to initialize SDL.");
+        return false;
+    }
 
-	if(!mRenderer->Init(1440, 900))
-	{
-		Logger::DebugLog("Failed to initialized Renderer.");
-	}
+    if (!mRenderer->Init(1440, 900))
+    {
+        Logger::DebugLog("Failed to initialized Renderer.");
+    }
 
-	StartGame();
+    StartGame();
 
-	return true;
+    return true;
 }
 
 void Game::RunLoop()
 {
-	EASY_PROFILER_ENABLE
-	EASY_MAIN_THREAD;
-	profiler::startListen();
+    EASY_PROFILER_ENABLE
+    EASY_MAIN_THREAD;
+    profiler::startListen();
 
-	auto lastFrame = std::chrono::high_resolution_clock::now();
-	while(!mShouldQuit)
-	{
-		EASY_BLOCK("GameLoop")
+    auto lastFrame = std::chrono::high_resolution_clock::now();
+    while (!mShouldQuit)
+    {
+        EASY_BLOCK("GameLoop")
 
-		auto now = std::chrono::high_resolution_clock::now();
-		auto delta = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(now - lastFrame).count() / 1000.0f;
-		lastFrame = now;
+        auto now = std::chrono::high_resolution_clock::now();
+        auto delta = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(now - lastFrame).count() /
+            1000.0f;
+        lastFrame = now;
 
-		mInput.ProcessInput();
+        mInput.ProcessInput();
 
-		ConfigSystem::DrawDebugWindow();
+        ConfigSystem::DrawDebugWindow();
 
-		//TODO: Run systems
-		mWorld.Update(delta);
+        //TODO: Run systems
+        mWorld.Update(delta);
 
-		EASY_END_BLOCK;
-	}
+        EASY_END_BLOCK;
+    }
 
-	profiler::dumpBlocksToFile("test_profile.prof");
+    profiler::dumpBlocksToFile("test_profile.prof");
 }
 
 void Game::StartGame()
 {
-	mWorld.Init(mRenderer);
+    mWorld.Init(mRenderer);
 
-	const auto scene = CVar::Get("initialScene");
-	assert(scene != nullptr);
-	mWorld.LoadObjLevel(scene->stringValue);
+    const auto scene = CVar::Get("initialScene");
+    assert(scene != nullptr);
+    mWorld.LoadObjLevel(scene->stringValue);
 }

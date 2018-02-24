@@ -1,4 +1,3 @@
-
 // jobxx - C++ lightweight task library.
 //
 // This is free and unencumbered software released into the public domain.
@@ -45,7 +44,6 @@ struct jobxx::park::thread_state
     std::mutex _lock;
     std::condition_variable _cond;
     std::atomic<int> _state = -2;
-
 };
 
 jobxx::park_result jobxx::park::_park(park* first, predicate first_pred, park* second, predicate second_pred)
@@ -105,7 +103,7 @@ jobxx::park_result jobxx::park::_park(park* first, predicate first_pred, park* s
     // event could be triggered and effectively lost.
     {
         std::unique_lock<std::mutex> lock(thread._lock);
-        thread._cond.wait(lock, [&thread](){ return thread._state.load() == -1; });
+        thread._cond.wait(lock, [&thread]() { return thread._state.load() == -1; });
     }
 
     // determine whom unlocked us, and reset our state back to its default.
