@@ -40,16 +40,36 @@ set(SDL_LIBS
 #--- Easy Profiler ---
 add_subdirectory(External/EasyProfiler)
 
+#--- rapidjson ---
 add_subdirectory(External/rapidjson)
+
+#--- Dear ImGui ---
+add_library(
+	imgui STATIC
+	External/imgui/imconfig.h
+	External/imgui/imgui.cpp
+	External/imgui/imgui.h
+	External/imgui/imgui_demo.cpp
+	External/imgui/imgui_draw.cpp
+	External/imgui/imgui_internal.h
+	External/imgui/stb_rect_pack.h
+	External/imgui/stb_textedit.h
+	External/imgui/stb_truetype.h
+)
+target_include_directories(imgui PUBLIC External/imgui)
 
 #---- DX 12 -----
 find_package(D3D12 REQUIRED)
 
+
+#---INCLUDES----
 set(IMPORT_INCLUDES 
 	External/TinyObjLoader
 	External/px_sched
 	External/EasyProfiler/easy_profiler_core/include
 	External/rapidjson/include/rapidjson
+	External/imgui
+	External/imgui/examples/directx12_example
 	${SDL2_BINARY_DIR}/include
 	${SDL2_SOURCE_DIR}/include
 	${D3D12_INCLUDE_DIRS}
@@ -64,4 +84,4 @@ add_executable(ToyEngine ${SOURCES} ${HEADERS})
 set_target_properties(ToyEngine PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
 target_include_directories(ToyEngine PRIVATE ${IMPORT_INCLUDES})
-target_link_libraries(ToyEngine ${SDL_LIBS} ${D3D12_LIBRARIES})
+target_link_libraries(ToyEngine ${SDL_LIBS} ${D3D12_LIBRARIES} imgui)

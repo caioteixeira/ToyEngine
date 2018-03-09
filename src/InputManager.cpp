@@ -1,7 +1,7 @@
 #include "InputManager.h"
 #include "WindowsHeaders.h"
 #include "Game.h"
-#include "Core/imgui/imgui.h"
+#include "imgui.h"
 
 InputManager::InputManager(Game& game)
     : mGame(game)
