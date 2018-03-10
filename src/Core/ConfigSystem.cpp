@@ -3,8 +3,8 @@
 #include <fstream>
 #include <document.h>
 #include "Logger.h"
-#include "imgui/imgui.h"
 #include <array>
+#include "imgui.h"
 
 using namespace Engine;
 

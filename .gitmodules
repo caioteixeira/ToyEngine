@@ -13,3 +13,6 @@
 [submodule "External/rapidjson"]
 	path = External/rapidjson
 	url = https://github.com/caioteixeira/rapidjson.git
+[submodule "External/imgui"]
+	path = External/imgui
+	url = https://github.com/caioteixeira/imgui.git

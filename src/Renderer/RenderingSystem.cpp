@@ -3,9 +3,9 @@
 #include "FramePacket.h"
 #include "../Transform.h"
 #include "../Camera.h"
-#include "../Core/imgui/imgui.h"
 #include <easy/profiler.h>
 #include "PointLight.h"
+#include "imgui.h"
 
 RenderingSystem::RenderingSystem()
 {
