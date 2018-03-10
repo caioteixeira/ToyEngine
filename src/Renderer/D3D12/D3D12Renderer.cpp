@@ -18,6 +18,7 @@ D3D12Renderer::D3D12Renderer(): mWindow(nullptr), mThreadPool(NUM_THREADS - 1)
 D3D12Renderer::~D3D12Renderer()
 {
     ImGui_ImplDX12_Shutdown();
+    ImGui::DestroyContext();
     delete[] mWindowName;
 }
 
@@ -56,6 +57,7 @@ void D3D12Renderer::InitImgui()
 
     SDL_GetWindowWMInfo(mWindow, &wmInfo);
 
+    ImGui::CreateContext();
     ImGui_ImplDX12_Init(wmInfo.info.win.window, mGraphicsDevice->SwapChainBufferCount, mGraphicsDevice->GetDevice(),
                         DXGI_FORMAT_R8G8B8A8_UNORM, mImguiDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
                         mImguiDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
@@ -159,6 +161,7 @@ void D3D12Renderer::RenderFrame(FramePacket& framePacket)
     mImguiContext->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
     mImguiContext->SetViewport(mGraphicsDevice->GetViewPort());
     ImGui::Render();
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData());
 
     mImguiContext->Finish();
 
