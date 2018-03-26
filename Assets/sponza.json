@@ -1,0 +1,27 @@
+{
+	"world": 
+	{
+		"ambientLight": [ 0.5, 0.5, 0.5 ]
+	},
+
+	"entities":[
+		{
+			"name": "Sponza",
+			"components": [
+				{
+                    "type": "transform",
+                    "properties": {
+                        "position": [ 0.0, 0.0, 0.0 ]
+                    } 
+					
+				},
+				{
+                    "type": "mesh",
+                    "properties": {
+                        "modelPath": "Assets/sponza.obj"
+                    }
+				}
+			]
+		}
+	]
+}

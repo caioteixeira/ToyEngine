@@ -3,16 +3,33 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "Renderer/PointLight.h"
+#include "JsonUtils.h"
 
 using namespace Engine::ECS;
 
-GameWorld::GameWorld()
+static void LoadTransform(entityx::Entity entity, rapidjson::Value& value)
 {
+    Vector3 position;
+    GetVectorFromJSON(value, "position", position);
+
+    auto transform = entity.Assign<Transform>();
+    transform->position = position;
+}
+
+GameWorld::GameWorld(): 
+    mLevelLoader(entities)
+{
+    mLevelLoader.RegisterComponentLoader("transform", LoadTransform);
+
+    //FIXME: Refactor to use static method
+    mLevelLoader.RegisterComponentLoader("mesh", 
+        [this](entityx::Entity entity, auto& value){
+        LoadMesh(entity, value);
+    });
 }
 
 GameWorld::~GameWorld()
-{
-}
+= default;
 
 void GameWorld::Init(std::shared_ptr<Renderer> renderer)
 {
@@ -46,19 +63,33 @@ void GameWorld::Init(std::shared_ptr<Renderer> renderer)
     mRenderer = renderer;
 }
 
-void GameWorld::LoadObjLevel(const std::string& path)
+void GameWorld::LoadMesh(entityx::Entity rootEntity, rapidjson::Value& value)
 {
     auto resourceManager = mRenderer->GetResourceManager();
 
     std::vector<Mesh> meshes;
-    resourceManager->LoadObjFile(path, meshes);
+    std::string modelPath;
+
+    if (!GetStringFromJSON(value, "modelPath", modelPath))
+    {
+        return;
+    }
+
+    resourceManager->LoadObjFile(modelPath, meshes);
 
     for (Mesh& mesh : meshes)
     {
         entityx::Entity meshEntity = entities.Create();
         meshEntity.Assign<Mesh>(mesh);
         meshEntity.Assign<Transform>();
+
+        //TODO: Set parent transform to rootEntity
     }
+}
+
+void GameWorld::LoadScene(const std::string& path)
+{
+    mLevelLoader.Load(path);
 }
 
 void GameWorld::Update(double deltaTime)

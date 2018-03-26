@@ -74,5 +74,5 @@ void Game::StartGame()
 
     const auto scene = CVar::Get("initialScene");
     assert(scene != nullptr);
-    mWorld.LoadObjLevel(scene->stringValue);
+    mWorld.LoadScene(scene->stringValue);
 }
