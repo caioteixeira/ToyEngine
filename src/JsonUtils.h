@@ -49,3 +49,39 @@ inline bool GetVectorFromJSON(const rapidjson::Value& inObject, const char* inPr
 
 	return true;
 }
+
+inline bool GetFloatFromJSON(const rapidjson::Value& inObject, const char* inProperty, float& outFloat)
+{
+    auto itr = inObject.FindMember(inProperty);
+    if (itr == inObject.MemberEnd())
+    {
+        return false;
+    }
+
+    auto& property = itr->value;
+    if (!property.IsDouble())
+    {
+        return false;
+    }
+
+    outFloat = property.GetDouble();
+    return true;
+}
+
+inline bool GetIntFromJSON(const rapidjson::Value& inObject, const char* inProperty, int& outInt)
+{
+    auto itr = inObject.FindMember(inProperty);
+    if (itr == inObject.MemberEnd())
+    {
+        return false;
+    }
+
+    auto& property = itr->value;
+    if (!property.IsInt())
+    {
+        return false;
+    }
+
+    outInt = property.GetInt();
+    return true;
+}
