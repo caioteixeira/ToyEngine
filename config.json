@@ -1,5 +1,5 @@
 {
-    "initialScene": "Assets/sponza.obj",
+    "initialScene": "Assets/sponza.json",
     "numThreads": 4,
     "targetFramerate": 60.0
 }

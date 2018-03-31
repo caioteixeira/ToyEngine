@@ -1,0 +1,66 @@
+{
+    "world": {
+        "ambientLight": [ 0.5, 0.5, 0.5 ]
+    },
+
+    "entities": [
+        {
+            "name": "Sponza",
+            "components": [
+                {
+                    "type": "transform",
+                    "properties": {
+                        "position": [ 0.0, 0.0, 0.0 ]
+                    }
+
+                },
+                {
+                    "type": "mesh",
+                    "properties": {
+                        "modelPath": "Assets/sponza.obj"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "PointLight",
+            "components": [
+                {
+                    "type": "transform",
+                    "properties": {
+                        "position": [ 400.0, 100.0, 0.0 ]
+                    }
+
+                },
+                {
+                    "type": "pointLight",
+                    "properties": {
+                        "diffuse": [ 0.01, 0.1, 1.0 ],
+                        "innerRadius": 100.0,
+                        "outerRadius": 400.0
+                    }
+                }
+            ]
+        },
+        {
+            "name": "PointLight",
+            "components": [
+                {
+                    "type": "transform",
+                    "properties": {
+                        "position": [ 100.0, 100.0, 0.0 ]
+                    }
+
+                },
+                {
+                    "type": "pointLight",
+                    "properties": {
+                        "diffuse": [ 0.01, 1.0, 1.0 ],
+                        "innerRadius": 100.0,
+                        "outerRadius": 600.0
+                    }
+                }
+            ]
+        }
+    ]
+}
