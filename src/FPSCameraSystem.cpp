@@ -120,5 +120,29 @@ void FPSCameraSystem::UpdateCamera(entityx::ComponentHandle<Camera>& camera,
         Strafe(camera, transform, cameraSpeed * dt);
     }
 
+    if (Input::IsMouseDown())
+    {
+        int x, y;
+        Input::GetMousePosition(x, y);
+        if (!mCapturingMousePosition)
+        {
+            mLastMousePosX = x;
+            mLastMousePosY = y;
+            mCapturingMousePosition = true;
+        }
+
+        const float dx = XMConvertToRadians(0.25f*static_cast<float>(x - mLastMousePosX));
+        const float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePosY));
+        Pitch(camera, dy);
+        RotateY(camera, dx);
+
+        mLastMousePosX = x;
+        mLastMousePosY = y;
+    }
+    else
+    {
+        mCapturingMousePosition = false;
+    }
+
     UpdateViewMatrix(camera, transform);
 }

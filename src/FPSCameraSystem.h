@@ -14,6 +14,8 @@ namespace Engine
 
     private:
         void UpdateCamera(entityx::ComponentHandle<Camera>& camera, entityx::ComponentHandle<Transform>& transform, entityx::TimeDelta dt);
+        bool mCapturingMousePosition = false;
+        int mLastMousePosX = 0;
+        int mLastMousePosY = 0;
     };
-
 }

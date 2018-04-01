@@ -59,7 +59,7 @@ void GameWorld::Init(std::shared_ptr<Renderer> renderer)
     cameraEntity.Assign<Transform>()->position = cameraPos;
 
     auto aspectRatio = static_cast<float>(1440) / 900;
-    cameraEntity.Assign<Camera>(1.0f, 1000.0f, aspectRatio, 0.25f * Math::PI);
+    cameraEntity.Assign<Camera>(1.0f, 5000.0f, aspectRatio, 0.25f * Math::PI);
 
     auto fpsCameraSystem = systems.Add<FPSCameraSystem>();
     auto renderingSystem = systems.Add<RenderingSystem>();
