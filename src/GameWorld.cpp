@@ -4,6 +4,8 @@
 #include "Camera.h"
 #include "Renderer/PointLight.h"
 #include "JsonUtils.h"
+#include "Math.h"
+#include "FPSCameraSystem.h"
 
 using namespace Engine::ECS;
 
@@ -51,14 +53,15 @@ GameWorld::~GameWorld()
 
 void GameWorld::Init(std::shared_ptr<Renderer> renderer)
 {
-    //TODO: Implement level Loader
-
     entityx::Entity cameraEntity = entities.Create();
 
     const Vector3 cameraPos(30.0, 30.0, 100.0);
     cameraEntity.Assign<Transform>()->position = cameraPos;
-    cameraEntity.Assign<Camera>();
 
+    auto aspectRatio = static_cast<float>(1440) / 900;
+    cameraEntity.Assign<Camera>(1.0f, 1000.0f, aspectRatio, 0.25f * Math::PI);
+
+    auto fpsCameraSystem = systems.Add<FPSCameraSystem>();
     auto renderingSystem = systems.Add<RenderingSystem>();
     systems.Configure();
     renderingSystem->SetRenderer(renderer);
@@ -85,7 +88,7 @@ void GameWorld::LoadMesh(entityx::Entity rootEntity, rapidjson::Value& value)
         meshEntity.Assign<Mesh>(mesh);
         meshEntity.Assign<Transform>();
 
-        //TODO: Set parent transform to rootEntity
+        //TODO: Set parent transform to rootEntity, when implementing scene graph
     }
 }
 
@@ -96,5 +99,6 @@ void GameWorld::LoadScene(const std::string& path)
 
 void GameWorld::Update(double deltaTime)
 {
+    systems.update<FPSCameraSystem>(deltaTime);
     systems.update<RenderingSystem>(deltaTime);
 }

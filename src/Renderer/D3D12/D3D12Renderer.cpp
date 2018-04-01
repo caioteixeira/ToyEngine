@@ -35,10 +35,6 @@ bool D3D12Renderer::Init(int width, int height)
         return false;
     }
 
-    mProj = Matrix::CreatePerspectiveFieldOfView(DirectX::XMConvertToRadians(90.0f),
-                                                 static_cast<float>(mWidth) / static_cast<float>(mHeight), 0.5f,
-                                                 5000.0f);
-
     mGraphicsDevice = std::make_unique<D3D12GraphicsDevice>(GetActiveWindow());
     mResourceManager = std::make_unique<D3D12ResourceManager>(mGraphicsDevice.get());
 
@@ -73,7 +69,7 @@ void D3D12Renderer::RenderFrame(FramePacket& framePacket)
 
     GlobalConstants constantBuffer;
     memset(&constantBuffer, 0, sizeof GlobalConstants);
-    constantBuffer.projMatrix = framePacket.viewMatrix * mProj;
+    constantBuffer.viewProjMatrix = framePacket.viewProjMatrix;
     constantBuffer.cameraPos = framePacket.cameraPos;
     constantBuffer.ambientColor = framePacket.ambientLightColor;
     memcpy(&constantBuffer.pointLights, &framePacket.pointLights, sizeof PointLightData * MAX_POINT_LIGHTS);

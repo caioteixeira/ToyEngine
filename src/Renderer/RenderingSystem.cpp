@@ -74,10 +74,8 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
     entityx::ComponentHandle<Camera> camera;
     for (auto entity : es.entities_with_components(transform, camera))
     {
-        //TODO: Implement FPS camera
-        const auto viewMatrix = Matrix::CreateLookAt(transform->position, Vector3::Zero, Vector3::Up);
-        packet.viewMatrix = viewMatrix;
-        packet.cameraPos = viewMatrix.Translation();
+        packet.viewProjMatrix = camera->view * camera->proj;
+        packet.cameraPos = transform->position;
 
         //TODO: Add support to multiple cameras
         break;
@@ -87,12 +85,12 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
     for (auto entity : es.entities_with_components(mesh, transform))
     {
         MeshElement element;
-        auto meshPosition = transform->position;
-        auto meshScale = transform->scale;
-        auto meshRotation = transform->rotation;
-        auto meshGeometry = mesh->geometry;
-        auto material = mesh->material;
-        auto buffer = mesh->perObjectBuffer;
+        const auto meshPosition = transform->position;
+        const auto meshScale = transform->scale;
+        const auto meshRotation = transform->rotation;
+        const auto meshGeometry = mesh->geometry;
+        const auto material = mesh->material;
+        const auto buffer = mesh->perObjectBuffer;
 
         auto quat = Quaternion::CreateFromYawPitchRoll(meshRotation.x, meshRotation.y, meshRotation.z);
         quat.Normalize();

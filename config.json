@@ -1,5 +1,6 @@
 {
     "initialScene": "Assets/sponza.json",
     "numThreads": 4,
-    "targetFramerate": 60.0
+    "targetFramerate": 60.0,
+    "cameraSpeed": 30.0 
 }
