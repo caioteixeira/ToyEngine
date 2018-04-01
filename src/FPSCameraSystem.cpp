@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Transform.h"
 #include "WindowsHeaders.h"
+#include "Input.h"
 
 using namespace DirectX;
 
@@ -97,30 +98,24 @@ void FPSCameraSystem::Update(entityx::EntityManager& entities, entityx::EventMan
 }
 
 void FPSCameraSystem::UpdateCamera(entityx::ComponentHandle<Camera>& camera,
-    entityx::ComponentHandle<Transform>& transform, entityx::TimeDelta dt)
+    entityx::ComponentHandle<Transform>& transform, const entityx::TimeDelta dt)
 {
     const auto cvar = CVar::Get("cameraSpeed");
     const float cameraSpeed = cvar->floatValue;
 
-    const Uint8 *state = SDL_GetKeyboardState(NULL);
-
-    //IF W
-    if(state[SDL_SCANCODE_W])
+    if (Input::IsKeyDown(W))
     {
         Walk(camera, transform, cameraSpeed * dt);
     }
-    //IF S
-    if(state[SDL_SCANCODE_S])
+    if (Input::IsKeyDown(S))
     {
         Walk(camera, transform, -cameraSpeed * dt);
     }
-    //IF A
-    if(state[SDL_SCANCODE_A])
+    if (Input::IsKeyDown(A))
     {
         Strafe(camera, transform, -cameraSpeed * dt);
     }
-    //IF D
-    if(state[SDL_SCANCODE_D])
+    if (Input::IsKeyDown(D))
     {
         Strafe(camera, transform, cameraSpeed * dt);
     }
