@@ -15,7 +15,7 @@ struct PointLightData
 
 struct GlobalConstants
 {
-    Matrix projMatrix;
+    Matrix viewProjMatrix;
     Vector3 cameraPos;
     float p; //padding;
     Vector3 ambientColor;

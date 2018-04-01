@@ -29,7 +29,9 @@ bool Game::Init()
         return false;
     }
 
-    if (!mRenderer->Init(1440, 900))
+    const auto windowWidth = CVar::Get("windowWidth")->intValue;
+    const auto windowHeight = CVar::Get("windowHeight")->intValue;
+    if (!mRenderer->Init(windowWidth, windowHeight))
     {
         Logger::DebugLog("Failed to initialized Renderer.");
     }

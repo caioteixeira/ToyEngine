@@ -14,7 +14,7 @@ struct MeshElement
 
 struct FramePacket
 {
-    Matrix viewMatrix;
+    Matrix viewProjMatrix;
     Vector3 cameraPos;
     std::vector<MeshElement> meshes;
 

@@ -36,8 +36,6 @@ private:
     int mWidth = 0;
     int mHeight = 0;
 
-    Matrix mProj;
-
     Engine::Core::WorkerPool mThreadPool;
 
     /**

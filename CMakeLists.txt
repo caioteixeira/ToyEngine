@@ -30,7 +30,7 @@ set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 set(SDL_STATIC ON CACHE BOOL "" FORCE)
 set(LIBC ON CACHE BOOL "" FORCE)
 
-add_subdirectory(External/SDL2)
+add_subdirectory(External/SDL2 EXCLUDE_FROM_ALL)
 
 set(SDL_LIBS
 	SDL2-static
@@ -38,10 +38,10 @@ set(SDL_LIBS
 )
 
 #--- Easy Profiler ---
-add_subdirectory(External/EasyProfiler)
+add_subdirectory(External/EasyProfiler EXCLUDE_FROM_ALL)
 
 #--- rapidjson ---
-add_subdirectory(External/rapidjson)
+add_subdirectory(External/rapidjson EXCLUDE_FROM_ALL)
 
 #--- Dear ImGui ---
 add_library(
