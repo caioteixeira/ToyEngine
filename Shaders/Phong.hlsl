@@ -39,7 +39,7 @@ SamplerState linearWrapSampler : register(s2);
 SamplerState linearClampSampler : register(s3);
 SamplerState anisotropicWrapSampler : register(s4);
 SamplerState anisotropicClampSampler : register(s5);
-Texture2D DiffuseTexture : register(t0);
+Texture2D DiffuseTex : register(t0);
 
 // Input structs for vertex and pixel shader
 struct VS_INPUT
@@ -120,7 +120,11 @@ PS_INPUT VS(VS_INPUT input)
 //--------------------------------------------------------------------------------------
 float4 PS(PS_INPUT input) : SV_Target
 {
-    float4 color = DiffuseTexture.Sample(anisotropicWrapSampler, input.mTex);
+#ifdef DiffuseTexture
+    float4 color = DiffuseTex.Sample(anisotropicWrapSampler, input.mTex);
+#else
+    float4 color = float4(kd, 1.0);
+#endif
 
 	//ambient light
     float3 phong = ambientLight;

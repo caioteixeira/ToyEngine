@@ -56,9 +56,12 @@ void LoadShape(std::vector<OBJModelLoader::SubmeshDesc>& submeshes, tinyobj::att
                 vertex.normal.z = attrib.normals[3 * index.normal_index + 2];
             }
 
-            vertex.texCoord.x = attrib.texcoords[2 * index.texcoord_index + 0];
-            vertex.texCoord.y = 1.0f - attrib.texcoords[2 * index.texcoord_index + 1];
-
+            if(attrib.texcoords.size() > 0)
+            {
+                vertex.texCoord.x = attrib.texcoords[2 * index.texcoord_index + 0];
+                vertex.texCoord.y = 1.0f - attrib.texcoords[2 * index.texcoord_index + 1];
+            }
+           
             //TODO: Avoid duplicated vertices
             submeshes[descIndex].indices.push_back(static_cast<uint32_t>(submeshes[descIndex].vertices.size()));
             submeshes[descIndex].vertices.push_back(vertex);
