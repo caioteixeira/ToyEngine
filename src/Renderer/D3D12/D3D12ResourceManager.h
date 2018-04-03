@@ -26,4 +26,5 @@ private:
     D3D12GraphicsDevice* mDevice;
 
     std::unordered_map<std::string, TexturePtr> mTextureCache;
+    std::unordered_map<MaterialProperties, PipelineStatePtr> mPSOCache;
 };

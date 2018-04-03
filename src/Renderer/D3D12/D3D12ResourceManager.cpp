@@ -110,6 +110,11 @@ MaterialPtr D3D12ResourceManager::CreateMaterial(OBJModelLoader::MaterialDesc& d
 
 PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties properties)
 {
+    if(mPSOCache.count(properties) > 0)
+    {
+        return mPSOCache[properties];
+    }
+
     auto state = std::make_shared<PipelineState>();
 
     CD3DX12_DESCRIPTOR_RANGE texTable;
@@ -149,20 +154,20 @@ PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties prope
     };
 
     //Create pipeline state
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 
     //
     // PSO for opaque objects.
     //
-    ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-    opaquePsoDesc.InputLayout = {inputLayout.data(), (UINT)inputLayout.size()};
-    opaquePsoDesc.pRootSignature = state->rootSignature.Get();
-    opaquePsoDesc.VS =
+    ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+    psoDesc.InputLayout = {inputLayout.data(), (UINT)inputLayout.size()};
+    psoDesc.pRootSignature = state->rootSignature.Get();
+    psoDesc.VS =
     {
         reinterpret_cast<BYTE*>(vertexShader->GetBufferPointer()),
         vertexShader->GetBufferSize()
     };
-    opaquePsoDesc.PS =
+    psoDesc.PS =
     {
         reinterpret_cast<BYTE*>(pixelShader->GetBufferPointer()),
         pixelShader->GetBufferSize()
@@ -170,19 +175,21 @@ PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties prope
 
     auto rastState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     rastState.CullMode = D3D12_CULL_MODE_NONE;
-    opaquePsoDesc.RasterizerState = rastState;
-    opaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    opaquePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-    opaquePsoDesc.SampleMask = UINT_MAX;
-    opaquePsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    opaquePsoDesc.NumRenderTargets = 1;
-    opaquePsoDesc.RTVFormats[0] = mDevice->GetBackBufferFormat();
-    opaquePsoDesc.SampleDesc.Count = 1;
-    opaquePsoDesc.SampleDesc.Quality = 0;
-    opaquePsoDesc.DSVFormat = mDevice->GetDepthStencilFormat();
+    psoDesc.RasterizerState = rastState;
+    psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+    psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+    psoDesc.SampleMask = UINT_MAX;
+    psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    psoDesc.NumRenderTargets = 1;
+    psoDesc.RTVFormats[0] = mDevice->GetBackBufferFormat();
+    psoDesc.SampleDesc.Count = 1;
+    psoDesc.SampleDesc.Quality = 0;
+    psoDesc.DSVFormat = mDevice->GetDepthStencilFormat();
 
     ThrowIfFailed(
-        mDevice->GetDevice()->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&state->pipelineState)));
+        mDevice->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&state->pipelineState)));
+
+    mPSOCache.emplace(properties, state);
 
     return state;
 }
