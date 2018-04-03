@@ -113,10 +113,14 @@ void D3D12Renderer::RenderFrame(FramePacket& framePacket)
                     context->SetGraphicsRootSignature(pipelineState->rootSignature.Get());
                     context->SetDynamicDescriptorHeap();
 
-                    auto& textureDescriptor = material->diffuseTexture->GetGraphicsTexture()->descriptor;
-                    CD3DX12_CPU_DESCRIPTOR_HANDLE
-                        CPUDescriptor(textureDescriptor->GetCPUDescriptorHandleForHeapStart());
-                    const auto GPUDescriptor = context->CopyDescriptorToDynamicHeap(CPUDescriptor);
+                    if (material->properties & DiffuseTexture)
+                    {
+                        auto& textureDescriptor = material->diffuseTexture->GetGraphicsTexture()->descriptor;
+                        CD3DX12_CPU_DESCRIPTOR_HANDLE
+                            CPUDescriptor(textureDescriptor->GetCPUDescriptorHandleForHeapStart());
+                        const auto GPUDescriptor = context->CopyDescriptorToDynamicHeap(CPUDescriptor);
+                        context->SetGraphicsRootDescriptorTable(0, GPUDescriptor);
+                    }
 
                     auto& materialCB = context->ReserveUploadMemory(sizeof(MaterialConstants));
                     MaterialConstants materialConstants;
@@ -131,7 +135,6 @@ void D3D12Renderer::RenderFrame(FramePacket& framePacket)
                     context->SetVertexBuffer(element->mesh->GetVertexBuffer());
                     context->SetPrimitiveTopology(EPT_TriangleList);
 
-                    context->SetGraphicsRootDescriptorTable(0, GPUDescriptor);
                     context->SetGraphicsRootConstantBufferView(1, globalCB.GPUAddress);
                     context->SetGraphicsRootConstantBufferView(2, objectCB.GPUAddress);
                     context->SetGraphicsRootConstantBufferView(3, materialCB.GPUAddress);

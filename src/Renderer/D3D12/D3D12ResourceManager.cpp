@@ -96,13 +96,14 @@ MaterialPtr D3D12ResourceManager::CreateMaterial(OBJModelLoader::MaterialDesc& d
 
     //TODO: Properly set illumination properties
     material->SetProperty(Diffuse);
-    material->pipelineState = GetPipelineState(material->properties);
 
     material->diffuseTexture = GetTexture(desc.diffuseTexName);
-    if (material->diffuseTexture == nullptr)
+    if (material->diffuseTexture != nullptr)
     {
-        return nullptr;
+        material->SetProperty(DiffuseTexture);
     }
+
+    material->pipelineState = GetPipelineState(material->properties);
 
     return material;
 }
@@ -129,8 +130,16 @@ PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties prope
     state->rootSignature = mDevice->CreateRootSignature(rootSigDesc);
 
     //Compile Shaders
-    auto vertexShader = mDevice->CompileShaderFromFile(L"Shaders/Phong.hlsl", nullptr, "VS", "vs_5_0");
-    auto pixelShader = mDevice->CompileShaderFromFile(L"Shaders/Phong.hlsl", nullptr, "PS", "ps_5_0");
+    std::vector<D3D_SHADER_MACRO> defines = {};
+    if (properties & DiffuseTexture)
+    {
+        const D3D_SHADER_MACRO define = { "DiffuseTexture", "1" };
+        defines.push_back(define);
+    }
+    defines.push_back({ nullptr, nullptr });
+
+    auto vertexShader = mDevice->CompileShaderFromFile(L"Shaders/Phong.hlsl", defines.data(), "VS", "vs_5_0");
+    auto pixelShader = mDevice->CompileShaderFromFile(L"Shaders/Phong.hlsl", defines.data(), "PS", "ps_5_0");
 
     std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout =
     {
