@@ -46,7 +46,7 @@ void Engine::LevelLoader::LoadEntities(rapidjson::GenericValue<rapidjson::UTF8<>
 {
     for (auto entityItr = array.Begin(); entityItr != array.End(); ++entityItr)
     {
-        auto entity = mEntityManager.Create();
+        const auto entity = mEntityManager.Create();
 
         for (auto propertyItr = entityItr->MemberBegin(); propertyItr != entityItr->MemberEnd(); ++propertyItr)
         {

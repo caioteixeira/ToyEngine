@@ -35,11 +35,27 @@ static void LoadPointLight(entityx::Entity entity, rapidjson::Value& value)
     pointLight->outerRadius = outerRadius;
 }
 
+static void LoadCamera(entityx::Entity entity, rapidjson::Value& value)
+{
+    const auto windowWidth = CVar::Get("windowWidth")->intValue;
+    const auto windowHeight = CVar::Get("windowHeight")->intValue;
+
+    float nearPlane;
+    GetFloatFromJSON(value, "nearPlane", nearPlane);
+
+    float farPlane;
+    GetFloatFromJSON(value, "farPlane", farPlane);
+
+    auto aspectRatio = static_cast<float>(windowWidth) / windowHeight;
+    entity.Assign<Camera>(nearPlane, farPlane, aspectRatio, 0.25f * Math::PI);
+}
+
 GameWorld::GameWorld(): 
     mLevelLoader(entities)
 {
     mLevelLoader.RegisterComponentLoader("transform", LoadTransform);
     mLevelLoader.RegisterComponentLoader("pointLight", LoadPointLight);
+    mLevelLoader.RegisterComponentLoader("camera", LoadCamera);
 
     //FIXME: Refactor to use static method
     mLevelLoader.RegisterComponentLoader("mesh", 
@@ -53,17 +69,6 @@ GameWorld::~GameWorld()
 
 void GameWorld::Init(std::shared_ptr<Renderer> renderer)
 {
-    entityx::Entity cameraEntity = entities.Create();
-
-    const Vector3 cameraPos(30.0, 30.0, 100.0);
-    cameraEntity.Assign<Transform>()->position = cameraPos;
-
-    const auto windowWidth = CVar::Get("windowWidth")->intValue;
-    const auto windowHeight = CVar::Get("windowHeight")->intValue;
-
-    auto aspectRatio = static_cast<float>(windowWidth) / windowHeight;
-    cameraEntity.Assign<Camera>(1.0f, 5000.0f, aspectRatio, 0.25f * Math::PI);
-
     auto fpsCameraSystem = systems.Add<FPSCameraSystem>();
     auto renderingSystem = systems.Add<RenderingSystem>();
     systems.Configure();

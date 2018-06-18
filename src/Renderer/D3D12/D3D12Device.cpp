@@ -328,7 +328,7 @@ void D3D12GraphicsDevice::InitDevice()
         debugInterface->EnableDebugLayer();
 
         ComPtr<ID3D12Debug1> debugInterface1;
-        auto r = SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&debugInterface1)));
+        const auto r = SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&debugInterface1)));
         if (r)
         {
             debugInterface1->SetEnableGPUBasedValidation(false);
