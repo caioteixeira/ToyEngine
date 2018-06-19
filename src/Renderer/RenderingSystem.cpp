@@ -29,21 +29,12 @@ void RenderingSystem::ShowDebugUI(entityx::EntityManager& es)
                     ImGui::GetIO().Framerate);
     }
 
-    //Camera position
-    entityx::ComponentHandle<Transform> transform;
-    entityx::ComponentHandle<Camera> camera;
-    for (auto entity : es.entities_with_components(transform, camera))
-    {
-        ImGui::Begin("Camera Position");
-        ImGui::InputFloat3("CameraPos", reinterpret_cast<float*>(&transform->position));
-        ImGui::End();
-    }
 
     // Light Data
     ImGui::Begin("LightData");
-
     ImGui::Text("Ambient Light");
     ImGui::InputFloat3("Ambient", reinterpret_cast<float*>(&mAmbientLight));
+    entityx::ComponentHandle<Transform> transform;
     entityx::ComponentHandle<PointLight> pointLight;
     for (auto entity : es.entities_with_components(transform, pointLight))
     {
