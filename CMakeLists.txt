@@ -49,6 +49,10 @@ add_library(
 	External/imgui/imconfig.h
 	External/imgui/imgui.cpp
 	External/imgui/imgui.h
+	External/imgui/examples/imgui_impl_dx12.h
+	External/imgui/examples/imgui_impl_dx12.cpp
+	External/imgui/examples/imgui_impl_win32.h
+	External/imgui/examples/imgui_impl_win32.cpp
 	External/imgui/imgui_demo.cpp
 	External/imgui/imgui_draw.cpp
 	External/imgui/imgui_internal.h
@@ -56,7 +60,7 @@ add_library(
 	External/imgui/stb_textedit.h
 	External/imgui/stb_truetype.h
 )
-target_include_directories(imgui PUBLIC External/imgui)
+target_include_directories(imgui PUBLIC External/imgui External/imgui/examples)
 
 #---- DX 12 -----
 find_package(D3D12 REQUIRED)
@@ -69,7 +73,7 @@ set(IMPORT_INCLUDES
 	External/EasyProfiler/easy_profiler_core/include
 	External/rapidjson/include/rapidjson
 	External/imgui
-	External/imgui/examples/directx12_example
+	External/imgui/examples
 	${SDL2_BINARY_DIR}/include
 	${SDL2_SOURCE_DIR}/include
 	${D3D12_INCLUDE_DIRS}
