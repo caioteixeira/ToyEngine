@@ -6,9 +6,9 @@ bool Input::IsKeyDown(KeyCode key)
     return state[key];
 }
 
-bool Input::IsMouseDown()
+bool Input::IsRightMouseButtonDown()
 {
-    if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)) 
+    if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT)) 
     {
         return true;
     }

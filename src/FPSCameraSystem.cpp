@@ -120,7 +120,7 @@ void FPSCameraSystem::UpdateCamera(entityx::ComponentHandle<Camera>& camera,
         Strafe(camera, transform, cameraSpeed * dt);
     }
 
-    if (Input::IsMouseDown())
+    if (Input::IsRightMouseButtonDown())
     {
         int x, y;
         Input::GetMousePosition(x, y);

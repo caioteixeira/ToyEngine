@@ -54,7 +54,7 @@ namespace Engine
     {
     public:
         static bool IsKeyDown(KeyCode key);
-        static bool IsMouseDown();
+        static bool IsRightMouseButtonDown();
         static void GetMousePosition(int& x, int& y);
     };
 }
