@@ -33,7 +33,9 @@ void RenderingSystem::ShowDebugUI(entityx::EntityManager& es)
     // Light Data
     ImGui::Begin("LightData");
     ImGui::Text("Ambient Light");
-    ImGui::InputFloat3("Ambient", reinterpret_cast<float*>(&mAmbientLight));
+    const ImGuiColorEditFlags flags = ImGuiColorEditFlags_RGB | ImGuiColorEditFlags_PickerHueWheel;
+
+    ImGui::ColorPicker3("Ambient", reinterpret_cast<float*>(&mAmbientLight), flags);
     entityx::ComponentHandle<Transform> transform;
     entityx::ComponentHandle<PointLight> pointLight;
     for (auto entity : es.entities_with_components(transform, pointLight))
@@ -42,7 +44,7 @@ void RenderingSystem::ShowDebugUI(entityx::EntityManager& es)
         ImGui::Text("PointLight");
         ImGui::PushID(&pointLight->diffuse);
         ImGui::InputFloat3("## Position", reinterpret_cast<float*>(&transform->position));
-        ImGui::InputFloat3("## Color", reinterpret_cast<float *>(&pointLight->diffuse));
+        ImGui::ColorPicker3("## Color", reinterpret_cast<float *>(&pointLight->diffuse), flags);
         ImGui::InputFloat("## InnerRadius", &pointLight->innerRadius);
         ImGui::InputFloat("## OuterRadius", &pointLight->outerRadius);
         ImGui::PopID();

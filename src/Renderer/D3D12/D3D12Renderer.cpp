@@ -7,6 +7,8 @@
 #include <SDL_syswm.h>
 #include "imgui.h"
 #include "imgui_impl_dx12.h"
+#include "examples/imgui_impl_win32.h"
+#include "examples/imgui_impl_dx12.h"
 
 using namespace Engine;
 
@@ -18,6 +20,7 @@ D3D12Renderer::D3D12Renderer(): mWindow(nullptr), mThreadPool(NUM_THREADS - 1)
 D3D12Renderer::~D3D12Renderer()
 {
     ImGui_ImplDX12_Shutdown();
+    ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
     delete[] mWindowName;
 }
@@ -52,11 +55,15 @@ void D3D12Renderer::InitImgui()
     SDL_VERSION(&wmInfo.version);
 
     SDL_GetWindowWMInfo(mWindow, &wmInfo);
+    const auto hwnd = wmInfo.info.win.window;
 
+    IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGui_ImplDX12_Init(wmInfo.info.win.window, mGraphicsDevice->SwapChainBufferCount, mGraphicsDevice->GetDevice(),
+    ImGui_ImplWin32_Init(hwnd);
+    ImGui_ImplDX12_Init(mGraphicsDevice->GetDevice(), mGraphicsDevice->SwapChainBufferCount,
                         DXGI_FORMAT_R8G8B8A8_UNORM, mImguiDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
                         mImguiDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+    ImGui::StyleColorsDark();
 
     SetupImguiNewFrame();
 }
@@ -156,11 +163,15 @@ void D3D12Renderer::RenderFrame(FramePacket& framePacket)
     jobQueue.wait_job_actively(renderJob);
 
     //Render ImGuiFrame
-    mImguiContext->SetScissor(mGraphicsDevice->GetScissorRect());
+    auto contextManager = mGraphicsDevice->GetCommandContextManager();
+    mImguiContext = contextManager->AllocateContext();
     mImguiContext->SetRenderTarget(mGraphicsDevice->CurrentBackBufferView(), mGraphicsDevice->DepthStencilView());
+    mImguiContext->SetScissor(mGraphicsDevice->GetScissorRect());
     mImguiContext->SetViewport(mGraphicsDevice->GetViewPort());
+    mImguiContext->SetDescriptorHeap(mImguiDescriptorHeap);
+
     ImGui::Render();
-    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData());
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), mImguiContext->GetCommandList());
 
     mImguiContext->Finish();
 
@@ -182,10 +193,9 @@ void D3D12Renderer::Clear() const
 
 void D3D12Renderer::SetupImguiNewFrame()
 {
-    auto contextManager = mGraphicsDevice->GetCommandContextManager();
-    mImguiContext = contextManager->AllocateContext();
-    mImguiContext->SetDescriptorHeap(mImguiDescriptorHeap);
-    ImGui_ImplDX12_NewFrame(mImguiContext->GetCommandList());
+    ImGui_ImplDX12_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
 }
 
 void D3D12Renderer::Present()
