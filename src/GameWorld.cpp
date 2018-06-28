@@ -6,6 +6,7 @@
 #include "JsonUtils.h"
 #include "Math.h"
 #include "FPSCameraSystem.h"
+#include "DebugSystem.h"
 
 using namespace Engine::ECS;
 
@@ -77,6 +78,7 @@ void GameWorld::Init(std::shared_ptr<Renderer> renderer)
 {
     auto fpsCameraSystem = systems.Add<FPSCameraSystem>();
     auto renderingSystem = systems.Add<RenderingSystem>();
+    systems.Add<DebugSystem>();
     systems.Configure();
     renderingSystem->SetRenderer(renderer);
     mRenderer = renderer;
@@ -118,5 +120,6 @@ void GameWorld::LoadScene(const std::string& path)
 void GameWorld::Update(double deltaTime)
 {
     systems.update<FPSCameraSystem>(deltaTime);
+    systems.update<DebugSystem>(deltaTime);
     systems.update<RenderingSystem>(deltaTime);
 }
