@@ -1,7 +1,7 @@
 {
     "windowWidth": 1440,
     "windowHeight": 900, 
-    "initialScene": "Assets/sponza.json",
+    "initialScene": "Assets/cubes.json",
     "numThreads": 4,
     "targetFramerate": 60.0,
     "cameraSpeed": 150.0

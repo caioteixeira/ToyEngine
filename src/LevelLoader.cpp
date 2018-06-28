@@ -1,6 +1,7 @@
 #include "LevelLoader.h"
 #include "EngineCore.h"
 #include <fstream>
+#include "NameComponent.h"
 
 Engine::LevelLoader::LevelLoader(entityx::EntityManager& manager)
     : mEntityManager(manager)
@@ -46,13 +47,16 @@ void Engine::LevelLoader::LoadEntities(rapidjson::GenericValue<rapidjson::UTF8<>
 {
     for (auto entityItr = array.Begin(); entityItr != array.End(); ++entityItr)
     {
-        const auto entity = mEntityManager.Create();
-
+        auto entity = mEntityManager.Create();
+        
         for (auto propertyItr = entityItr->MemberBegin(); propertyItr != entityItr->MemberEnd(); ++propertyItr)
         {
             if(std::strcmp(propertyItr->name.GetString(), "name") == 0)
             {
-                //TODO
+                auto nameComp = entity.Assign<NameComponent>();
+                const auto entityName = propertyItr->value.GetString();
+                nameComp->name = entityName;
+
                 continue;
             }
 

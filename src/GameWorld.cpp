@@ -11,11 +11,17 @@ using namespace Engine::ECS;
 
 static void LoadTransform(entityx::Entity entity, rapidjson::Value& value)
 {
+    auto transform = entity.Assign<Transform>();
+
     Vector3 position;
     GetVectorFromJSON(value, "position", position);
-
-    auto transform = entity.Assign<Transform>();
     transform->position = position;
+
+    Vector3 scale;
+    if(GetVectorFromJSON(value, "scale", scale))
+    {
+        transform->scale = scale;
+    }
 }
 
 static void LoadPointLight(entityx::Entity entity, rapidjson::Value& value)
@@ -90,13 +96,17 @@ void GameWorld::LoadMesh(entityx::Entity rootEntity, rapidjson::Value& value)
 
     resourceManager->LoadObjFile(modelPath, meshes);
 
-    for (Mesh& mesh : meshes)
+    if(meshes.size() == 1)
+    {
+        rootEntity.Assign<Mesh>(meshes[0]);
+        return;
+    }
+
+    for (auto& mesh : meshes)
     {
         entityx::Entity meshEntity = entities.Create();
         meshEntity.Assign<Mesh>(mesh);
-        meshEntity.Assign<Transform>();
-
-        //TODO: Set parent transform to rootEntity, when implementing scene graph
+        auto transform = meshEntity.Assign<Transform>();
     }
 }
 
