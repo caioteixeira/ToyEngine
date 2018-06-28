@@ -6,6 +6,7 @@
 #include <easy/profiler.h>
 #include "PointLight.h"
 #include "imgui.h"
+#include "../NameComponent.h"
 
 RenderingSystem::RenderingSystem()
 {
@@ -50,7 +51,25 @@ void RenderingSystem::ShowDebugUI(entityx::EntityManager& es)
         ImGui::PopID();
         ImGui::EndGroup();
     }
+    ImGui::End();
 
+    //Mesh transforms
+    ImGui::Begin("Meshes");
+    entityx::ComponentHandle<Mesh> mesh;
+    entityx::ComponentHandle<NameComponent> name;
+    for(auto entity : es.entities_with_components(transform, mesh, name))
+    {
+        ImGui::BeginGroup();
+        ImGui::Text(name->name.c_str());
+        ImGui::PushID(name->name.c_str());
+        ImGui::Text("Position");
+        ImGui::InputFloat3("## position", reinterpret_cast<float *>(&transform->position));
+        ImGui::Text("Scale");
+        ImGui::InputFloat3("## scale", reinterpret_cast<float *>(&transform->scale));
+        ImGui::PopID();
+        ImGui::EndGroup();
+    }
+    
     ImGui::End();
 }
 
