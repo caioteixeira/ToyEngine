@@ -6,10 +6,8 @@
 
 struct MeshElement
 {
-    MeshGeometryPtr mesh;
-    MaterialPtr material;
+    MeshHandle meshHandle;
     Matrix worldTransform;
-    GraphicsBufferPtr constantBuffer;
 };
 
 struct FramePacket

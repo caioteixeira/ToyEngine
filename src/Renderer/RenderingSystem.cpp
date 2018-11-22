@@ -67,25 +67,20 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
         break;
     };
 
-    entityx::ComponentHandle<Mesh> mesh;
+    entityx::ComponentHandle<MeshRenderer> mesh;
     for (auto entity : es.entities_with_components(mesh, transform))
     {
         MeshElement element;
         const auto meshPosition = transform->position;
         const auto meshScale = transform->scale;
         const auto meshRotation = transform->rotation;
-        const auto meshGeometry = mesh->geometry;
-        const auto material = mesh->material;
-        const auto buffer = mesh->perObjectBuffer;
 
         auto quat = Quaternion::CreateFromYawPitchRoll(meshRotation.x, meshRotation.y, meshRotation.z);
         quat.Normalize();
 
         element.worldTransform = Matrix::CreateScale(meshScale) *
             Matrix::CreateFromQuaternion(quat) * Matrix::CreateTranslation(meshPosition);
-        element.mesh = meshGeometry;
-        element.material = material;
-        element.constantBuffer = buffer;
+        element.meshHandle = mesh->meshHandle;
         packet.meshes.push_back(element);
     }
 

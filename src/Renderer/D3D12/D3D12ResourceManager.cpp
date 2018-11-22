@@ -18,7 +18,7 @@ D3D12ResourceManager::~D3D12ResourceManager()
 {
 }
 
-void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh>& outMeshes)
+void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<MeshHandle>& outMeshes)
 {
     std::vector<Vertex> vertices = {};
     std::vector<OBJModelLoader::SubmeshDesc> meshes = {};
@@ -40,25 +40,29 @@ void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<Mesh
 
     for (auto& meshData : meshes)
     {
+        if (materials.find(meshData.materialName) == materials.end())
+        {
+            //TODO: Use a "null material" instead
+            continue;
+        }
+
         auto vertexBuffer = mDevice->CreateGraphicsBuffer("Vertex Buffer", meshData.vertices.size(), sizeof(Vertex),
                                                           meshData.vertices.data());
         auto indexBuffer = mDevice->CreateGraphicsBuffer("Index Buffer", meshData.indices.size(), sizeof(uint32_t),
                                                          meshData.indices.data());
 
         MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer,
-                                                             static_cast<int>(meshData.indices.size()));
+            static_cast<int>(meshData.indices.size()));
+        auto& material = materials[meshData.materialName];
 
-        if (materials.find(meshData.materialName) != materials.end())
-        {
-            auto& material = materials[meshData.materialName];
+        Mesh mesh;
+        mesh.geometry = geo;
+        mesh.material = material;
 
-            Mesh mesh;
-            mesh.geometry = geo;
-            mesh.material = material;
-            outMeshes.push_back(mesh);
+        outMeshes.push_back(mMeshes.size());
+        mMeshes.push_back(mesh);
 
-            Logger::DebugLog("Renderer: Succesfully loaded a mesh element");
-        }
+        Logger::DebugLog("Renderer: Succesfully loaded a mesh element");
     }
 
     Logger::DebugLog("Renderer: Succesfully loaded OBJ File");
@@ -269,4 +273,9 @@ TexturePtr D3D12ResourceManager::LoadTexture(const std::string& path) const
     }
 
     return std::make_shared<Texture>(graphicsTexture, width, height);
+}
+
+Mesh * D3D12ResourceManager::GetMesh(const MeshHandle handle)
+{
+    return &mMeshes[handle];
 }

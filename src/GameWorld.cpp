@@ -88,7 +88,7 @@ void GameWorld::LoadMesh(entityx::Entity rootEntity, rapidjson::Value& value)
 {
     auto resourceManager = mRenderer->GetResourceManager();
 
-    std::vector<Mesh> meshes;
+    std::vector<MeshHandle> meshes;
     std::string modelPath;
 
     if (!GetStringFromJSON(value, "modelPath", modelPath))
@@ -100,15 +100,15 @@ void GameWorld::LoadMesh(entityx::Entity rootEntity, rapidjson::Value& value)
 
     if(meshes.size() == 1)
     {
-        rootEntity.Assign<Mesh>(meshes[0]);
+        rootEntity.Assign<MeshRenderer>(meshes[0]);
         return;
     }
 
     for (auto& mesh : meshes)
     {
         entityx::Entity meshEntity = entities.Create();
-        meshEntity.Assign<Mesh>(mesh);
-        auto transform = meshEntity.Assign<Transform>();
+        meshEntity.Assign<MeshRenderer>(mesh);
+        meshEntity.Assign<Transform>();
     }
 }
 
