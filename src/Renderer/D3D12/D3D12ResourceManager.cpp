@@ -6,6 +6,8 @@
 #include "../Vertex.h"
 #include "d3dx12.h"
 #include "../../EngineCore.h"
+#include "WICTextureLoader12.h"
+#include "D3D12CommandContextManager.h"
 
 using namespace Engine;
 
@@ -74,7 +76,7 @@ MeshGeometryPtr D3D12ResourceManager::GetMeshGeometry(const std::string& path, c
     return nullptr;
 }
 
-TexturePtr D3D12ResourceManager::GetTexture(const std::string& path)
+TextureHandle D3D12ResourceManager::GetTexture(const std::string& path)
 {
     auto it = mTextureCache.find(path);
     if (it != mTextureCache.end())
@@ -83,7 +85,7 @@ TexturePtr D3D12ResourceManager::GetTexture(const std::string& path)
     }
 
     auto texture = LoadTexture(path);
-    if (texture != nullptr)
+    if (texture != TextureHandle::NullHandle())
     {
         mTextureCache.emplace(path, texture);
     }
@@ -102,7 +104,7 @@ MaterialPtr D3D12ResourceManager::CreateMaterial(OBJModelLoader::MaterialDesc& d
     material->SetProperty(Diffuse);
 
     material->diffuseTexture = GetTexture(desc.diffuseTexName);
-    if (material->diffuseTexture != nullptr)
+    if (material->diffuseTexture != TextureHandle::NullHandle())
     {
         material->SetProperty(DiffuseTexture);
     }
@@ -253,29 +255,111 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> D3D12ResourceManager::GetStatic
     };
 }
 
-TexturePtr D3D12ResourceManager::LoadTexture(const std::string& path) const
+TextureHandle D3D12ResourceManager::CreateTextureFromFile(const char* inFileName)
 {
-    if (path.size() == 0)
+    std::string fileStr(inFileName);
+    const std::string extension = fileStr.substr(fileStr.find_last_of('.'));
+    const size_t cSize = strlen(inFileName) + 1;
+
+    size_t retCount;
+    std::wstring wc(cSize, L'#');
+    mbstowcs_s(&retCount, &wc[0], cSize, inFileName, _TRUNCATE);
+    HRESULT hr = -1;
+
+    std::unique_ptr<uint8_t[]> decodedData;
+    D3D12_SUBRESOURCE_DATA subresource;
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
+    if (extension == ".png" || extension == ".bmp" || extension == ".PNG" || extension == ".BMP")
     {
-        return nullptr;
+        hr = DirectX::LoadWICTextureFromFile(mDevice->GetDevice(), wc.c_str(), buffer.ReleaseAndGetAddressOf(),
+            decodedData, subresource);
+    }
+    else
+    {
+        //TODO: Use logger class
+        Logger::DebugLogError("ERROR: GraphicsDriver can only load images of type DDS, PNG, or BMP.");
     }
 
-    //TODO: Remove width and height from Texture class
-    int width = -1;
-    int height = -1;
+    if (hr != S_OK)
+    {
+        Logger::DebugLogError("Problem Creating Texture From File");
+        return TextureHandle::NullHandle();
+    }
+
+    const UINT64 uploadBufferSize = GetRequiredIntermediateSize(buffer.Get(), 0, 1);
+
+    // Create the GPU upload buffer.
+    Microsoft::WRL::ComPtr<ID3D12Resource> uploadHeap;
+    hr = mDevice->GetDevice()->CreateCommittedResource(
+        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+        D3D12_HEAP_FLAG_NONE,
+        &CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize),
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(uploadHeap.GetAddressOf())
+    );
+    ThrowIfFailed(hr, "ERROR: Failed to create upload buffer");
+
+    auto context = mDevice->GetCommandContextManager()->AllocateContext();
+
+    UpdateSubresources(context->GetCommandList(), buffer.Get(), uploadHeap.Get(),
+        0, 0, 1, &subresource);
+    context->TransitionResource(buffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+    context->Finish(true);
+
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap = mDevice->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+        D3D12_DESCRIPTOR_HEAP_FLAG_NONE, 1);
+
+    //Create SRV
+    const CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(descriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Format = buffer->GetDesc().Format;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.MipLevels = buffer->GetDesc().MipLevels;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+    mDevice->GetDevice()->CreateShaderResourceView(buffer.Get(), &srvDesc, hDescriptor);
+
+    //Fill texture object
+    auto resource = std::make_shared<GraphicsResource>();
+    resource->buffer = std::move(buffer);
+    resource->state = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+    GraphicsTexture texture;
+    texture.resource = std::move(resource);
+    texture.descriptor = std::move(descriptorHeap);
+
+    const auto index = mTextures.size();
+    mTextures.push_back(texture);
+
+    TextureHandle handle(index);
+    return handle;
+}
+
+TextureHandle D3D12ResourceManager::LoadTexture(const std::string& path)
+{
+    if (path.empty())
+    {
+        return TextureHandle::NullHandle();
+    }
+
     std::string finalPath("Assets/");
     finalPath = finalPath + path;
-    auto graphicsTexture = mDevice->CreateTextureFromFile(finalPath.c_str(), width, height);
-
-    if (graphicsTexture == nullptr)
-    {
-        return nullptr;
-    }
-
-    return std::make_shared<Texture>(graphicsTexture, width, height);
+    const auto graphicsTexture = CreateTextureFromFile(finalPath.c_str());
+    return graphicsTexture;
 }
 
 Mesh * D3D12ResourceManager::GetMesh(const MeshHandle handle)
 {
     return &mMeshes[handle];
+}
+
+GraphicsTexture * D3D12ResourceManager::GetTexture(const TextureHandle handle)
+{
+    return &mTextures[handle.value];
 }

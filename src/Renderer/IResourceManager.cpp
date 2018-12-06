@@ -9,7 +9,7 @@ MeshGeometryPtr IResourceManager::GetMeshGeometry(const std::string& path, const
     return nullptr;
 }
 
-TexturePtr IResourceManager::GetTexture(const std::string& path)
+TextureHandle IResourceManager::GetTexture(const std::string& path)
 {
-    return nullptr;
+    return TextureHandle::NullHandle();
 }

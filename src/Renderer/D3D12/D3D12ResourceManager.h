@@ -14,7 +14,7 @@ public:
     ~D3D12ResourceManager();
     void LoadObjFile(const std::string& path, std::vector<MeshHandle>& outMeshes);
     MeshGeometryPtr GetMeshGeometry(const std::string& path, const std::string& inputLayoutName);
-    TexturePtr GetTexture(const std::string& path);
+    TextureHandle GetTexture(const std::string& path);
 
 private:
     friend class D3D12Renderer;
@@ -22,14 +22,17 @@ private:
     MaterialPtr CreateMaterial(OBJModelLoader::MaterialDesc& desc);
     PipelineStatePtr GetPipelineState(MaterialProperties properties);
     std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers();
-    TexturePtr LoadTexture(const std::string& path) const;
+    TextureHandle CreateTextureFromFile(const char* inFileName);
+    TextureHandle LoadTexture(const std::string& path);
     Mesh* GetMesh(const MeshHandle handle);
+    GraphicsTexture* GetTexture(const TextureHandle handle);
 
     //TODO: Create a pipeline cache for multiple bindings
     D3D12GraphicsDevice* mDevice;
 
-    std::unordered_map<std::string, TexturePtr> mTextureCache;
+    std::unordered_map<std::string, TextureHandle> mTextureCache;
     std::unordered_map<MaterialProperties, PipelineStatePtr> mPSOCache;
 
+    std::vector<GraphicsTexture> mTextures;
     std::vector<Mesh> mMeshes;
 };

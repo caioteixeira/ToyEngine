@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include "Types.h"
-#include "Texture.h"
 #include "../Math.h"
 
 enum MaterialProperties
@@ -23,8 +22,8 @@ struct Material
     Color specularColor;
     float shininess;
 
-    TexturePtr diffuseTexture;
-    TexturePtr specularTexture;
+    TextureHandle diffuseTexture;
+    TextureHandle specularTexture;
 
     PipelineStatePtr pipelineState = nullptr;
 

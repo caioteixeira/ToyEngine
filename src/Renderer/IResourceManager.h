@@ -1,13 +1,13 @@
 ﻿#pragma once
 #include <string>
-#include "Texture.h"
 #include "Mesh.h"
 #include <vector>
+#include "Types.h"
 
 class IResourceManager
 {
 public:
     void LoadObjFile(const std::string& path, std::vector<Mesh>& outMeshes);
     MeshGeometryPtr GetMeshGeometry(const std::string& path, const std::string& inputLayoutName);
-    TexturePtr GetTexture(const std::string& path);
+    TextureHandle GetTexture(const std::string& path);
 };

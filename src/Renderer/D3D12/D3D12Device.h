@@ -29,7 +29,6 @@ public:
     Microsoft::WRL::ComPtr<struct ID3D12DescriptorHeap> CreateDescriptorHeap(
         enum D3D12_DESCRIPTOR_HEAP_TYPE heapType, enum D3D12_DESCRIPTOR_HEAP_FLAGS isShaderVisible,
         int numDescriptors) const;
-    GraphicsTexturePtr CreateTextureFromFile(const char* inFileName, int& outWidth, int& outHeight) const;
 
     void ClearBackBuffer(const Vector3& inColor, float inAlpha);
 

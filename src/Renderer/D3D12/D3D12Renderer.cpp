@@ -68,6 +68,53 @@ void D3D12Renderer::InitImgui()
     SetupImguiNewFrame();
 }
 
+void inline D3D12Renderer::RenderMesh(D3D12CommandContext* context, const DynamicAllocation globalCB, std::vector<MeshElement>::value_type element) const
+{
+    PerObjectConstants objectConstants;
+    objectConstants.worldTransform = element.worldTransform;
+
+    auto& objectCB = context->ReserveUploadMemory(sizeof(PerObjectConstants));
+    memcpy(objectCB.CPUAddress, &objectConstants, sizeof(PerObjectConstants));
+
+    auto mesh = mResourceManager->GetMesh(element.meshHandle);
+
+    auto& material = mesh->material;
+    auto& pipelineState = material->pipelineState;
+    context->SetPipelineState(pipelineState);
+    context->SetGraphicsRootSignature(pipelineState->rootSignature.Get());
+    context->SetDynamicDescriptorHeap();
+
+    if (material->properties & DiffuseTexture)
+    {
+        auto diffuseTexture = mResourceManager->GetTexture(material->diffuseTexture);
+        auto& textureDescriptor = diffuseTexture->descriptor;
+        CD3DX12_CPU_DESCRIPTOR_HANDLE
+            CPUDescriptor(textureDescriptor->GetCPUDescriptorHandleForHeapStart());
+        const auto GPUDescriptor = context->CopyDescriptorToDynamicHeap(CPUDescriptor);
+        context->SetGraphicsRootDescriptorTable(0, GPUDescriptor);
+    }
+
+    auto& materialCB = context->ReserveUploadMemory(sizeof(MaterialConstants));
+    MaterialConstants materialConstants;
+    materialConstants.kd = material->diffuseColor.ToVector3();
+    materialConstants.ks = material->specularColor.ToVector3();
+    materialConstants.ka = material->ambientColor.ToVector3();
+    materialConstants.ns = material->shininess;
+
+    memcpy(materialCB.CPUAddress, &materialConstants, sizeof(MaterialConstants));
+
+    const auto geometry = mesh->geometry;
+    context->SetIndexBuffer(geometry->GetIndexBuffer());
+    context->SetVertexBuffer(geometry->GetVertexBuffer());
+    context->SetPrimitiveTopology(EPT_TriangleList);
+
+    context->SetGraphicsRootConstantBufferView(1, globalCB.GPUAddress);
+    context->SetGraphicsRootConstantBufferView(2, objectCB.GPUAddress);
+    context->SetGraphicsRootConstantBufferView(3, materialCB.GPUAddress);
+
+    context->DrawIndexed(geometry->indexCount, 0);
+}
+
 void D3D12Renderer::RenderFrame(FramePacket& framePacket)
 {
     EASY_FUNCTION(profiler::colors::Blue);
@@ -94,50 +141,7 @@ void D3D12Renderer::RenderFrame(FramePacket& framePacket)
     for (auto element : framePacket.meshes)
     {
         EASY_BLOCK("RenderElement");
-
-        PerObjectConstants objectConstants;
-        objectConstants.worldTransform = element.worldTransform;
-
-        auto& objectCB = context->ReserveUploadMemory(sizeof(PerObjectConstants));
-        memcpy(objectCB.CPUAddress, &objectConstants, sizeof(PerObjectConstants));
-
-        auto mesh = mResourceManager->GetMesh(element.meshHandle);
-
-        auto& material = mesh->material;
-        auto& pipelineState = material->pipelineState;
-        context->SetPipelineState(pipelineState);
-        context->SetGraphicsRootSignature(pipelineState->rootSignature.Get());
-        context->SetDynamicDescriptorHeap();
-
-        if (material->properties & DiffuseTexture)
-        {
-            auto& textureDescriptor = material->diffuseTexture->GetGraphicsTexture()->descriptor;
-            CD3DX12_CPU_DESCRIPTOR_HANDLE
-                CPUDescriptor(textureDescriptor->GetCPUDescriptorHandleForHeapStart());
-            const auto GPUDescriptor = context->CopyDescriptorToDynamicHeap(CPUDescriptor);
-            context->SetGraphicsRootDescriptorTable(0, GPUDescriptor);
-        }
-
-        auto& materialCB = context->ReserveUploadMemory(sizeof(MaterialConstants));
-        MaterialConstants materialConstants;
-        materialConstants.kd = material->diffuseColor.ToVector3();
-        materialConstants.ks = material->specularColor.ToVector3();
-        materialConstants.ka = material->ambientColor.ToVector3();
-        materialConstants.ns = material->shininess;
-
-        memcpy(materialCB.CPUAddress, &materialConstants, sizeof(MaterialConstants));
-
-        const auto geometry = mesh->geometry;
-        context->SetIndexBuffer(geometry->GetIndexBuffer());
-        context->SetVertexBuffer(geometry->GetVertexBuffer());
-        context->SetPrimitiveTopology(EPT_TriangleList);
-
-        context->SetGraphicsRootConstantBufferView(1, globalCB.GPUAddress);
-        context->SetGraphicsRootConstantBufferView(2, objectCB.GPUAddress);
-        context->SetGraphicsRootConstantBufferView(3, materialCB.GPUAddress);
-
-        context->DrawIndexed(geometry->indexCount, 0);
-
+        RenderMesh(context, globalCB, element);
         EASY_END_BLOCK
     }
 
