@@ -38,24 +38,24 @@ bool D3D12Renderer::Init(int width, int height)
         return false;
     }
 
-    mGraphicsDevice = std::make_unique<D3D12GraphicsDevice>(GetActiveWindow());
-    mResourceManager = std::make_unique<D3D12ResourceManager>(mGraphicsDevice.get());
-
-    InitImgui();
-
-    return true;
-}
-
-void D3D12Renderer::InitImgui()
-{
-    mImguiDescriptorHeap = mGraphicsDevice->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-                                                                 D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
-
     struct SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
 
     SDL_GetWindowWMInfo(mWindow, &wmInfo);
     const auto hwnd = wmInfo.info.win.window;
+
+    mGraphicsDevice = std::make_unique<D3D12GraphicsDevice>(hwnd);
+    mResourceManager = std::make_unique<D3D12ResourceManager>(mGraphicsDevice.get());
+
+    InitImgui(hwnd);
+
+    return true;
+}
+
+void D3D12Renderer::InitImgui(const HWND hwnd)
+{
+    mImguiDescriptorHeap = mGraphicsDevice->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+                                                                 D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, 1);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();

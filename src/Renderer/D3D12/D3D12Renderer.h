@@ -23,7 +23,7 @@ private:
     void Clear() const;
     void Present();
 
-    void InitImgui();
+    void InitImgui(HWND hwnd);
     void inline RenderMesh(D3D12CommandContext* context, DynamicAllocation globalCB,
                     std::vector<MeshElement>::value_type element) const;
 
