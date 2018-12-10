@@ -37,7 +37,7 @@ public:
 
     void SetGraphicsRootSignature(ID3D12RootSignature* rootSignature) const;
     void SetGraphicsRootDescriptorTable(int index, D3D12_GPU_DESCRIPTOR_HANDLE descriptorTable) const;
-    void SetPipelineState(PipelineStatePtr state);
+    void SetPipelineState(PipelineState* state);
     void SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap);
     void SetDescriptorHeap(ID3D12DescriptorHeap* heap);
     void SetDynamicDescriptorHeap();
@@ -68,7 +68,7 @@ private:
     CommandContextManager* mContextManager;
     D3D12GraphicsDevice* mDevice;
 
-    PipelineStatePtr mActualPipelineState;
+    PipelineState* mActualPipelineState;
     ID3D12DescriptorHeap* mActualDescriptorHeap;
 
     DynamicUploadHeap mUploadHeap;

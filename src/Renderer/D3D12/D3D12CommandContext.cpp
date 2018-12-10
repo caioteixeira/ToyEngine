@@ -93,7 +93,7 @@ void D3D12CommandContext::SetGraphicsRootDescriptorTable(int index, D3D12_GPU_DE
     mCommandList->SetGraphicsRootDescriptorTable(index, descriptorTable);
 }
 
-void D3D12CommandContext::SetPipelineState(PipelineStatePtr state)
+void D3D12CommandContext::SetPipelineState(PipelineState* state)
 {
     if (mActualPipelineState == state)
     {

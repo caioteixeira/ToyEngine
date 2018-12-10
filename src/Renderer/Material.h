@@ -25,7 +25,7 @@ struct Material
     TextureHandle diffuseTexture;
     TextureHandle specularTexture;
 
-    PipelineStatePtr pipelineState = nullptr;
+    PipelineStateHandle pipelineState;
 
     void SetProperty(MaterialProperties property);
 };

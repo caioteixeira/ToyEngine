@@ -114,14 +114,14 @@ MaterialPtr D3D12ResourceManager::CreateMaterial(OBJModelLoader::MaterialDesc& d
     return material;
 }
 
-PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties properties)
+PipelineStateHandle D3D12ResourceManager::GetPipelineState(MaterialProperties properties)
 {
     if(mPSOCache.count(properties) > 0)
     {
         return mPSOCache[properties];
     }
 
-    auto state = std::make_shared<PipelineState>();
+    PipelineState state;
 
     CD3DX12_DESCRIPTOR_RANGE texTable;
     texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
@@ -138,7 +138,7 @@ PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties prope
                                             (UINT)samplers.size(), samplers.data(),
                                             D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-    state->rootSignature = mDevice->CreateRootSignature(rootSigDesc);
+    state.rootSignature = mDevice->CreateRootSignature(rootSigDesc);
 
     //Compile Shaders
     std::vector<D3D_SHADER_MACRO> defines = {};
@@ -167,7 +167,7 @@ PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties prope
     //
     ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
     psoDesc.InputLayout = {inputLayout.data(), (UINT)inputLayout.size()};
-    psoDesc.pRootSignature = state->rootSignature.Get();
+    psoDesc.pRootSignature = state.rootSignature.Get();
     psoDesc.VS =
     {
         reinterpret_cast<BYTE*>(vertexShader->GetBufferPointer()),
@@ -193,11 +193,15 @@ PipelineStatePtr D3D12ResourceManager::GetPipelineState(MaterialProperties prope
     psoDesc.DSVFormat = mDevice->GetDepthStencilFormat();
 
     ThrowIfFailed(
-        mDevice->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&state->pipelineState)));
+        mDevice->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&state.pipelineState)));
 
-    mPSOCache.emplace(properties, state);
+    PipelineStateHandle handle;
+    handle.value = mPipelinesStates.size();
+    mPipelinesStates.push_back(state);
 
-    return state;
+    mPSOCache.emplace(properties, handle);
+   
+    return handle;
 }
 
 std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> D3D12ResourceManager::GetStaticSamplers()
@@ -362,4 +366,9 @@ Mesh * D3D12ResourceManager::GetMesh(const MeshHandle handle)
 GraphicsTexture * D3D12ResourceManager::GetTexture(const TextureHandle handle)
 {
     return &mTextures[handle.value];
+}
+
+PipelineState* D3D12ResourceManager::GetPipelineState(const PipelineStateHandle handle)
+{
+    return &mPipelinesStates[handle.value];
 }

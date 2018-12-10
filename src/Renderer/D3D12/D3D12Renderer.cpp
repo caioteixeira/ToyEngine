@@ -79,7 +79,7 @@ void inline D3D12Renderer::RenderMesh(D3D12CommandContext* context, const Dynami
     auto mesh = mResourceManager->GetMesh(element.meshHandle);
 
     auto& material = mesh->material;
-    auto& pipelineState = material->pipelineState;
+    const auto pipelineState = mResourceManager->GetPipelineState(material->pipelineState);
     context->SetPipelineState(pipelineState);
     context->SetGraphicsRootSignature(pipelineState->rootSignature.Get());
     context->SetDynamicDescriptorHeap();
