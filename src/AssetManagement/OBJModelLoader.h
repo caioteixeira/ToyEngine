@@ -1,9 +1,8 @@
 #pragma once
 
 #include <vector>
-#include "Vertex.h"
-#include "Material.h"
-#include <unordered_map>
+#include "../Renderer/Vertex.h"
+#include "../Renderer/Material.h"
 #include <tiny_obj_loader.h>
 
 namespace OBJModelLoader
