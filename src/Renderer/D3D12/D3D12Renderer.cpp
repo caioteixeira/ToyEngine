@@ -76,9 +76,7 @@ void inline D3D12Renderer::RenderMesh(D3D12CommandContext* context, const Dynami
     auto& objectCB = context->ReserveUploadMemory(sizeof(PerObjectConstants));
     memcpy(objectCB.CPUAddress, &objectConstants, sizeof(PerObjectConstants));
 
-    auto mesh = mResourceManager->GetMesh(element.meshHandle);
-
-    auto& material = mesh->material;
+    auto& material = element.material;
     const auto pipelineState = mResourceManager->GetPipelineState(material->pipelineState);
     context->SetPipelineState(pipelineState);
     context->SetGraphicsRootSignature(pipelineState->rootSignature.Get());
@@ -103,7 +101,7 @@ void inline D3D12Renderer::RenderMesh(D3D12CommandContext* context, const Dynami
 
     memcpy(materialCB.CPUAddress, &materialConstants, sizeof(MaterialConstants));
 
-    const auto geometry = mesh->geometry;
+    const auto geometry = element.geometry;
     context->SetIndexBuffer(geometry->GetIndexBuffer());
     context->SetVertexBuffer(geometry->GetVertexBuffer());
     context->SetPrimitiveTopology(EPT_TriangleList);

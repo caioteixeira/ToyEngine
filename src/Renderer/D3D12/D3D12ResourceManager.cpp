@@ -1,7 +1,6 @@
 ﻿#include <unordered_map>
 #include "D3D12ResourceManager.h"
 #include "D3D12Device.h"
-#include "../OBJModelLoader.h"
 #include "../Mesh.h"
 #include "../Vertex.h"
 #include "d3dx12.h"
@@ -20,60 +19,17 @@ D3D12ResourceManager::~D3D12ResourceManager()
 {
 }
 
-void D3D12ResourceManager::LoadObjFile(const std::string& path, std::vector<MeshHandle>& outMeshes)
+MeshGeometryPtr D3D12ResourceManager::LoadMeshGeometry(OBJModelLoader::SubmeshDesc meshData) const
 {
-    std::vector<Vertex> vertices = {};
-    std::vector<OBJModelLoader::SubmeshDesc> meshes = {};
-    std::unordered_map<std::string, OBJModelLoader::MaterialDesc> materialMap = {};
+    auto vertexBuffer = mDevice->CreateGraphicsBuffer("Vertex Buffer", meshData.vertices.size(), sizeof(Vertex),
+                                                      meshData.vertices.data());
+    auto indexBuffer = mDevice->CreateGraphicsBuffer("Index Buffer", meshData.indices.size(), sizeof(uint32_t),
+                                                     meshData.indices.data());
 
-    OBJModelLoader::LoadObjFile(path, meshes, materialMap);
+    auto geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer,
+                                         static_cast<int>(meshData.indices.size()));
 
-    std::unordered_map<std::string, MaterialPtr> materials = {};
-    for (auto& desc : materialMap)
-    {
-        auto& material = CreateMaterial(desc.second);
-
-        if (material != nullptr)
-        {
-            materials[desc.first] = material;
-            Logger::DebugLog("Renderer: Succesfully loaded a material");
-        }
-    }
-
-    for (auto& meshData : meshes)
-    {
-        if (materials.find(meshData.materialName) == materials.end())
-        {
-            //TODO: Use a "null material" instead
-            continue;
-        }
-
-        auto vertexBuffer = mDevice->CreateGraphicsBuffer("Vertex Buffer", meshData.vertices.size(), sizeof(Vertex),
-                                                          meshData.vertices.data());
-        auto indexBuffer = mDevice->CreateGraphicsBuffer("Index Buffer", meshData.indices.size(), sizeof(uint32_t),
-                                                         meshData.indices.data());
-
-        MeshGeometryPtr geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer,
-            static_cast<int>(meshData.indices.size()));
-        auto& material = materials[meshData.materialName];
-
-        Mesh mesh;
-        mesh.geometry = geo;
-        mesh.material = material;
-
-        outMeshes.push_back(mMeshes.size());
-        mMeshes.push_back(mesh);
-
-        Logger::DebugLog("Renderer: Succesfully loaded a mesh element");
-    }
-
-    Logger::DebugLog("Renderer: Succesfully loaded OBJ File");
-}
-
-MeshGeometryPtr D3D12ResourceManager::GetMeshGeometry(const std::string& path, const std::string& inputLayoutName)
-{
-    //TODO: Implement
-    return nullptr;
+    return geo;
 }
 
 TextureHandle D3D12ResourceManager::GetTexture(const std::string& path)
@@ -92,7 +48,7 @@ TextureHandle D3D12ResourceManager::GetTexture(const std::string& path)
     return texture;
 }
 
-MaterialPtr D3D12ResourceManager::CreateMaterial(OBJModelLoader::MaterialDesc& desc)
+MaterialPtr D3D12ResourceManager::CreatePhongMaterial(OBJModelLoader::MaterialDesc& desc)
 {
     auto material = std::make_shared<Material>();
     material->ambientColor = desc.ambient;
@@ -111,6 +67,7 @@ MaterialPtr D3D12ResourceManager::CreateMaterial(OBJModelLoader::MaterialDesc& d
 
     material->pipelineState = GetPipelineState(material->properties);
 
+    mMaterials[desc.name] = material;
     return material;
 }
 
@@ -356,11 +313,6 @@ TextureHandle D3D12ResourceManager::LoadTexture(const std::string& path)
     finalPath = finalPath + path;
     const auto graphicsTexture = CreateTextureFromFile(finalPath.c_str());
     return graphicsTexture;
-}
-
-Mesh * D3D12ResourceManager::GetMesh(const MeshHandle handle)
-{
-    return &mMeshes[handle];
 }
 
 GraphicsTexture * D3D12ResourceManager::GetTexture(const TextureHandle handle)

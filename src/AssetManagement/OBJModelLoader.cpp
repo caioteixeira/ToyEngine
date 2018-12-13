@@ -88,7 +88,7 @@ OBJModelLoader::MaterialDesc OBJModelLoader::LoadMaterial(tinyobj::material_t ma
 }
 
 void OBJModelLoader::LoadObjFile(std::string path, std::vector<SubmeshDesc>& outSubmeshes,
-                                 std::unordered_map<std::string, MaterialDesc>& outMaterials)
+                                 std::vector<MaterialDesc>& outMaterials)
 {
     EASY_FUNCTION();
 
@@ -114,8 +114,8 @@ void OBJModelLoader::LoadObjFile(std::string path, std::vector<SubmeshDesc>& out
 
     for (const auto& material : materials)
     {
-        const auto data = LoadMaterial(material);
-        outMaterials[data.name] = data;
+        auto data = LoadMaterial(material);
+        outMaterials.push_back(data);
         Logger::DebugLog("Succesfully loaded a material");
     }
 }

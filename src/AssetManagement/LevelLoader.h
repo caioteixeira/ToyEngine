@@ -3,8 +3,8 @@
 
 #include <functional>
 #include <string>
-#include "ECS/entityx.h"
-#include "document.h"
+#include "../ECS/entityx.h"
+#include <document.h>
 
 namespace Engine
 {

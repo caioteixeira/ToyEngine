@@ -1,7 +1,7 @@
 #include "LevelLoader.h"
-#include "EngineCore.h"
+#include "../EngineCore.h"
 #include <fstream>
-#include "NameComponent.h"
+#include "../NameComponent.h"
 
 Engine::LevelLoader::LevelLoader(entityx::EntityManager& manager)
     : mEntityManager(manager)

@@ -80,7 +80,8 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
 
         element.worldTransform = Matrix::CreateScale(meshScale) *
             Matrix::CreateFromQuaternion(quat) * Matrix::CreateTranslation(meshPosition);
-        element.meshHandle = mesh->meshHandle;
+        element.geometry = mesh->geometry;
+        element.material = mesh->material;
         packet.meshes.push_back(element);
     }
 

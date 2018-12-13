@@ -2,19 +2,10 @@
 #include "MeshGeometry.h"
 #include "Material.h"
 
-typedef uint32_t MeshHandle;
-
-struct Mesh
-{
-    MeshGeometryPtr geometry;
-    MaterialPtr material;
-    GraphicsBufferPtr perObjectBuffer;
-};
-
 struct MeshRenderer
 {
-    MeshRenderer(const MeshHandle meshHandle) : meshHandle(meshHandle) {}
-
-    MeshHandle meshHandle;
+    MeshRenderer(const MeshGeometryPtr& geometry, const MaterialPtr& material) : geometry(geometry), material(material) {}
+    MeshGeometryPtr geometry;
+    MaterialPtr material;
 };
 

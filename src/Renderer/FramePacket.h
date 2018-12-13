@@ -6,8 +6,9 @@
 
 struct MeshElement
 {
-    MeshHandle meshHandle;
     Matrix worldTransform;
+    MeshGeometryPtr geometry;
+    MaterialPtr material;
 };
 
 struct FramePacket

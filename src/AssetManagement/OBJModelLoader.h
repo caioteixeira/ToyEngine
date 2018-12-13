@@ -32,5 +32,5 @@ namespace OBJModelLoader
     MaterialDesc LoadMaterial(tinyobj::material_t material);
 
     void LoadObjFile(std::string path, std::vector<SubmeshDesc>& outSubmeshes,
-                     std::unordered_map<std::string, MaterialDesc>& outMaterials);
+                     std::vector<MaterialDesc>& outMaterials);
 }

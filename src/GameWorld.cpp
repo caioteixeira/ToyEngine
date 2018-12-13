@@ -3,7 +3,7 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "Renderer/PointLight.h"
-#include "JsonUtils.h"
+#include "AssetManagement/JsonUtils.h"
 #include "Math.h"
 #include "FPSCameraSystem.h"
 #include "DebugSystem.h"
@@ -88,7 +88,6 @@ void GameWorld::LoadMesh(entityx::Entity rootEntity, rapidjson::Value& value)
 {
     auto resourceManager = mRenderer->GetResourceManager();
 
-    std::vector<MeshHandle> meshes;
     std::string modelPath;
 
     if (!GetStringFromJSON(value, "modelPath", modelPath))
@@ -96,18 +95,23 @@ void GameWorld::LoadMesh(entityx::Entity rootEntity, rapidjson::Value& value)
         return;
     }
 
-    resourceManager->LoadObjFile(modelPath, meshes);
+    std::vector<OBJModelLoader::MaterialDesc> materialMap;
+    std::vector<OBJModelLoader::SubmeshDesc> subMeshDescriptors;
+    LoadObjFile(modelPath, subMeshDescriptors, materialMap);
 
-    if(meshes.size() == 1)
+    std::unordered_map<std::string, MaterialPtr> materials;
+    for (auto material : materialMap)
     {
-        rootEntity.Assign<MeshRenderer>(meshes[0]);
-        return;
+        const auto materialHandle = resourceManager->CreatePhongMaterial(material);
+        materials[material.name] = materialHandle;
     }
 
-    for (auto& mesh : meshes)
+    for (auto& descriptor : subMeshDescriptors)
     {
+        auto mesh = resourceManager->LoadMeshGeometry(descriptor);
+
         entityx::Entity meshEntity = entities.Create();
-        meshEntity.Assign<MeshRenderer>(mesh);
+        meshEntity.Assign<MeshRenderer>(mesh, materials[descriptor.materialName]);
         meshEntity.Assign<Transform>();
     }
 }
