@@ -1,13 +1,13 @@
 ﻿#pragma once
 
 #include <array>
-#include "../IResourceManager.h"
 #include "../../AssetManagement/OBJModelLoader.h"
 #include "d3dx12.h"
+#include "../MeshGeometry.h"
 
 class D3D12GraphicsDevice;
 
-class D3D12ResourceManager : IResourceManager
+class D3D12ResourceManager
 {
 public:
     D3D12ResourceManager(D3D12GraphicsDevice* device);

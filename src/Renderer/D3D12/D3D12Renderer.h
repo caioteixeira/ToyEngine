@@ -1,7 +1,5 @@
 #pragma once
 #include "../ConstantBufferStructs.h"
-
-#include "../IRenderer.h"
 #include "../../WindowsHeaders.h"
 #include <memory>
 #include "D3D12Device.h"
@@ -9,7 +7,7 @@
 #include "../../EngineCore.h"
 #include "../FramePacket.h"
 
-class D3D12Renderer : IRenderer
+class D3D12Renderer
 {
 public:
     D3D12Renderer();
