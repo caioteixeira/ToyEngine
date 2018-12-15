@@ -1,7 +1,7 @@
 #pragma once
 #include "ECS/entityx.h"
-#include "Renderer/Renderer.h"
 #include "AssetManagement/LevelLoader.h"
+#include "Graphics/Renderer.h"
 
 namespace Engine::ECS
 {

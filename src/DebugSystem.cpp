@@ -1,8 +1,8 @@
 #include "DebugSystem.h"
 #include "../External/imgui/imgui.h"
 #include "Transform.h"
-#include "Renderer/PointLight.h"
-#include "Renderer/Mesh.h"
+#include "Graphics/PointLight.h"
+#include "Graphics/Mesh.h"
 #include "NameComponent.h"
 
 void DebugSystem::Update(entityx::EntityManager& es, entityx::EventManager& events, entityx::TimeDelta dt)

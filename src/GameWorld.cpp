@@ -1,9 +1,10 @@
 #include "GameWorld.h"
-#include "Renderer/RenderingSystem.h"
 #include "Transform.h"
 #include "AssetManagement/JsonUtils.h"
 #include "FPSCameraSystem.h"
 #include "DebugSystem.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/RenderingSystem.h"
 
 using namespace Engine::ECS;
 

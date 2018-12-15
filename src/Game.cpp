@@ -4,6 +4,7 @@
 #include <chrono>
 #include <easy/profiler.h>
 #include "EngineCore.h"
+#include "Graphics/Renderer.h"
 
 using namespace Engine;
 

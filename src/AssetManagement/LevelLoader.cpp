@@ -4,7 +4,7 @@
 #include "../NameComponent.h"
 #include "../Transform.h"
 #include "JsonUtils.h"
-#include "../Renderer/PointLight.h"
+#include "../Graphics/PointLight.h"
 #include "../Camera.h"
 #undef GetObject
 
