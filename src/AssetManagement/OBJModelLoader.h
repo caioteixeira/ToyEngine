@@ -7,14 +7,14 @@
 
 namespace OBJModelLoader
 {
-    struct SubmeshDesc
+    struct MeshDesc
     {
         std::vector<Vertex> vertices;
         std::vector<uint32_t> indices;
         std::string materialName;
     };
 
-    struct MaterialDesc
+    struct PhongMaterialDesc
     {
         std::string name;
         MaterialProperties properties = None;
@@ -28,8 +28,8 @@ namespace OBJModelLoader
         std::string specularTexName = "";
     };
 
-    MaterialDesc LoadMaterial(tinyobj::material_t material);
+    PhongMaterialDesc LoadMaterial(tinyobj::material_t material);
 
-    void LoadObjFile(std::string path, std::vector<SubmeshDesc>& outSubmeshes,
-                     std::vector<MaterialDesc>& outMaterials);
+    void LoadObjFile(std::string path, std::vector<MeshDesc>& outSubmeshes,
+                     std::vector<PhongMaterialDesc>& outMaterials);
 }

@@ -95,8 +95,8 @@ void GameWorld::LoadMesh(entityx::Entity rootEntity, rapidjson::Value& value)
         return;
     }
 
-    std::vector<OBJModelLoader::MaterialDesc> materialMap;
-    std::vector<OBJModelLoader::SubmeshDesc> subMeshDescriptors;
+    std::vector<OBJModelLoader::PhongMaterialDesc> materialMap;
+    std::vector<OBJModelLoader::MeshDesc> subMeshDescriptors;
     LoadObjFile(modelPath, subMeshDescriptors, materialMap);
 
     std::unordered_map<std::string, MaterialPtr> materials;

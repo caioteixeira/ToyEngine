@@ -19,7 +19,7 @@ D3D12ResourceManager::~D3D12ResourceManager()
 {
 }
 
-MeshGeometryPtr D3D12ResourceManager::LoadMeshGeometry(OBJModelLoader::SubmeshDesc meshData) const
+MeshGeometryPtr D3D12ResourceManager::LoadMeshGeometry(OBJModelLoader::MeshDesc meshData) const
 {
     auto vertexBuffer = mDevice->CreateGraphicsBuffer("Vertex Buffer", meshData.vertices.size(), sizeof(Vertex),
                                                       meshData.vertices.data());
@@ -48,7 +48,7 @@ TextureHandle D3D12ResourceManager::GetTexture(const std::string& path)
     return texture;
 }
 
-MaterialPtr D3D12ResourceManager::CreatePhongMaterial(OBJModelLoader::MaterialDesc& desc)
+MaterialPtr D3D12ResourceManager::CreatePhongMaterial(OBJModelLoader::PhongMaterialDesc& desc)
 {
     auto material = std::make_shared<Material>();
     material->ambientColor = desc.ambient;

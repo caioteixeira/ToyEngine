@@ -9,7 +9,7 @@
 
 using namespace Engine;
 
-void LoadShape(std::vector<OBJModelLoader::SubmeshDesc>& submeshes, tinyobj::attrib_t& attrib,
+void LoadShape(std::vector<OBJModelLoader::MeshDesc>& submeshes, tinyobj::attrib_t& attrib,
                const tinyobj::shape_t& shape,
                std::vector<tinyobj::material_t>& materials)
 {
@@ -20,7 +20,7 @@ void LoadShape(std::vector<OBJModelLoader::SubmeshDesc>& submeshes, tinyobj::att
     {
         if (materialToShapeMap.find(materialId) == materialToShapeMap.end())
         {
-            OBJModelLoader::SubmeshDesc desc;
+            OBJModelLoader::MeshDesc desc;
             desc.materialName = materials[materialId].name;
 
             int pos = submeshes.size();
@@ -70,9 +70,9 @@ void LoadShape(std::vector<OBJModelLoader::SubmeshDesc>& submeshes, tinyobj::att
     }
 }
 
-OBJModelLoader::MaterialDesc OBJModelLoader::LoadMaterial(tinyobj::material_t material)
+OBJModelLoader::PhongMaterialDesc OBJModelLoader::LoadMaterial(tinyobj::material_t material)
 {
-    MaterialDesc data;
+    PhongMaterialDesc data;
     data.name = material.name;
 
     data.properties = material.illum == 1 ? Diffuse : None;
@@ -87,8 +87,8 @@ OBJModelLoader::MaterialDesc OBJModelLoader::LoadMaterial(tinyobj::material_t ma
     return data;
 }
 
-void OBJModelLoader::LoadObjFile(std::string path, std::vector<SubmeshDesc>& outSubmeshes,
-                                 std::vector<MaterialDesc>& outMaterials)
+void OBJModelLoader::LoadObjFile(std::string path, std::vector<MeshDesc>& outSubmeshes,
+                                 std::vector<PhongMaterialDesc>& outMaterials)
 {
     EASY_FUNCTION();
 
