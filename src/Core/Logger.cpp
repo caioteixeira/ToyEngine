@@ -1,4 +1,5 @@
 #include "Logger.h"
+#include "../WindowsHeaders.h"
 #include "../Math.h"
 
 void Logger::DebugLog(const char* format, ...)

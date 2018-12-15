@@ -1,69 +1,15 @@
 #include "GameWorld.h"
 #include "Renderer/RenderingSystem.h"
 #include "Transform.h"
-#include "Camera.h"
-#include "Renderer/PointLight.h"
 #include "AssetManagement/JsonUtils.h"
-#include "Math.h"
 #include "FPSCameraSystem.h"
 #include "DebugSystem.h"
 
 using namespace Engine::ECS;
 
-static void LoadTransform(entityx::Entity entity, rapidjson::Value& value)
-{
-    auto transform = entity.Assign<Transform>();
-
-    Vector3 position;
-    GetVectorFromJSON(value, "position", position);
-    transform->position = position;
-
-    Vector3 scale;
-    if(GetVectorFromJSON(value, "scale", scale))
-    {
-        transform->scale = scale;
-    }
-}
-
-static void LoadPointLight(entityx::Entity entity, rapidjson::Value& value)
-{
-    Vector3 diffuse;
-    GetVectorFromJSON(value, "diffuse", diffuse);
-
-    float innerRadius;
-    GetFloatFromJSON(value, "innerRadius", innerRadius);
-
-    float outerRadius;
-    GetFloatFromJSON(value, "outerRadius", outerRadius);
-
-    auto pointLight = entity.Assign<PointLight>();
-    pointLight->diffuse = diffuse;
-    pointLight->innerRadius = innerRadius;
-    pointLight->outerRadius = outerRadius;
-}
-
-static void LoadCamera(entityx::Entity entity, rapidjson::Value& value)
-{
-    const auto windowWidth = CVar::Get("windowWidth")->intValue;
-    const auto windowHeight = CVar::Get("windowHeight")->intValue;
-
-    float nearPlane;
-    GetFloatFromJSON(value, "nearPlane", nearPlane);
-
-    float farPlane;
-    GetFloatFromJSON(value, "farPlane", farPlane);
-
-    auto aspectRatio = static_cast<float>(windowWidth) / windowHeight;
-    entity.Assign<Camera>(nearPlane, farPlane, aspectRatio, 0.25f * Math::PI);
-}
-
 GameWorld::GameWorld(): 
     mLevelLoader(entities)
 {
-    mLevelLoader.RegisterComponentLoader("transform", LoadTransform);
-    mLevelLoader.RegisterComponentLoader("pointLight", LoadPointLight);
-    mLevelLoader.RegisterComponentLoader("camera", LoadCamera);
-
     //FIXME: Refactor to use static method
     mLevelLoader.RegisterComponentLoader("mesh", 
         [this](entityx::Entity entity, auto& value){

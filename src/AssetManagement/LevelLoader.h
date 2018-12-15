@@ -18,6 +18,7 @@ namespace Engine
         void RegisterComponentLoader(std::string, ComponentLoaderFunc);
     private:
         void LoadEntities(rapidjson::GenericValue<rapidjson::UTF8<>>::Array& array);
+        void InitDefaultLoaders();
 
         entityx::EntityManager& mEntityManager;
         std::unordered_map<std::string, ComponentLoaderFunc> mLoaderMap;

@@ -2,12 +2,65 @@
 #include "../EngineCore.h"
 #include <fstream>
 #include "../NameComponent.h"
+#include "../Transform.h"
+#include "JsonUtils.h"
+#include "../Renderer/PointLight.h"
+#include "../Camera.h"
+#undef GetObject
 
 Engine::LevelLoader::LevelLoader(entityx::EntityManager& manager)
     : mEntityManager(manager)
 {
-    
+    InitDefaultLoaders();
 }
+
+static void LoadTransform(entityx::Entity entity, rapidjson::Value& value)
+{
+    auto transform = entity.Assign<Transform>();
+
+    Vector3 position;
+    GetVectorFromJSON(value, "position", position);
+    transform->position = position;
+
+    Vector3 scale;
+    if (GetVectorFromJSON(value, "scale", scale))
+    {
+        transform->scale = scale;
+    }
+}
+
+static void LoadPointLight(entityx::Entity entity, rapidjson::Value& value)
+{
+    Vector3 diffuse;
+    GetVectorFromJSON(value, "diffuse", diffuse);
+
+    float innerRadius;
+    GetFloatFromJSON(value, "innerRadius", innerRadius);
+
+    float outerRadius;
+    GetFloatFromJSON(value, "outerRadius", outerRadius);
+
+    auto pointLight = entity.Assign<PointLight>();
+    pointLight->diffuse = diffuse;
+    pointLight->innerRadius = innerRadius;
+    pointLight->outerRadius = outerRadius;
+}
+
+static void LoadCamera(entityx::Entity entity, rapidjson::Value& value)
+{
+    const auto windowWidth = Engine::CVar::Get("windowWidth")->intValue;
+    const auto windowHeight = Engine::CVar::Get("windowHeight")->intValue;
+
+    float nearPlane;
+    GetFloatFromJSON(value, "nearPlane", nearPlane);
+
+    float farPlane;
+    GetFloatFromJSON(value, "farPlane", farPlane);
+
+    auto aspectRatio = static_cast<float>(windowWidth) / windowHeight;
+    entity.Assign<Camera>(nearPlane, farPlane, aspectRatio, 0.25f * Math::PI);
+}
+
 
 void Engine::LevelLoader::Load(const std::string& filename)
 {
@@ -83,6 +136,13 @@ void Engine::LevelLoader::LoadEntities(rapidjson::GenericValue<rapidjson::UTF8<>
             }
         }
     }
+}
+
+void Engine::LevelLoader::InitDefaultLoaders()
+{
+    RegisterComponentLoader("transform", LoadTransform);
+    RegisterComponentLoader("pointLight", LoadPointLight);
+    RegisterComponentLoader("camera", LoadCamera);
 }
 
 void Engine::LevelLoader::RegisterComponentLoader(std::string componentType, ComponentLoaderFunc componentLoader)
