@@ -11,12 +11,11 @@ namespace Engine::ECS
         GameWorld();
         ~GameWorld();
 
-        void Init(std::shared_ptr<Renderer> renderer);
+        void Init();
         void LoadMesh(entityx::Entity rootEntity, rapidjson::Value &);
         void LoadScene(const std::string& path);
         void Update(double deltaTime);
     private:
-        std::shared_ptr<Renderer> mRenderer;
         LevelLoader mLevelLoader;
     };
 }

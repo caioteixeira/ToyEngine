@@ -13,6 +13,9 @@ public:
     D3D12Renderer();
     ~D3D12Renderer();
 
+    D3D12Renderer(D3D12Renderer&) = delete;
+    D3D12Renderer(D3D12Renderer&&) = delete;
+
     bool Init(int width, int height);
     void RenderFrame(FramePacket& framePacket);
     D3D12ResourceManager* GetResourceManager() const;

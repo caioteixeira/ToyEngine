@@ -14,6 +14,7 @@ using namespace Engine;
 
 D3D12Renderer::D3D12Renderer(): mWindow(nullptr), mThreadPool(NUM_THREADS - 1)
 {
+    SDL_Log("Created Renderer!");
 }
 
 

@@ -5,6 +5,7 @@
 #include "DebugSystem.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/RenderingSystem.h"
+#include "Graphics/GraphicsCore.h"
 
 using namespace Engine::ECS;
 
@@ -21,19 +22,17 @@ GameWorld::GameWorld():
 GameWorld::~GameWorld()
 = default;
 
-void GameWorld::Init(std::shared_ptr<Renderer> renderer)
+void GameWorld::Init()
 {
     auto fpsCameraSystem = systems.Add<FPSCameraSystem>();
     auto renderingSystem = systems.Add<RenderingSystem>();
     systems.Add<DebugSystem>();
     systems.Configure();
-    renderingSystem->SetRenderer(renderer);
-    mRenderer = renderer;
 }
 
 void GameWorld::LoadMesh(entityx::Entity rootEntity, rapidjson::Value& value)
 {
-    auto resourceManager = mRenderer->GetResourceManager();
+    auto resourceManager = Graphics::GetRenderer()->GetResourceManager();
 
     std::string modelPath;
 

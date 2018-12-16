@@ -7,20 +7,16 @@
 #include "PointLight.h"
 #include "imgui.h"
 #include "../NameComponent.h"
+#include "GraphicsCore.h"
 
 RenderingSystem::RenderingSystem()
 {
+    mRenderer = Graphics::GetRenderer();
 }
 
 
 RenderingSystem::~RenderingSystem()
-{
-}
-
-void RenderingSystem::SetRenderer(std::shared_ptr<Renderer> renderer)
-{
-    mRenderer = renderer;
-}
+= default;
 
 void RenderingSystem::ShowDebugUI(entityx::EntityManager& es)
 {
