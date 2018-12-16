@@ -5,6 +5,7 @@
 #include <easy/profiler.h>
 #include "EngineCore.h"
 #include "Graphics/Renderer.h"
+#include "Graphics/GraphicsCore.h"
 
 using namespace Engine;
 
@@ -13,8 +14,6 @@ Game::Game():
     , mInput(*this)
     , mShouldQuit(false)
 {
-    mRenderer = std::make_shared<Renderer>();
-
     ConfigSystem::Init();
 }
 
@@ -29,13 +28,7 @@ bool Game::Init()
         Logger::DebugLog("Failed to initialize SDL.");
         return false;
     }
-
-    const auto windowWidth = CVar::Get("windowWidth")->intValue;
-    const auto windowHeight = CVar::Get("windowHeight")->intValue;
-    if (!mRenderer->Init(windowWidth, windowHeight))
-    {
-        Logger::DebugLog("Failed to initialized Renderer.");
-    }
+    Graphics::Init();
 
     StartGame();
 
@@ -73,7 +66,7 @@ void Game::RunLoop()
 
 void Game::StartGame()
 {
-    mWorld.Init(mRenderer);
+    mWorld.Init();
 
     const auto scene = CVar::Get("initialScene");
     assert(scene != nullptr);

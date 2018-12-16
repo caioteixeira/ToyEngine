@@ -12,7 +12,6 @@ namespace Engine::ECS
         ~GameWorld();
 
         void Init();
-        void LoadMesh(entityx::Entity rootEntity, rapidjson::Value &);
         void LoadScene(const std::string& path);
         void Update(double deltaTime);
     private:

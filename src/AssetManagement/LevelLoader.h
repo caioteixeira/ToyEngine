@@ -8,7 +8,7 @@
 
 namespace Engine
 {
-    typedef std::function<void (entityx::Entity, rapidjson::Value&)> ComponentLoaderFunc;
+    typedef std::function<void (entityx::Entity, entityx::EntityManager&, rapidjson::Value&)> ComponentLoaderFunc;
 
     class LevelLoader
     {

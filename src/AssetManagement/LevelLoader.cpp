@@ -6,6 +6,7 @@
 #include "JsonUtils.h"
 #include "../Graphics/PointLight.h"
 #include "../Camera.h"
+#include "../Graphics/GraphicsCore.h"
 #undef GetObject
 
 Engine::LevelLoader::LevelLoader(entityx::EntityManager& manager)
@@ -14,7 +15,7 @@ Engine::LevelLoader::LevelLoader(entityx::EntityManager& manager)
     InitDefaultLoaders();
 }
 
-static void LoadTransform(entityx::Entity entity, rapidjson::Value& value)
+static void LoadTransform(entityx::Entity entity, entityx::EntityManager& entityManager, rapidjson::Value& value)
 {
     auto transform = entity.Assign<Transform>();
 
@@ -29,7 +30,7 @@ static void LoadTransform(entityx::Entity entity, rapidjson::Value& value)
     }
 }
 
-static void LoadPointLight(entityx::Entity entity, rapidjson::Value& value)
+static void LoadPointLight(entityx::Entity entity, entityx::EntityManager& entityManager, rapidjson::Value& value)
 {
     Vector3 diffuse;
     GetVectorFromJSON(value, "diffuse", diffuse);
@@ -46,7 +47,7 @@ static void LoadPointLight(entityx::Entity entity, rapidjson::Value& value)
     pointLight->outerRadius = outerRadius;
 }
 
-static void LoadCamera(entityx::Entity entity, rapidjson::Value& value)
+static void LoadCamera(entityx::Entity entity, entityx::EntityManager& entityManager, rapidjson::Value& value)
 {
     const auto windowWidth = Engine::CVar::Get("windowWidth")->intValue;
     const auto windowHeight = Engine::CVar::Get("windowHeight")->intValue;
@@ -59,6 +60,40 @@ static void LoadCamera(entityx::Entity entity, rapidjson::Value& value)
 
     auto aspectRatio = static_cast<float>(windowWidth) / windowHeight;
     entity.Assign<Camera>(nearPlane, farPlane, aspectRatio, 0.25f * Math::PI);
+}
+
+static void LoadMesh(entityx::Entity entity, entityx::EntityManager& entityManager, rapidjson::Value& value)
+{
+    //TODO: Add submeshes as children
+
+    auto resourceManager = Graphics::GetRenderer()->GetResourceManager();
+
+    std::string modelPath;
+
+    if (!GetStringFromJSON(value, "modelPath", modelPath))
+    {
+        return;
+    }
+
+    std::vector<OBJModelLoader::PhongMaterialDesc> materialMap;
+    std::vector<OBJModelLoader::MeshDesc> subMeshDescriptors;
+    LoadObjFile(modelPath, subMeshDescriptors, materialMap);
+
+    std::unordered_map<std::string, MaterialPtr> materials;
+    for (auto material : materialMap)
+    {
+        const auto materialHandle = resourceManager->CreatePhongMaterial(material);
+        materials[material.name] = materialHandle;
+    }
+
+    for (auto& descriptor : subMeshDescriptors)
+    {
+        auto mesh = resourceManager->LoadMeshGeometry(descriptor);
+
+        entityx::Entity meshEntity = entityManager.Create();
+        meshEntity.Assign<MeshRenderer>(mesh, materials[descriptor.materialName]);
+        meshEntity.Assign<Transform>();
+    }
 }
 
 
@@ -131,7 +166,7 @@ void Engine::LevelLoader::LoadEntities(rapidjson::GenericValue<rapidjson::UTF8<>
                     }
 
                     auto& loader = mLoaderMap[type];
-                    loader(entity, componentItr->GetObject()["properties"]);
+                    loader(entity, mEntityManager, componentItr->GetObject()["properties"]);
                 }
             }
         }
@@ -143,6 +178,7 @@ void Engine::LevelLoader::InitDefaultLoaders()
     RegisterComponentLoader("transform", LoadTransform);
     RegisterComponentLoader("pointLight", LoadPointLight);
     RegisterComponentLoader("camera", LoadCamera);
+    RegisterComponentLoader("mesh", LoadMesh);
 }
 
 void Engine::LevelLoader::RegisterComponentLoader(std::string componentType, ComponentLoaderFunc componentLoader)
