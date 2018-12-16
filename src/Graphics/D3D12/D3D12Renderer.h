@@ -38,6 +38,4 @@ private:
     SDL_Window* mWindow;
     int mWidth = 0;
     int mHeight = 0;
-
-    Engine::Core::WorkerPool mThreadPool;
 };
