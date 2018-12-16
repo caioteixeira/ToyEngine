@@ -12,7 +12,7 @@ class D3D12ResourceManager
 public:
     explicit D3D12ResourceManager(D3D12GraphicsDevice* device);
     ~D3D12ResourceManager();
-    MeshGeometryPtr LoadMeshGeometry(OBJModelLoader::MeshDesc meshData) const;
+    MeshGeometryPtr LoadMeshGeometry(OBJModelLoader::MeshDesc& meshData) const;
     MaterialPtr CreatePhongMaterial(OBJModelLoader::PhongMaterialDesc& desc);
     TextureHandle GetTexture(const std::string& path);
 

@@ -66,7 +66,7 @@ static void LoadMesh(entityx::Entity entity, entityx::EntityManager& entityManag
 {
     //TODO: Add submeshes as children
 
-    auto resourceManager = Graphics::GetRenderer()->GetResourceManager();
+    const auto resourceManager = Graphics::GetResourcesManager();
 
     std::string modelPath;
 

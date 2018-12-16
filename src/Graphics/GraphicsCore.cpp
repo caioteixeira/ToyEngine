@@ -1,6 +1,7 @@
 #include "GraphicsCore.h"
 
 std::unique_ptr<Renderer> Graphics::mRenderer = nullptr;
+std::unique_ptr<GraphicsResourcesManager> Graphics::mResourcesManager = nullptr;
 
 void Graphics::Init()
 {
@@ -12,9 +13,16 @@ void Graphics::Init()
     {
         Logger::DebugLog("Failed to initialized Renderer.");
     }
+
+    mResourcesManager = std::make_unique<GraphicsResourcesManager>(mRenderer->GetResourceManager());
 }
 
 Renderer* Graphics::GetRenderer()
 {
     return mRenderer.get();
+}
+
+GraphicsResourcesManager* Graphics::GetResourcesManager()
+{
+    return mResourcesManager.get();
 }

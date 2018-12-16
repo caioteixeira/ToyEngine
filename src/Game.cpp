@@ -19,6 +19,7 @@ Game::Game():
 
 Game::~Game()
 {
+    SDL_Quit();
 }
 
 bool Game::Init()

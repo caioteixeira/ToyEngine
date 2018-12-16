@@ -19,7 +19,7 @@ D3D12ResourceManager::~D3D12ResourceManager()
 {
 }
 
-MeshGeometryPtr D3D12ResourceManager::LoadMeshGeometry(OBJModelLoader::MeshDesc meshData) const
+MeshGeometryPtr D3D12ResourceManager::LoadMeshGeometry(OBJModelLoader::MeshDesc& meshData) const
 {
     auto vertexBuffer = mDevice->CreateGraphicsBuffer("Vertex Buffer", meshData.vertices.size(), sizeof(Vertex),
                                                       meshData.vertices.data());
