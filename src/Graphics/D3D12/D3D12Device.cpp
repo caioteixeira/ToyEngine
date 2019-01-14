@@ -87,15 +87,9 @@ ComPtr<ID3D12RootSignature> D3D12GraphicsDevice::CreateRootSignature(CD3DX12_ROO
 GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string& name, size_t numElements,
                                                             size_t elementSize, const void* initialData) const
 {
-    auto buffer = std::make_shared<GraphicsBuffer>();
-    buffer->elementSize = elementSize;
-    buffer->numElements = numElements;
-
-    auto resource = std::make_shared<GraphicsResource>();
+    auto resource = std::make_unique<GraphicsResource>();
     resource->bufferSize = numElements * elementSize;
     resource->state = D3D12_RESOURCE_STATE_COMMON;
-
-    buffer->resource = resource;
 
     //Allocate buffer
     D3D12_HEAP_PROPERTIES heapProperties;
@@ -155,6 +149,10 @@ GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string& n
         context->Finish(true);
     }
 
+    auto buffer = std::make_shared<GraphicsBuffer>();
+    buffer->elementSize = elementSize;
+    buffer->numElements = numElements;
+    buffer->resource = std::move(resource);
     return buffer;
 }
 

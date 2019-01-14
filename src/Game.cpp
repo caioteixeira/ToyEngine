@@ -10,8 +10,7 @@
 using namespace Engine;
 
 Game::Game():
-    mWorld()
-    , mInput(*this)
+    mInput(*this)
     , mShouldQuit(false)
 {
     ConfigSystem::Init();

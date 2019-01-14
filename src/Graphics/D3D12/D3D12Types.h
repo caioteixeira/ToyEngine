@@ -62,7 +62,7 @@ struct GraphicsResource
     D3D12_RESOURCE_STATES state;
 };
 
-typedef std::shared_ptr<GraphicsResource> GraphicsResourcePtr;
+typedef std::unique_ptr<GraphicsResource> GraphicsResourcePtr;
 
 struct GraphicsBuffer
 {
@@ -95,7 +95,14 @@ struct GraphicsTexture
 {
     GraphicsTexture()
     {
-        resource = std::make_shared<GraphicsResource>();
+        resource = std::make_unique<GraphicsResource>();
+    }
+
+    GraphicsTexture(GraphicsTexture&) = delete;
+    GraphicsTexture(GraphicsTexture&& other) noexcept
+    {
+        resource = std::move(other.resource);
+        descriptor = std::move(other.descriptor);
     }
 
     GraphicsResourcePtr resource;

@@ -41,7 +41,7 @@ uint64_t D3D12CommandContext::Finish(bool waitCompletion)
     return fenceValue;
 }
 
-void D3D12CommandContext::CopyBuffer(GraphicsResourcePtr dest, GraphicsResourcePtr src)
+void D3D12CommandContext::CopyBuffer(GraphicsResourcePtr& dest, GraphicsResourcePtr& src)
 {
     TransitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST);
     TransitionResource(src, D3D12_RESOURCE_STATE_COPY_SOURCE);
@@ -186,7 +186,7 @@ void D3D12CommandContext::TransitionResource(ID3D12Resource* resource, D3D12_RES
     mCommandList->ResourceBarrier(1, &barrierDesc);
 }
 
-void D3D12CommandContext::TransitionResource(GraphicsResourcePtr resource, D3D12_RESOURCE_STATES state)
+void D3D12CommandContext::TransitionResource(GraphicsResourcePtr& resource, D3D12_RESOURCE_STATES state)
 {
     TransitionResource(resource->buffer.Get(), resource->state, state);
     resource->state = state;
