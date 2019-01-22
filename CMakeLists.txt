@@ -83,6 +83,7 @@ set(IMPORT_INCLUDES
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.cc")
 file(GLOB_RECURSE HEADERS "src/*.h" "src/*.inl")
 
+add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
 add_executable(ToyEngine ${SOURCES} ${HEADERS})
 
 set_target_properties(ToyEngine PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")

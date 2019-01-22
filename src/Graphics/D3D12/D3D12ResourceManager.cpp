@@ -287,12 +287,12 @@ TextureHandle D3D12ResourceManager::CreateTextureFromFile(const char* inFileName
     mDevice->GetDevice()->CreateShaderResourceView(buffer.Get(), &srvDesc, hDescriptor);
 
     //Fill texture object
-    auto resource = std::make_unique<GraphicsResource>();
-    resource->buffer = std::move(buffer);
-    resource->state = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    GraphicsResource resource;
+    resource.buffer = buffer;
+    resource.state = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 
     GraphicsTexture texture;
-    texture.resource = std::move(resource);
+    texture.resource = resource;
     texture.descriptor = std::move(descriptorHeap);
 
     const auto index = mTextures.size();

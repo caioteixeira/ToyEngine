@@ -62,29 +62,27 @@ struct GraphicsResource
     D3D12_RESOURCE_STATES state;
 };
 
-typedef std::unique_ptr<GraphicsResource> GraphicsResourcePtr;
-
 struct GraphicsBuffer
 {
-    GraphicsResourcePtr resource = nullptr;
+    GraphicsResource resource;
     size_t elementSize;
     size_t numElements;
 
     D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView()
     {
         D3D12_VERTEX_BUFFER_VIEW view;
-        view.BufferLocation = resource->buffer->GetGPUVirtualAddress();
+        view.BufferLocation = resource.buffer->GetGPUVirtualAddress();
         view.StrideInBytes = static_cast<UINT>(elementSize);
-        view.SizeInBytes = static_cast<UINT>(resource->bufferSize);
+        view.SizeInBytes = static_cast<UINT>(resource.bufferSize);
         return view;
     };
 
     D3D12_INDEX_BUFFER_VIEW GetIndexBufferView()
     {
         D3D12_INDEX_BUFFER_VIEW view;
-        view.BufferLocation = resource->buffer->GetGPUVirtualAddress();
+        view.BufferLocation = resource.buffer->GetGPUVirtualAddress();
         view.Format = DXGI_FORMAT_R32_UINT;
-        view.SizeInBytes = static_cast<UINT>(resource->bufferSize);
+        view.SizeInBytes = static_cast<UINT>(resource.bufferSize);
         return view;
     };
 };
@@ -95,7 +93,6 @@ struct GraphicsTexture
 {
     GraphicsTexture()
     {
-        resource = std::make_unique<GraphicsResource>();
     }
 
     GraphicsTexture(GraphicsTexture&) = delete;
@@ -105,7 +102,7 @@ struct GraphicsTexture
         descriptor = std::move(other.descriptor);
     }
 
-    GraphicsResourcePtr resource;
+    GraphicsResource resource;
     //CPU visible discriptor heap, this should not be binded directly to the pipeline, 
     // but copied to the GPU visible heap every frame
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptor;

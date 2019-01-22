@@ -41,7 +41,7 @@ uint64_t D3D12CommandContext::Finish(bool waitCompletion)
     return fenceValue;
 }
 
-void D3D12CommandContext::CopyBuffer(GraphicsResourcePtr& dest, GraphicsResourcePtr& src)
+void D3D12CommandContext::CopyBuffer(GraphicsResource* dest, GraphicsResource* src)
 {
     TransitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST);
     TransitionResource(src, D3D12_RESOURCE_STATE_COPY_SOURCE);
@@ -128,9 +128,9 @@ void D3D12CommandContext::SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Descrip
 
 void D3D12CommandContext::SetIndexBuffer(const GraphicsBufferPtr buffer)
 {
-    if (buffer->resource->state != D3D12_RESOURCE_STATE_INDEX_BUFFER)
+    if (buffer->resource.state != D3D12_RESOURCE_STATE_INDEX_BUFFER)
     {
-        TransitionResource(buffer->resource, D3D12_RESOURCE_STATE_INDEX_BUFFER);
+        TransitionResource(&buffer->resource, D3D12_RESOURCE_STATE_INDEX_BUFFER);
     }
     auto view = buffer->GetIndexBufferView();
     mCommandList->IASetIndexBuffer(&view);
@@ -138,9 +138,9 @@ void D3D12CommandContext::SetIndexBuffer(const GraphicsBufferPtr buffer)
 
 void D3D12CommandContext::SetVertexBuffer(const GraphicsBufferPtr buffer)
 {
-    if (buffer->resource->state != D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER)
+    if (buffer->resource.state != D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER)
     {
-        TransitionResource(buffer->resource, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+        TransitionResource(&buffer->resource, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
     }
     auto view = buffer->GetVertexBufferView();
     mCommandList->IASetVertexBuffers(0, 1, &view);
@@ -186,7 +186,7 @@ void D3D12CommandContext::TransitionResource(ID3D12Resource* resource, D3D12_RES
     mCommandList->ResourceBarrier(1, &barrierDesc);
 }
 
-void D3D12CommandContext::TransitionResource(GraphicsResourcePtr& resource, D3D12_RESOURCE_STATES state)
+void D3D12CommandContext::TransitionResource(GraphicsResource* resource, D3D12_RESOURCE_STATES state)
 {
     TransitionResource(resource->buffer.Get(), resource->state, state);
     resource->state = state;

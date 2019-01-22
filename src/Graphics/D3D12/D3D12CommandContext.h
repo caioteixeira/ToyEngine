@@ -25,7 +25,7 @@ public:
     uint64_t Flush(bool waitCompletion = false);
     uint64_t Finish(bool waitCompletion = false);
 
-    void CopyBuffer(GraphicsResourcePtr& dest, GraphicsResourcePtr& src);
+    void CopyBuffer(GraphicsResource* dest, GraphicsResource* src);
     DynamicAllocation ReserveUploadMemory(size_t sizeInBytes);
 
     void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle, Color& clearColor);
@@ -56,7 +56,7 @@ public:
 
     void TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES stateBefore,
                             D3D12_RESOURCE_STATES stateAfter);
-    void TransitionResource(GraphicsResourcePtr& resource, D3D12_RESOURCE_STATES state);
+    void TransitionResource(GraphicsResource* resource, D3D12_RESOURCE_STATES state);
 
     ID3D12GraphicsCommandList* GetCommandList() { return mCommandList; }
 

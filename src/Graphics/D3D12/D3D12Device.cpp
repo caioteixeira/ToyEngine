@@ -87,9 +87,9 @@ ComPtr<ID3D12RootSignature> D3D12GraphicsDevice::CreateRootSignature(CD3DX12_ROO
 GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string& name, size_t numElements,
                                                             size_t elementSize, const void* initialData) const
 {
-    auto resource = std::make_unique<GraphicsResource>();
-    resource->bufferSize = numElements * elementSize;
-    resource->state = D3D12_RESOURCE_STATE_COMMON;
+    GraphicsResource resource;
+    resource.bufferSize = numElements * elementSize;
+    resource.state = D3D12_RESOURCE_STATE_COMMON;
 
     //Allocate buffer
     D3D12_HEAP_PROPERTIES heapProperties;
@@ -110,10 +110,10 @@ GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string& n
     desc.MipLevels = 1;
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
-    desc.Width = (UINT64)resource->bufferSize;
+    desc.Width = (UINT64)resource.bufferSize;
 
     auto result = mDevice->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &desc,
-                                                   resource->state, nullptr, IID_PPV_ARGS(&resource->buffer));
+                                                   resource.state, nullptr, IID_PPV_ARGS(&resource.buffer));
     ThrowIfFailed(result, "ERROR! Failed to initialize buffer");
 
     //Copies initial data
@@ -138,13 +138,13 @@ GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string& n
         auto context = mCommandListManager->AllocateContext();
         void* dest;
         ThrowIfFailed(uploadBuffer->Map(0, nullptr, &dest));
-        memcpy(dest, initialData, resource->bufferSize);
+        memcpy(dest, initialData, resource.bufferSize);
         uploadBuffer->Unmap(0, nullptr);
 
-        context->TransitionResource(resource, D3D12_RESOURCE_STATE_COPY_DEST);
-        context->GetCommandList()->CopyBufferRegion(resource->buffer.Get(), 0, uploadBuffer.Get(), 0,
-                                                    resource->bufferSize);
-        context->TransitionResource(resource, D3D12_RESOURCE_STATE_GENERIC_READ);
+        context->TransitionResource(&resource, D3D12_RESOURCE_STATE_COPY_DEST);
+        context->GetCommandList()->CopyBufferRegion(resource.buffer.Get(), 0, uploadBuffer.Get(), 0,
+                                                    resource.bufferSize);
+        context->TransitionResource(&resource, D3D12_RESOURCE_STATE_GENERIC_READ);
 
         context->Finish(true);
     }
@@ -152,7 +152,7 @@ GraphicsBufferPtr D3D12GraphicsDevice::CreateGraphicsBuffer(const std::string& n
     auto buffer = std::make_shared<GraphicsBuffer>();
     buffer->elementSize = elementSize;
     buffer->numElements = numElements;
-    buffer->resource = std::move(resource);
+    buffer->resource = resource;
     return buffer;
 }
 
