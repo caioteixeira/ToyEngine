@@ -7,7 +7,7 @@
 struct MeshElement
 {
     Matrix worldTransform;
-    MeshGeometryPtr geometry;
+    MeshGeometry geometry;
     MaterialPtr material;
 };
 

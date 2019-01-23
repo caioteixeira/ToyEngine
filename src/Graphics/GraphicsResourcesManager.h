@@ -15,7 +15,7 @@ namespace Engine
     public:
         explicit GraphicsResourcesManager(D3D12ResourceManager* resourceManager);
         ~GraphicsResourcesManager() = default;
-        MeshGeometryPtr LoadMeshGeometry(OBJModelLoader::MeshDesc& meshData) const;
+        MeshGeometry LoadMeshGeometry(OBJModelLoader::MeshDesc& meshData) const;
         MaterialPtr CreatePhongMaterial(OBJModelLoader::PhongMaterialDesc& desc) const;
         TextureHandle GetTexture(const std::string& path) const;
     private:

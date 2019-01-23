@@ -4,8 +4,8 @@
 
 struct MeshRenderer
 {
-    MeshRenderer(const MeshGeometryPtr& geometry, const MaterialPtr& material) : geometry(geometry), material(material) {}
-    MeshGeometryPtr geometry;
+    MeshRenderer(const MeshGeometry& geometry, const MaterialPtr& material) : geometry(geometry), material(material) {}
+    MeshGeometry geometry;
     MaterialPtr material;
 };
 

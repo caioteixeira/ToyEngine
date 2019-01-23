@@ -2,7 +2,7 @@
 
 #include "D3D12/D3D12Types.h"
 
-struct GraphicBufferHandle
+struct GraphicsBufferHandle
 {
     uint32_t value;
 };

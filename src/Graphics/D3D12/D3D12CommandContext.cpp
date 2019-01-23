@@ -126,7 +126,7 @@ void D3D12CommandContext::SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Descrip
     SetDescriptorHeap(heap.Get());
 }
 
-void D3D12CommandContext::SetIndexBuffer(const GraphicsBufferPtr buffer)
+void D3D12CommandContext::SetIndexBuffer(GraphicsBuffer* buffer)
 {
     if (buffer->resource.state != D3D12_RESOURCE_STATE_INDEX_BUFFER)
     {
@@ -136,7 +136,7 @@ void D3D12CommandContext::SetIndexBuffer(const GraphicsBufferPtr buffer)
     mCommandList->IASetIndexBuffer(&view);
 }
 
-void D3D12CommandContext::SetVertexBuffer(const GraphicsBufferPtr buffer)
+void D3D12CommandContext::SetVertexBuffer(GraphicsBuffer* buffer)
 {
     if (buffer->resource.state != D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER)
     {

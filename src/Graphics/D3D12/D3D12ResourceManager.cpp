@@ -19,17 +19,17 @@ D3D12ResourceManager::~D3D12ResourceManager()
 {
 }
 
-MeshGeometryPtr D3D12ResourceManager::LoadMeshGeometry(OBJModelLoader::MeshDesc& meshData) const
+MeshGeometry D3D12ResourceManager::LoadMeshGeometry(OBJModelLoader::MeshDesc& meshData)
 {
-    auto vertexBuffer = mDevice->CreateGraphicsBuffer("Vertex Buffer", meshData.vertices.size(), sizeof(Vertex),
+    const auto vertexBuffer = CreateGraphicsBuffer("Vertex Buffer", meshData.vertices.size(), sizeof(Vertex),
                                                       meshData.vertices.data());
-    auto indexBuffer = mDevice->CreateGraphicsBuffer("Index Buffer", meshData.indices.size(), sizeof(uint32_t),
+    const auto indexBuffer = CreateGraphicsBuffer("Index Buffer", meshData.indices.size(), sizeof(uint32_t),
                                                      meshData.indices.data());
 
-    auto geo = std::make_shared<MeshGeometry>(vertexBuffer, indexBuffer,
-                                         static_cast<int>(meshData.indices.size()));
-
-    return geo;
+    MeshGeometry geometry;
+    geometry.VertexBuffer = vertexBuffer;
+    geometry.IndexBuffer = indexBuffer;
+    return geometry;
 }
 
 TextureHandle D3D12ResourceManager::GetTexture(const std::string& path)
@@ -323,4 +323,85 @@ GraphicsTexture * D3D12ResourceManager::GetTexture(const TextureHandle handle)
 PipelineState* D3D12ResourceManager::GetPipelineState(const PipelineStateHandle handle)
 {
     return &mPipelinesStates[handle.value];
+}
+
+GraphicsBufferHandle D3D12ResourceManager::CreateGraphicsBuffer(const std::string& name, size_t numElements,
+    SIZE_T elementSize, const void* initialData)
+{
+    GraphicsResource resource;
+    resource.bufferSize = numElements * elementSize;
+    resource.state = D3D12_RESOURCE_STATE_COMMON;
+
+    //Allocate buffer
+    D3D12_HEAP_PROPERTIES heapProperties;
+    heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+    heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    heapProperties.CreationNodeMask = 1;
+    heapProperties.VisibleNodeMask = 1;
+
+    D3D12_RESOURCE_DESC desc = {};
+    desc.Alignment = 0;
+    desc.DepthOrArraySize = 1;
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+    desc.Format = DXGI_FORMAT_UNKNOWN;
+    desc.Height = 1;
+    desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    desc.MipLevels = 1;
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
+    desc.Width = (UINT64)resource.bufferSize;
+
+    const auto result = mDevice->GetDevice()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &desc,
+        resource.state, nullptr, IID_PPV_ARGS(&resource.buffer));
+    ThrowIfFailed(result, "ERROR! Failed to initialize buffer");
+
+    //Copies initial data
+    if (initialData)
+    {
+        //Allocate buffer
+        D3D12_HEAP_PROPERTIES UploadHeapProps;
+        UploadHeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+        UploadHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        UploadHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        UploadHeapProps.CreationNodeMask = 1;
+        UploadHeapProps.VisibleNodeMask = 1;
+
+        desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+        Microsoft::WRL::ComPtr<ID3D12Resource> uploadBuffer;
+        auto hr = mDevice->GetDevice()->CreateCommittedResource(&UploadHeapProps, D3D12_HEAP_FLAG_NONE,
+            &desc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+            IID_PPV_ARGS(&uploadBuffer));
+        ThrowIfFailed(hr);
+
+        auto context = mDevice->GetCommandContextManager()->AllocateContext();
+        void* dest;
+        ThrowIfFailed(uploadBuffer->Map(0, nullptr, &dest));
+        memcpy(dest, initialData, resource.bufferSize);
+        uploadBuffer->Unmap(0, nullptr);
+
+        context->TransitionResource(&resource, D3D12_RESOURCE_STATE_COPY_DEST);
+        context->GetCommandList()->CopyBufferRegion(resource.buffer.Get(), 0, uploadBuffer.Get(), 0,
+            resource.bufferSize);
+        context->TransitionResource(&resource, D3D12_RESOURCE_STATE_GENERIC_READ);
+
+        context->Finish(true);
+    }
+
+    GraphicsBuffer buffer;
+    buffer.elementSize = elementSize;
+    buffer.numElements = numElements;
+    buffer.resource = resource;
+
+    GraphicsBufferHandle handle;
+    handle.value = mGraphicsBuffers.size();
+    mGraphicsBuffers.push_back(buffer);
+    return handle;
+}
+
+GraphicsBuffer* D3D12ResourceManager::GetGraphicsBuffer(const GraphicsBufferHandle handle)
+{
+    return &mGraphicsBuffers[handle.value];
 }

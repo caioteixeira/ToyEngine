@@ -42,8 +42,8 @@ public:
     void SetDescriptorHeap(ID3D12DescriptorHeap* heap);
     void SetDynamicDescriptorHeap();
 
-    void SetIndexBuffer(const GraphicsBufferPtr buffer);
-    void SetVertexBuffer(const GraphicsBufferPtr buffer);
+    void SetIndexBuffer(GraphicsBuffer* buffer);
+    void SetVertexBuffer(GraphicsBuffer* buffer);
     void SetPrimitiveTopology(EPrimitiveTopology topology);
 
     void SetViewport(const D3D12_VIEWPORT& viewport);

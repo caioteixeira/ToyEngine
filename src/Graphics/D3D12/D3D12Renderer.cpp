@@ -103,15 +103,17 @@ void inline D3D12Renderer::RenderMesh(D3D12CommandContext* context, const Dynami
     memcpy(materialCB.CPUAddress, &materialConstants, sizeof(MaterialConstants));
 
     const auto geometry = element.geometry;
-    context->SetIndexBuffer(geometry->GetIndexBuffer());
-    context->SetVertexBuffer(geometry->GetVertexBuffer());
+    const auto indexBuffer = mResourceManager->GetGraphicsBuffer(geometry.IndexBuffer);
+    const auto vertexBuffer = mResourceManager->GetGraphicsBuffer(geometry.VertexBuffer);
+    context->SetIndexBuffer(indexBuffer);
+    context->SetVertexBuffer(vertexBuffer);
     context->SetPrimitiveTopology(EPT_TriangleList);
 
     context->SetGraphicsRootConstantBufferView(1, globalCB.GPUAddress);
     context->SetGraphicsRootConstantBufferView(2, objectCB.GPUAddress);
     context->SetGraphicsRootConstantBufferView(3, materialCB.GPUAddress);
 
-    context->DrawIndexed(geometry->indexCount, 0);
+    context->DrawIndexed(indexBuffer->numElements, 0);
 }
 
 void D3D12Renderer::RenderFrame(FramePacket& framePacket)

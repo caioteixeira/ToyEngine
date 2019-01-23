@@ -4,6 +4,7 @@
 #include "../../AssetManagement/OBJModelLoader.h"
 #include "d3dx12.h"
 #include "../MeshGeometry.h"
+#include "../Types.h"
 
 class D3D12GraphicsDevice;
 
@@ -12,7 +13,7 @@ class D3D12ResourceManager
 public:
     explicit D3D12ResourceManager(D3D12GraphicsDevice* device);
     ~D3D12ResourceManager();
-    MeshGeometryPtr LoadMeshGeometry(OBJModelLoader::MeshDesc& meshData) const;
+    MeshGeometry LoadMeshGeometry(OBJModelLoader::MeshDesc& meshData);
     MaterialPtr CreatePhongMaterial(OBJModelLoader::PhongMaterialDesc& desc);
     TextureHandle GetTexture(const std::string& path);
 
@@ -26,6 +27,10 @@ private:
     GraphicsTexture* GetTexture(const TextureHandle handle);
     PipelineState* GetPipelineState(const PipelineStateHandle handle);
 
+    GraphicsBufferHandle CreateGraphicsBuffer(const std::string& name, size_t numElements, SIZE_T elementSize,
+        const void* initialData);
+    GraphicsBuffer* GetGraphicsBuffer(const GraphicsBufferHandle handle);
+
     //TODO: Create a pipeline cache for multiple bindings
     D3D12GraphicsDevice* mDevice;
 
@@ -34,5 +39,7 @@ private:
 
     std::vector<GraphicsTexture> mTextures;
     std::vector<PipelineState> mPipelinesStates;
+    std::vector<GraphicsBuffer> mGraphicsBuffers;
+
     std::unordered_map<std::string, MaterialPtr> mMaterials;
 };

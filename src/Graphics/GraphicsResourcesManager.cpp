@@ -7,7 +7,7 @@ GraphicsResourcesManager::GraphicsResourcesManager(D3D12ResourceManager* resourc
 {
 }
 
-MeshGeometryPtr GraphicsResourcesManager::LoadMeshGeometry(OBJModelLoader::MeshDesc& meshData) const
+MeshGeometry GraphicsResourcesManager::LoadMeshGeometry(OBJModelLoader::MeshDesc& meshData) const
 {
     return mResourceManager->LoadMeshGeometry(meshData);
 }
