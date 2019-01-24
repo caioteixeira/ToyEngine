@@ -93,25 +93,18 @@ void inline D3D12Renderer::RenderMesh(D3D12CommandContext* context, const Dynami
         context->SetGraphicsRootDescriptorTable(0, GPUDescriptor);
     }
 
-    auto& materialCB = context->ReserveUploadMemory(sizeof(MaterialConstants));
-    MaterialConstants materialConstants;
-    materialConstants.kd = material->diffuseColor.ToVector3();
-    materialConstants.ks = material->specularColor.ToVector3();
-    materialConstants.ka = material->ambientColor.ToVector3();
-    materialConstants.ns = material->shininess;
-
-    memcpy(materialCB.CPUAddress, &materialConstants, sizeof(MaterialConstants));
-
     const auto geometry = element.geometry;
     const auto indexBuffer = mResourceManager->GetGraphicsBuffer(geometry.IndexBuffer);
     const auto vertexBuffer = mResourceManager->GetGraphicsBuffer(geometry.VertexBuffer);
+    const auto materialBuffer = mResourceManager->GetGraphicsBuffer(material->constantBuffer);
+
     context->SetIndexBuffer(indexBuffer);
     context->SetVertexBuffer(vertexBuffer);
     context->SetPrimitiveTopology(EPT_TriangleList);
 
     context->SetGraphicsRootConstantBufferView(1, globalCB.GPUAddress);
     context->SetGraphicsRootConstantBufferView(2, objectCB.GPUAddress);
-    context->SetGraphicsRootConstantBufferView(3, materialCB.GPUAddress);
+    context->SetGraphicsRootConstantBufferView(3, materialBuffer->resource.buffer->GetGPUVirtualAddress());
 
     context->DrawIndexed(indexBuffer->numElements, 0);
 }

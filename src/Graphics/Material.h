@@ -17,15 +17,11 @@ struct Material
 {
     MaterialProperties properties = None;
 
-    Color ambientColor;
-    Color diffuseColor;
-    Color specularColor;
-    float shininess;
-
     TextureHandle diffuseTexture;
     TextureHandle specularTexture;
 
     PipelineStateHandle pipelineState;
+    GraphicsBufferHandle constantBuffer;
 
     void SetProperty(MaterialProperties property);
 };

@@ -7,6 +7,7 @@
 #include "../../EngineCore.h"
 #include "WICTextureLoader12.h"
 #include "D3D12CommandContextManager.h"
+#include "../ConstantBufferStructs.h"
 
 using namespace Engine;
 
@@ -51,10 +52,14 @@ TextureHandle D3D12ResourceManager::GetTexture(const std::string& path)
 MaterialPtr D3D12ResourceManager::CreatePhongMaterial(OBJModelLoader::PhongMaterialDesc& desc)
 {
     auto material = std::make_shared<Material>();
-    material->ambientColor = desc.ambient;
-    material->diffuseColor = desc.diffuse;
-    material->specularColor = desc.specular;
-    material->shininess = desc.shininess;
+
+    MaterialConstants materialConstants;
+    materialConstants.kd = desc.diffuse.ToVector3();
+    materialConstants.ks = desc.specular.ToVector3();
+    materialConstants.ka = desc.ambient.ToVector3();
+    materialConstants.ns = desc.shininess;
+
+    material->constantBuffer = CreateGraphicsBuffer("MaterialConstants", 1, sizeof MaterialConstants, &materialConstants);
 
     //TODO: Properly set illumination properties
     material->SetProperty(Diffuse);
