@@ -64,9 +64,12 @@ MaterialPtr D3D12ResourceManager::CreatePhongMaterial(OBJModelLoader::PhongMater
     //TODO: Properly set illumination properties
     material->SetProperty(Diffuse);
 
-    material->diffuseTexture = GetTexture(desc.diffuseTexName);
-    if (material->diffuseTexture != TextureHandle::NullHandle())
+    if (!desc.diffuseTexName.empty())
     {
+        const auto diffuseTexture = GetTexture(desc.diffuseTexName);
+        assert(diffuseTexture != TextureHandle::NullHandle());
+
+        material->textures.push_back(diffuseTexture);
         material->SetProperty(DiffuseTexture);
     }
 
@@ -86,7 +89,7 @@ PipelineStateHandle D3D12ResourceManager::GetPipelineState(MaterialProperties pr
     PipelineState state;
 
     CD3DX12_DESCRIPTOR_RANGE texTable;
-    texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+    texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0);
 
     // Create root signature
     CD3DX12_ROOT_PARAMETER slotRootParameter[4];

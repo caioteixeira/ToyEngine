@@ -8,7 +8,9 @@ struct MeshElement
 {
     Matrix worldTransform;
     MeshGeometry geometry;
-    MaterialPtr material;
+    GraphicsBufferHandle constantBuffer;
+    PipelineStateHandle pipelineState;
+    std::vector<TextureHandle> textures;
 };
 
 struct FramePacket

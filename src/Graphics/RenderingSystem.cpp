@@ -77,7 +77,10 @@ void RenderingSystem::Update(entityx::EntityManager& es, entityx::EventManager& 
         element.worldTransform = Matrix::CreateScale(meshScale) *
             Matrix::CreateFromQuaternion(quat) * Matrix::CreateTranslation(meshPosition);
         element.geometry = mesh->geometry;
-        element.material = mesh->material;
+        element.textures = mesh->material->textures;
+        element.pipelineState = mesh->material->pipelineState;
+        element.constantBuffer = mesh->material->constantBuffer;
+
         packet.meshes.push_back(element);
     }
 

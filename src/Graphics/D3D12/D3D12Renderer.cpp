@@ -77,26 +77,25 @@ void inline D3D12Renderer::RenderMesh(D3D12CommandContext* context, const Dynami
     auto& objectCB = context->ReserveUploadMemory(sizeof(PerObjectConstants));
     memcpy(objectCB.CPUAddress, &objectConstants, sizeof(PerObjectConstants));
 
-    auto& material = element.material;
-    const auto pipelineState = mResourceManager->GetPipelineState(material->pipelineState);
+    const auto pipelineState = mResourceManager->GetPipelineState(element.pipelineState);
     context->SetPipelineState(pipelineState);
     context->SetGraphicsRootSignature(pipelineState->rootSignature.Get());
     context->SetDynamicDescriptorHeap();
 
-    if (material->properties & DiffuseTexture)
+    for(int i = 0; i < element.textures.size(); i++)
     {
-        auto diffuseTexture = mResourceManager->GetTexture(material->diffuseTexture);
+        auto diffuseTexture = mResourceManager->GetTexture(element.textures[i]);
         auto& textureDescriptor = diffuseTexture->descriptor;
-        CD3DX12_CPU_DESCRIPTOR_HANDLE
+        const CD3DX12_CPU_DESCRIPTOR_HANDLE
             CPUDescriptor(textureDescriptor->GetCPUDescriptorHandleForHeapStart());
         const auto GPUDescriptor = context->CopyDescriptorToDynamicHeap(CPUDescriptor);
-        context->SetGraphicsRootDescriptorTable(0, GPUDescriptor);
+        context->SetGraphicsRootDescriptorTable(i, GPUDescriptor);
     }
 
     const auto geometry = element.geometry;
     const auto indexBuffer = mResourceManager->GetGraphicsBuffer(geometry.IndexBuffer);
     const auto vertexBuffer = mResourceManager->GetGraphicsBuffer(geometry.VertexBuffer);
-    const auto materialBuffer = mResourceManager->GetGraphicsBuffer(material->constantBuffer);
+    const auto materialBuffer = mResourceManager->GetGraphicsBuffer(element.constantBuffer);
 
     context->SetIndexBuffer(indexBuffer);
     context->SetVertexBuffer(vertexBuffer);

@@ -17,8 +17,7 @@ struct Material
 {
     MaterialProperties properties = None;
 
-    TextureHandle diffuseTexture;
-    TextureHandle specularTexture;
+    std::vector<TextureHandle> textures;
 
     PipelineStateHandle pipelineState;
     GraphicsBufferHandle constantBuffer;
