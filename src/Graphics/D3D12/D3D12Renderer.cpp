@@ -74,7 +74,7 @@ void inline D3D12Renderer::RenderMesh(D3D12CommandContext* context, const Dynami
     PerObjectConstants objectConstants;
     objectConstants.worldTransform = element.worldTransform;
 
-    auto& objectCB = context->ReserveUploadMemory(sizeof(PerObjectConstants));
+    auto objectCB = context->ReserveUploadMemory(sizeof(PerObjectConstants));
     memcpy(objectCB.CPUAddress, &objectConstants, sizeof(PerObjectConstants));
 
     const auto pipelineState = mResourceManager->GetPipelineState(element.pipelineState);

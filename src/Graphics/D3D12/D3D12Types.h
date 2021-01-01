@@ -57,9 +57,9 @@ enum ETextureFormat
 struct GraphicsResource
 {
     Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
-    size_t bufferSize;
+    size_t bufferSize = 0;
 
-    D3D12_RESOURCE_STATES state;
+    D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_COMMON;
 };
 
 struct GraphicsBuffer

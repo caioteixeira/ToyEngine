@@ -28,12 +28,12 @@ public:
     void CopyBuffer(GraphicsResource* dest, GraphicsResource* src);
     DynamicAllocation ReserveUploadMemory(size_t sizeInBytes);
 
-    void ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle, Color& clearColor);
-    void ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE& dsvHandle, float depth, UINT8 stencil);
+    void ClearRenderTargetView(const D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle, Color& clearColor);
+    void ClearDepthStencilView(const D3D12_CPU_DESCRIPTOR_HANDLE& dsvHandle, float depth, UINT8 stencil);
 
     CD3DX12_GPU_DESCRIPTOR_HANDLE CopyDescriptorToDynamicHeap(CD3DX12_CPU_DESCRIPTOR_HANDLE descriptor) const;
 
-    void SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE& rtv, D3D12_CPU_DESCRIPTOR_HANDLE& dsv) const;
+    void SetRenderTarget(const D3D12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_DESCRIPTOR_HANDLE& dsv) const;
 
     void SetGraphicsRootSignature(ID3D12RootSignature* rootSignature) const;
     void SetGraphicsRootDescriptorTable(int index, D3D12_GPU_DESCRIPTOR_HANDLE descriptorTable) const;

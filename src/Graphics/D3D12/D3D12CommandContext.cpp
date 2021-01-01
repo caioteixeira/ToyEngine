@@ -53,7 +53,7 @@ DynamicAllocation D3D12CommandContext::ReserveUploadMemory(size_t sizeInBytes)
     return mUploadHeap.Allocate(sizeInBytes, 256);
 }
 
-void D3D12CommandContext::ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle, Color& clearColor)
+void D3D12CommandContext::ClearRenderTargetView(const D3D12_CPU_DESCRIPTOR_HANDLE& rtvHandle, Color& clearColor)
 {
     float color[4];
     color[0] = clearColor.x;
@@ -64,7 +64,7 @@ void D3D12CommandContext::ClearRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE& rtv
     mCommandList->ClearRenderTargetView(rtvHandle, color, 0, nullptr);
 }
 
-void D3D12CommandContext::ClearDepthStencilView(D3D12_CPU_DESCRIPTOR_HANDLE& dsvHandle, float depth, UINT8 stencil)
+void D3D12CommandContext::ClearDepthStencilView(const D3D12_CPU_DESCRIPTOR_HANDLE& dsvHandle, float depth, UINT8 stencil)
 {
     mCommandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, depth, stencil, 0,
                                         nullptr);
@@ -78,7 +78,7 @@ CD3DX12_GPU_DESCRIPTOR_HANDLE D3D12CommandContext::CopyDescriptorToDynamicHeap(
     return alloc.GPUHandle;
 }
 
-void D3D12CommandContext::SetRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE& rtv, D3D12_CPU_DESCRIPTOR_HANDLE& dsv) const
+void D3D12CommandContext::SetRenderTarget(const D3D12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_DESCRIPTOR_HANDLE& dsv) const
 {
     mCommandList->OMSetRenderTargets(1, &rtv, true, &dsv);
 }

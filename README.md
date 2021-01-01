@@ -30,7 +30,7 @@ my main goal with this project is to have to a good testbed for my engine and gr
 
 ## How to build it
 
-* Use the provided CMakeLists file to build it with **Visual Studio 2017**
+* Use the provided CMakeLists file to build it with **Visual Studio 2019**
 
 ## Screenshot
 

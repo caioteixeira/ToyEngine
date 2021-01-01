@@ -4,7 +4,7 @@
 
 using namespace Engine;
 
-inline void ThrowIfFailed(HRESULT hr, char* str = nullptr)
+inline void ThrowIfFailed(HRESULT hr, const char* str = nullptr)
 {
     if (hr != S_OK)
     {
