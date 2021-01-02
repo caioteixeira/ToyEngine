@@ -16,8 +16,7 @@ void ConfigSystem::Init()
 {
     memset(mCVars.data(), 0, sizeof(CVar) * mCVars.size());
 
-    //TODO: Load config.json
-    std::ifstream configFile("config.json");
+    std::ifstream configFile("Assets/config.json");
     if (!configFile.is_open())
     {
         Logger::DebugLogError("Failed to open config.json!");

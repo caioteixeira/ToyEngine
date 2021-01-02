@@ -248,3 +248,5 @@ ModelManifest.xml
 # CMake
 CMakeCache.txt
 CMakeFiles/*
+
+!Assets/*

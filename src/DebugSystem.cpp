@@ -1,8 +1,8 @@
 #include "DebugSystem.h"
 #include "../External/imgui/imgui.h"
 #include "Transform.h"
-#include "Renderer/PointLight.h"
-#include "Renderer/Mesh.h"
+#include "Graphics/PointLight.h"
+#include "Graphics/Mesh.h"
 #include "NameComponent.h"
 
 void DebugSystem::Update(entityx::EntityManager& es, entityx::EventManager& events, entityx::TimeDelta dt)
@@ -16,7 +16,7 @@ void DebugSystem::Update(entityx::EntityManager& es, entityx::EventManager& even
     //Mesh transforms
     ImGui::Begin("Meshes");
     entityx::ComponentHandle<Transform> transform;
-    entityx::ComponentHandle<Mesh> mesh;
+    entityx::ComponentHandle<MeshRenderer> mesh;
     entityx::ComponentHandle<NameComponent> name;
     for (auto entity : es.entities_with_components(transform, mesh, name))
     {

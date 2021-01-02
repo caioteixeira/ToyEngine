@@ -8,7 +8,7 @@
 #include <wrl.h>
 #endif
 
-#include "Renderer/D3DCommon/D3DHelpers.h"
+#include "Graphics/D3DCommon/D3DHelpers.h"
 
 #include <d3d12.h>
 #include <dxgi1_4.h>

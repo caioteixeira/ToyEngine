@@ -63,7 +63,7 @@ add_library(
 target_include_directories(imgui PUBLIC External/imgui External/imgui/examples)
 
 #---- DX 12 -----
-find_package(D3D12 REQUIRED)
+#find_package(D3D12 REQUIRED)
 
 
 #---INCLUDES----
@@ -83,9 +83,22 @@ set(IMPORT_INCLUDES
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.cc")
 file(GLOB_RECURSE HEADERS "src/*.h" "src/*.inl")
 
+add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
+
 add_executable(ToyEngine ${SOURCES} ${HEADERS})
 
-set_target_properties(ToyEngine PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_custom_command(TARGET ToyEngine PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_SOURCE_DIR}/Assets/ $<TARGET_FILE_DIR:ToyEngine>/Assets/
+)
+
+add_custom_command(TARGET ToyEngine PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_SOURCE_DIR}/Shaders/ $<TARGET_FILE_DIR:ToyEngine>/Shaders/
+)
+
+#message("WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}")
+set_target_properties(ToyEngine PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 target_include_directories(ToyEngine PRIVATE ${IMPORT_INCLUDES})
-target_link_libraries(ToyEngine ${SDL_LIBS} ${D3D12_LIBRARIES} imgui)
+target_link_libraries(ToyEngine ${SDL_LIBS} dxgi.lib d3d12.lib d3dcompiler.lib imgui)

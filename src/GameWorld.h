@@ -1,7 +1,7 @@
 #pragma once
 #include "ECS/entityx.h"
-#include "Renderer/Renderer.h"
-#include "LevelLoader.h"
+#include "AssetManagement/LevelLoader.h"
+#include "Graphics/Renderer.h"
 
 namespace Engine::ECS
 {
@@ -11,12 +11,10 @@ namespace Engine::ECS
         GameWorld();
         ~GameWorld();
 
-        void Init(std::shared_ptr<Renderer> renderer);
-        void LoadMesh(entityx::Entity rootEntity, rapidjson::Value &);
+        void Init();
         void LoadScene(const std::string& path);
         void Update(double deltaTime);
     private:
-        std::shared_ptr<Renderer> mRenderer;
         LevelLoader mLevelLoader;
     };
 }
